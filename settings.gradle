@@ -1,0 +1,5 @@
+rootProject.name = 'zp-ms'
+include 'common'
+include 'user'
+include 'storage'
+

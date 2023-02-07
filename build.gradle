@@ -1,0 +1,17 @@
+allprojects{
+
+    group 'xyz.chener.zp'
+    version '1.0-SNAPSHOT'
+
+    repositories {
+        maven { name "Alibaba" ; url "https://maven.aliyun.com/repository/public" }
+        mavenCentral()
+    }
+}
+
+subprojects {
+    ext {
+        set('springCloudVersion', "2022.0.0")
+    }
+}
+

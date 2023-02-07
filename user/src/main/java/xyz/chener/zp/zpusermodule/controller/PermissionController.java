@@ -1,0 +1,120 @@
+package xyz.chener.zp.zpusermodule.controller;
+
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.entity.R;
+import xyz.chener.zp.zpusermodule.entity.Permission;
+import xyz.chener.zp.zpusermodule.entity.Role;
+import xyz.chener.zp.zpusermodule.entity.UserBase;
+import xyz.chener.zp.zpusermodule.entity.dto.UiRoutingDto;
+import xyz.chener.zp.zpusermodule.error.SqlRunException;
+import xyz.chener.zp.zpusermodule.service.RoleService;
+import xyz.chener.zp.zpusermodule.service.UserBaseService;
+import xyz.chener.zp.zpusermodule.service.impl.PermissionServiceImpl;
+import xyz.chener.zp.zpusermodule.service.impl.UiRoutingServiceImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@RestController
+@UnifiedReturn
+@Slf4j
+@RequestMapping("/api/web")
+@Validated
+public class PermissionController {
+
+    private final RoleService roleService;
+    private final PermissionServiceImpl permissionService;
+    private final UiRoutingServiceImpl uiRoutingService;
+
+    private final UserBaseService userBaseService;
+
+    public PermissionController(RoleService roleService, PermissionServiceImpl permissionService, UiRoutingServiceImpl uiRoutingService, UserBaseService userBaseService) {
+        this.roleService = roleService;
+        this.permissionService = permissionService;
+        this.uiRoutingService = uiRoutingService;
+        this.userBaseService = userBaseService;
+    }
+
+    @GetMapping("/getUserRole")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
+    public PageInfo<Role> getUserRole(@ModelAttribute Role role
+            , @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size)
+    {
+        try {
+            PageHelper.startPage(page,size);
+            return new PageInfo<>(roleService.lambdaQuery(role).list());
+        }catch (Exception exception)
+        {
+            log.error(exception.getMessage());
+            exception.printStackTrace();
+            throw new SqlRunException(R.ErrorMessage.SQL_RUN_ERROR.get());
+        }
+    }
+
+
+    @GetMapping("/getConcurrentUiRouting")
+    public List<UiRoutingDto> getConcurrentUiRouting()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.nonNull(authentication))
+            return uiRoutingService.getUserUiRouting(authentication.getName());
+        return new ArrayList<>();
+    }
+
+
+    @GetMapping("/getPermissionListConst")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
+    public List<Permission> getPermissionListConst()
+    {
+        return permissionService.lambdaQuery().orderBy(true,true,Permission::getPermissionEnName).list();
+
+    }
+
+
+    @GetMapping("/getRoleList")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
+    public PageInfo<Role> getRoleList(@ModelAttribute Role role
+            , @RequestParam(defaultValue = "1") Integer page
+            , @RequestParam(defaultValue = "10") Integer size)
+    {
+        PageHelper.startPage(page,size);
+        return new PageInfo<>(roleService.lambdaQuery(role).list());
+    }
+
+
+    @PostMapping("/saveRole")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    public Role saveRole(@RequestParam(required = false) Long id
+            , @Length(max = 20,min = 3,message = "角色名长度3-20") @RequestParam String roleName
+            , @RequestParam(required = false) List<String> roleList)
+    {
+        return roleService.saveOrUpdateRole(id,roleName,roleList);
+    }
+
+
+    @GetMapping("/getRoleUserCount")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    public Long saveRole(@RequestParam(required = true) Long id)
+    {
+        try {
+            return userBaseService.lambdaQuery().eq(UserBase::getRoleId,id).count();
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            return 0L;
+        }
+
+    }
+
+
+}
