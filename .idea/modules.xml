@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/zp-ms.common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common/zp-ms.common.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/zp-ms.user.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user/zp-ms.user.main.iml" />
-    </modules>
-  </component>
-</project>
