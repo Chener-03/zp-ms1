@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: zp-gateway
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        group: zp
+        server-addr: localhost:8848
+        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: 123456
+        file-extension: yml
+      discovery:
+        group: zp
+        server-addr: localhost:8848
+        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: 123456
+        ip: 127.0.0.1
+    openfeign:
+      lazy-attributes-resolution: true
+    gateway:
+      routes:
+        - id: user-module
+          uri: lb://zp-user-module
+          predicates:
+            - Path=/v1/user/**
+          filters:
+            - StripPrefix=2
+        - id: storagecalculation-module
+          uri: lb://zp-storagecalculation-module
+          predicates:
+            - Path=/v1/file/**
+          filters:
+            - StripPrefix=2
+
+
+    sentinel:
+      datasource:
+        ds1:
+          nacos:
+            server-addr: localhost:8848
+            username: nacos
+            password: 123456
+            namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+            data-id: gateway-sentinel-flow.json
+            group-id: zp
+            data-type: json
+            rule-type: flow
+        ds2:
+          nacos:
+            server-addr: localhost:8848
+            username: nacos
+            password: 123456
+            namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+            data-id: gateway-sentinel-degrade.json
+            group-id: zp
+            data-type: json
+            rule-type: degrade
+      enabled: false
+      eager: true
+      transport:
+        port: 9900
+        dashboard: 127.0.0.1:8080
+
+  config:
+    import:
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=zp
+
+feign:
+  sentinel:
+    enabled: true
+
+
+gateway:
+  ip:
+    enable: true
+    is-white: false
+    ip-list:
+      - 127.0.0.2

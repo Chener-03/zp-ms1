@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: zp-storagecalculation-module
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        group: zp
+        server-addr: localhost:8848
+        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: 123456
+        file-extension: yml
+        enabled: false
+      discovery:
+        group: zp
+        server-addr: localhost:8848
+        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: 123456
+        ip: 127.0.0.1
+    openfeign:
+      lazy-attributes-resolution: true
+
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    hikari:
+      max-lifetime: 60000
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://bj-cynosdbmysql-grp-a7tnayym.sql.tencentcdb.com:21449/zp?characterEncoding=utf8&useSSL=false&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
+    username: admin01
+    password: CZPczp666...
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+  data:
+    redis:
+      database: 3
+      host: 127.0.0.1
+      port: 6379
+      password: admin123654
+      connect-timeout: 10000
+
+
+
+
+
+
+
+server:
+  port: 6100
+
+feign:
+  sentinel:
+    enabled: true
+
+zp:
+  jwt:
+    salt: sdadaddadada
+    expires: 1000000000
+#  security:
+#    write-list:
+#      - /api/web/getFilePublic
+
+  storage:
+    location: ./filetemp/a/
+#    hardwareUid: qqaacc
