@@ -1,3 +1,3 @@
 xyz.chener.zp.common.autoconfig.CommonAutoConfig
 xyz.chener.zp.common.config.security.SecurityConfig
-xyz.chener.zp.common.config.mbp.MybatisPlusInterceptorConfig
+xyz.chener.zp.common.config.mbp.MybatisInterceptorsConfig
