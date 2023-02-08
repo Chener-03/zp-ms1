@@ -12,11 +12,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
 import xyz.chener.zp.common.entity.R;
+import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.entity.Permission;
 import xyz.chener.zp.zpusermodule.entity.Role;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.dto.UiRoutingDto;
 import xyz.chener.zp.zpusermodule.error.SqlRunException;
+import xyz.chener.zp.zpusermodule.error.role.DefaultRoleDeleteError;
+import xyz.chener.zp.zpusermodule.error.role.DefaultUserRoleDeleteError;
 import xyz.chener.zp.zpusermodule.service.RoleService;
 import xyz.chener.zp.zpusermodule.service.UserBaseService;
 import xyz.chener.zp.zpusermodule.service.impl.PermissionServiceImpl;
@@ -99,13 +102,14 @@ public class PermissionController {
             , @Length(max = 20,min = 3,message = "角色名长度3-20") @RequestParam String roleName
             , @RequestParam(required = false) List<String> roleList)
     {
+        AssertUrils.state(id > 1000, DefaultRoleDeleteError.class);
         return roleService.saveOrUpdateRole(id,roleName,roleList);
     }
 
 
     @GetMapping("/getRoleUserCount")
     @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
-    public Long saveRole(@RequestParam(required = true) Long id)
+    public Long getRoleUserCount(@RequestParam(required = true) Long id)
     {
         try {
             return userBaseService.lambdaQuery().eq(UserBase::getRoleId,id).count();
@@ -113,7 +117,25 @@ public class PermissionController {
             log.error(exception.getMessage());
             return 0L;
         }
+    }
 
+
+    @PostMapping("/deleteRole")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    public void deleteRole(@RequestParam(required = true) Long id)
+    {
+        AssertUrils.state(id > 1000, DefaultRoleDeleteError.class);
+        roleService.lambdaUpdate().eq(Role::getId,id).remove();
+    }
+
+
+    @PostMapping("/setUserRole")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    public void setUserRole(@RequestParam(required = true) Long id
+            , @RequestParam(required = false) Long roleId)
+    {
+        AssertUrils.state(id > 1000, DefaultUserRoleDeleteError.class);
+        userBaseService.lambdaUpdate().eq(UserBase::getId,id).set(UserBase::getRoleId,roleId).update();
     }
 
 

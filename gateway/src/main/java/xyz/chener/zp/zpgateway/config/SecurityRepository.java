@@ -91,7 +91,7 @@ public class SecurityRepository implements WebFilter {
                 if (checkUser(userBase)) {
                     CompletableFuture<PageInfo<Role>> res = CompletableFuture.supplyAsync(() -> userModuleService.getUserRoleById(userBase.getRoleId()));
                     PageInfo<Role> rolePageInfo = res.get();
-                    if (userBaseInfo.getList().size() == 0)
+                    if (rolePageInfo.getList().size() == 0)
                         throw new UserAuthNotFoundError();
                     Role role = rolePageInfo.getList().get(0);
                     ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange

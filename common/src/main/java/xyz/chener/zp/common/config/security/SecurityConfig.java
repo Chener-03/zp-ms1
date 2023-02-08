@@ -1,12 +1,18 @@
 package xyz.chener.zp.common.config.security;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,6 +29,7 @@ import java.util.ArrayList;
 @EnableMethodSecurity(prePostEnabled =true)
 @EnableConfigurationProperties(CommonConfig.class)
 @AutoConfigureAfter(CommonAutoConfig.class)
+@AutoConfigureBefore(value = {SecurityFilterAutoConfiguration.class, SecurityAutoConfiguration.class})
 public class SecurityConfig {
 
 
@@ -47,6 +54,7 @@ public class SecurityConfig {
 
     @Bean
     @RefreshScope
+    @Primary
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         ArrayList<String> urls = new ArrayList<>();
         urls.addAll(commonConfig.getSecurity().getWriteList());

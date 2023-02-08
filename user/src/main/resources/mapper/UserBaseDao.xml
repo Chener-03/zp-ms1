@@ -8,6 +8,9 @@
             <if test="userAllInfo.id != null">
                 and a.id = #{userAllInfo.id}
             </if>
+            <if test="roleNotNull != null and roleNotNull==true">
+                and a.role_id is not null
+            </if>
             <if test="userAllInfo.username != null and userAllInfo.username!=''">
                 and a.username like #{userAllInfo.username}
             </if>

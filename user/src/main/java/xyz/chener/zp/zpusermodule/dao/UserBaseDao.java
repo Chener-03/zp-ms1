@@ -17,7 +17,8 @@ import java.util.List;
 @Mapper
 public interface UserBaseDao extends BaseMapper<UserBase> {
 
-    List<UserAllInfoDto> getAllUserInfo(@Param("userAllInfo") UserAllInfoDto userAllInfo);
+    List<UserAllInfoDto> getAllUserInfo(@Param("userAllInfo") UserAllInfoDto userAllInfo
+            ,@Param("roleNotNull") Boolean roleNotNull);
 
 }
 

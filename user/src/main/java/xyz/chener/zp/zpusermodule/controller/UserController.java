@@ -17,6 +17,7 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.common.utils.CustomFieldQuery;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserExtend;
@@ -78,7 +79,8 @@ public class UserController {
     @PreAuthorize("hasAnyRole('microservice_call','user_user_list')")
     public PageInfo<UserAllInfoDto> getUserAllInfo(@ModelAttribute UserAllInfoDto userAllInfo
             , @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size
-            ,@RequestParam(defaultValue = "false") Boolean isLike)
+            ,@RequestParam(defaultValue = "false") Boolean isLike
+            ,@RequestParam(defaultValue = "false") Boolean roleNotNull,@ModelAttribute CustomFieldQuery c)
     {
         try {
             if (isLike)
@@ -93,7 +95,7 @@ public class UserController {
                 Optional.ofNullable(userAllInfo.getNameCn()).ifPresent(s -> userAllInfo.setNameCn("%" + s + "%"));
             }
 
-            return userBaseService.getUserAllInfo(userAllInfo,page,size);
+            return userBaseService.getUserAllInfo(userAllInfo,page,size,roleNotNull);
         }catch (Exception exception)
         {
             log.error(exception.getMessage());

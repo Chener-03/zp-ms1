@@ -26,11 +26,10 @@ import xyz.chener.zp.common.utils.Jwt;
 
 @Configuration
 @EnableConfigurationProperties(CommonConfig.class)
-
 @Import({FeignClientConfig.class
         , UnifiedErrorReturn.class
         , WriteListAutoConfig.class, WriteListRegister.class
-        ,SecurityConfig.class,UnifiedReturnConfig.class})
+        ,UnifiedReturnConfig.class})
 public class CommonAutoConfig {
 
     private final CommonConfig commonConfig;
@@ -67,10 +66,5 @@ public class CommonAutoConfig {
         return new EntryPointProcess();
     }
 
-//
-//    @Bean
-//    public UnifiedReturnConfig unifiedReturnConfig(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
-//        return new UnifiedReturnConfig(requestMappingHandlerAdapter);
-//    }
 
 }

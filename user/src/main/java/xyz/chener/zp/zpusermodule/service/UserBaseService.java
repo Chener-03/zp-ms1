@@ -24,7 +24,7 @@ public interface UserBaseService extends IService<UserBase> {
 
     OwnInformation getUserInformation(String username);
 
-    PageInfo<UserAllInfoDto> getUserAllInfo(UserAllInfoDto userAllInfo , Integer page, Integer size);
+    PageInfo<UserAllInfoDto> getUserAllInfo(UserAllInfoDto userAllInfo , Integer page, Integer size,Boolean roleNotNull);
 
     UserBase addOrUpdateUser(UserBase userBase);
 

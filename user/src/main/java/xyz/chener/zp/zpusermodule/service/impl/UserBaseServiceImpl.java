@@ -191,9 +191,10 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
     }
 
     @Override
-    public PageInfo<UserAllInfoDto> getUserAllInfo(UserAllInfoDto userAllInfo, Integer page, Integer size) {
+    public PageInfo<UserAllInfoDto> getUserAllInfo(UserAllInfoDto userAllInfo
+            , Integer page, Integer size,Boolean roleNotNull) {
         PageHelper.startPage(page,size);
-        List<UserAllInfoDto> info = getBaseMapper().getAllUserInfo(userAllInfo);
+        List<UserAllInfoDto> info = getBaseMapper().getAllUserInfo(userAllInfo,roleNotNull);
         info.stream().parallel().forEach(e-> e.addRoleName(roleService));
         return new PageInfo<>(info);
     }
