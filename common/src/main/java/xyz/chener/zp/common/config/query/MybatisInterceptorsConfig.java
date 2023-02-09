@@ -1,6 +1,5 @@
-package xyz.chener.zp.common.config.mbp;
+package xyz.chener.zp.common.config.query;
 
-import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @Configuration
 @ConditionalOnBean(SqlSessionFactory.class)
-@AutoConfigureBefore(PageHelperAutoConfiguration.class)
+@AutoConfigureAfter(PageHelperAutoConfiguration.class)
 public class MybatisInterceptorsConfig implements InitializingBean {
 
     private final List<SqlSessionFactory> sqlSessionFactoryList;

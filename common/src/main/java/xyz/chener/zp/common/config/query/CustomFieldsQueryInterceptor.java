@@ -1,19 +1,25 @@
-package xyz.chener.zp.common.config.mbp;
+package xyz.chener.zp.common.config.query;
 
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import xyz.chener.zp.common.utils.CustomFieldQuery;
 
-import java.sql.SQLException;
+import java.io.StringReader;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,7 +50,8 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         } else {
             boundSql = (BoundSql) args[5];
         }
-        List<String> query = CustomFieldQuery.getQuery();
+        List<CustomFieldQuery.TableField> query = CustomFieldQuery.getQuery();
+        processBoundSql(boundSql,query);
         if (query.size() == 0)
         {
             return invocation.proceed();
@@ -61,23 +68,47 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         }
     }
 
-    private String processBoundSql(BoundSql boundSql,List<String> query)
+    private String processBoundSql(BoundSql boundSql,List<CustomFieldQuery.TableField> query) throws Exception
     {
         PluginUtils.MPBoundSql mpBoundSql = PluginUtils.mpBoundSql(boundSql);
         String oldSql = mpBoundSql.sql();
-        String newSql = null;
-        if (isCountSql(oldSql)) {
-            CustomFieldQuery.StartQuery(query);
-            return oldSql;
-        }
 
+        Select select = (Select) CCJSqlParserUtil.parse(oldSql);
+        PlainSelect selectBody = (PlainSelect) select.getSelectBody();
+        ArrayList<Table> allTable = new ArrayList<>();
+        ArrayList<SelectExpressionItem> allSelect = new ArrayList<>();
+        selectBody.getFromItem().accept(new FromItemVisitorAdapter() {
+            @Override
+            public void visit(Table table) {
+                allTable.add(table);
+            }
+        });
+        if (selectBody.getJoins()!=null)
+        {
+            selectBody.getJoins().forEach(it->{
+                it.getRightItem().accept(new FromItemVisitorAdapter() {
+                    @Override
+                    public void visit(Table table) {
+                        allTable.add(table);
+                    }
+                });
+            });
+        }
+        selectBody.getSelectItems().forEach(it->{
+            it.accept(new SelectItemVisitorAdapter(){
+                @Override
+                public void visit(SelectExpressionItem selectExpressionItem) {
+                    allSelect.add(selectExpressionItem);
+                }
+            });
+        });
 
         return oldSql;
     }
 
     private String replaceSqlSelect(List<String> list)
     {
-
+return "";
     }
 
     private boolean isCountSql(String sql)
@@ -105,6 +136,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         while (matcher.find()) {
             fields.add(matcher.group(1));
         }
+        return null;
     }
 
     private void resetBoundSql(String sql,BoundSql boundSql)
@@ -114,6 +146,10 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+        if (target instanceof Executor) {
+            return Plugin.wrap(target, this);
+        } else {
+            return target;
+        }
     }
 }

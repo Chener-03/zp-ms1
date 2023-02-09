@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule.controller;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
-import xyz.chener.zp.common.utils.CustomFieldQuery;
+import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserExtend;

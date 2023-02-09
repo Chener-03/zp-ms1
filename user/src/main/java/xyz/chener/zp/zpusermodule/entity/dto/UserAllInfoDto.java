@@ -3,9 +3,9 @@ package xyz.chener.zp.zpusermodule.entity.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import xyz.chener.zp.common.config.query.QueryTableName;
 import xyz.chener.zp.common.error.HttpErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
-import xyz.chener.zp.common.utils.CustomFieldQuery;
 import xyz.chener.zp.zpusermodule.entity.Role;
 import xyz.chener.zp.zpusermodule.service.RoleService;
 
@@ -13,53 +13,71 @@ import java.util.Date;
 
 public class UserAllInfoDto  {
 
+    @QueryTableName("user_base")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
+    @QueryTableName("user_base")
     private String username;
 
 
+    @QueryTableName("user_base")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date expireTime;
 
+    @QueryTableName("user_base")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date expireTimeEnd;
 
+    @QueryTableName("user_base")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    @QueryTableName("user_base")
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTimeEnd;
 
     //0 is false
+    @QueryTableName("user_base")
     private Integer disable;
 
+    @QueryTableName("user_base")
     private String lastLoginIp;
 
+    @QueryTableName("user_base")
     private String lastLoginOs;
 
+    @QueryTableName("user_base")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastLoginTime;
 
+    @QueryTableName("user_base")
     private Long roleId;
 
 
-
+    @QueryTableName("user_extend")
     private String email;
 
+    @QueryTableName("user_extend")
     private String phone;
     //上级userid
+    @QueryTableName("user_extend")
     private Long superUserId;
     //职务
+    @QueryTableName("user_extend")
     private String post;
     //签名
+    @QueryTableName("user_extend")
     private String autograph;
     //简介
+    @QueryTableName("user_extend")
     private String introduce;
 
+    @QueryTableName("user_extend")
     private String avatarId;
 
+    @QueryTableName("user_extend")
     private String nameCn;
 
     private String roleName;
