@@ -3,6 +3,7 @@ package xyz.chener.zp.zpusermodule.entity.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.common.config.query.QueryTableName;
 import xyz.chener.zp.common.error.HttpErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
@@ -11,7 +12,7 @@ import xyz.chener.zp.zpusermodule.service.RoleService;
 
 import java.util.Date;
 
-public class UserAllInfoDto  {
+public class UserAllInfoDto extends CustomFieldQuery{
 
     @QueryTableName("user_base")
     @JsonSerialize(using = ToStringSerializer.class)

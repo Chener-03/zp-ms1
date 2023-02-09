@@ -36,7 +36,6 @@ spring:
 
 
 
-
 server:
   port: 6050
 

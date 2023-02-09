@@ -40,7 +40,7 @@ public class CustomFieldQuery {
     }
 
     public static CustomFieldQueryCloseable StartQuery(CustomFieldQuery query,Class<?> entityClass){
-        List<String> cols = query.getFields();
+        List<String> cols = query.getQueryFields();
         AssertUrils.state(!entityClass.equals(CustomFieldQuery.class),new CostomFieldQueryError("StartQuery entity class cannot be its own"));
         if (entityClass.getSuperclass().equals(Model.class)) {
             List<TableField> mbpModelEntityFields = getMbpModelEntityFields(entityClass);
@@ -57,18 +57,20 @@ public class CustomFieldQuery {
     }
 
     public static <T> LambdaQueryChainWrapper<T> StartQuery(CustomFieldQuery query
-            ,LambdaQueryChainWrapper<T> mbpLambdaQuery,Class<T> entityClass){
-        mbpLambdaQuery.select(new Predicate<TableFieldInfo>() {
-            @Override
-            public boolean test(TableFieldInfo tableFieldInfo) {
-
-                return false;
-            }
-        })
-
-
+            ,LambdaQueryChainWrapper<T> mbpLambdaQuery){
+        mbpLambdaQuery.select(tableFieldInfo -> query.getQueryFields().contains(tableFieldInfo.getEl()));
         return mbpLambdaQuery;
     }
+
+
+    public CustomFieldQueryCloseable StartQuery(Class<?> entityClass) {
+        return CustomFieldQuery.StartQuery(this,entityClass);
+    }
+
+    public CustomFieldQueryCloseable StartQuery() {
+        return CustomFieldQuery.StartQuery(this,this.getClass());
+    }
+
 
     private static List<TableField> getEntityFields(Class<?> entityClass){
         List<TableField> cache = normalModelEntityFieldsCache.get(entityClass);
@@ -153,6 +155,8 @@ public class CustomFieldQuery {
     }
 
 
+
+
     public static List<TableField> getQuery()
     {
         List<TableField> list = localVar.get();
@@ -164,18 +168,14 @@ public class CustomFieldQuery {
     }
 
 
-    public CustomFieldQueryCloseable StartQuery() {
-        return CustomFieldQuery.StartQuery(this,this.getClass());
-    }
-
 
     private List<String> queryFields = new ArrayList<>();
 
-    public List<String> getFields() {
+    public List<String> getQueryFields() {
         return queryFields;
     }
 
-    public void setFields(List<String> fields) {
-        this.queryFields = fields;
+    public void setQueryFields(List<String> queryFields) {
+        this.queryFields = queryFields;
     }
 }

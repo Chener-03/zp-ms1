@@ -2,8 +2,10 @@ package xyz.chener.zp.common.config.query;
 
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -22,6 +24,7 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,14 +47,20 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         Object[] args = invocation.getArgs();
         MappedStatement ms = (MappedStatement) args[0];
         Object parameter = args[1];
+        RowBounds rowBounds = (RowBounds) args[2];
+        ResultHandler resultHandler = (ResultHandler) args[3];
+        Executor executor = (Executor) invocation.getTarget();
+        CacheKey cacheKey;
         BoundSql boundSql;
         if (args.length == 4) {
             boundSql = ms.getBoundSql(parameter);
+            cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
         } else {
+            cacheKey = (CacheKey) args[4];
             boundSql = (BoundSql) args[5];
         }
         List<CustomFieldQuery.TableField> query = CustomFieldQuery.getQuery();
-        processBoundSql(boundSql,query);
+
         if (query.size() == 0)
         {
             return invocation.proceed();
@@ -59,7 +68,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         String oldSql = null;
         try {
             oldSql = processBoundSql(boundSql,query);
-            return invocation.proceed();
+            return executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
         }catch (Throwable e){
             log.warn("Parameter restriction error, the original sql query content will be returned!");
             if (oldSql != null)
@@ -76,7 +85,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         Select select = (Select) CCJSqlParserUtil.parse(oldSql);
         PlainSelect selectBody = (PlainSelect) select.getSelectBody();
         ArrayList<Table> allTable = new ArrayList<>();
-        ArrayList<SelectExpressionItem> allSelect = new ArrayList<>();
+        //ArrayList<SelectExpressionItem> allSelect = new ArrayList<>();
         selectBody.getFromItem().accept(new FromItemVisitorAdapter() {
             @Override
             public void visit(Table table) {
@@ -94,56 +103,65 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
                 });
             });
         }
-        selectBody.getSelectItems().forEach(it->{
+        /*        selectBody.getSelectItems().forEach(it->{
             it.accept(new SelectItemVisitorAdapter(){
                 @Override
                 public void visit(SelectExpressionItem selectExpressionItem) {
                     allSelect.add(selectExpressionItem);
                 }
             });
-        });
+        });*/
 
+        List<CustomFieldQuery.TableField> allowedFields = query.stream()
+                .filter(e -> containsTable(allTable, e.tableName)).toList();
+        List<SelectItem> selectItems = buildSelectItem(allowedFields, allTable);
+        if (selectItems.size() > 0)
+        {
+            selectBody.setSelectItems(selectItems);
+            resetBoundSql(selectBody.toString(),boundSql);
+        }
         return oldSql;
     }
 
-    private String replaceSqlSelect(List<String> list)
+    private boolean containsTable(List<Table> tables,String tableName)
     {
-return "";
+        return tables.stream().anyMatch(it->it.getName().equals(tableName));
     }
 
-    private boolean isCountSql(String sql)
+    private Table findTable(List<Table> tables,String tableName)
     {
-        return sql.matches("(?i)^\\s*select\\s+count\\s*\\(.*\\)\\s+.*");
+        return tables.stream().filter(it->it.getName().equals(tableName)).findFirst().orElse(null);
     }
 
-    private List<String> getSqlSelectFields(String sql)
+    private List<SelectItem> buildSelectItem(List<CustomFieldQuery.TableField> fields
+            ,List<Table> allTable)
     {
-        int select = sql.toLowerCase().indexOf("select");
-        if (select == -1)
-        {
-            log.warn("The sql statement maybe not a select statement!");
-            throw new RuntimeException();
+        List<SelectItem> item = new ArrayList<>();
+        fields.forEach(it->{
+            Table table = findTable(allTable, it.tableName);
+            if (table != null)
+            {
+                SelectExpressionItem si = new SelectExpressionItem();
+                si.setExpression(buildColumn(table, it.fieldName));
+                item.add(si);
+            }
+        });
+        return item;
+    }
+
+    private Column buildColumn(Table table,String fieldName)
+    {
+        if (table.getAlias() == null) {
+            return new Column(fieldName);
+        }else {
+            return new Column(new Table(table.getAlias().getName()),fieldName);
         }
-        int from = sql.toLowerCase().indexOf("from");
-        if (from == -1)
-        {
-            log.warn("The Sql may not contain from!");
-            throw new RuntimeException();
-        }
-        List<String> fields = new ArrayList<>();
-        Pattern pattern = Pattern.compile("SELECT\\s+([^,]+),");
-        Matcher matcher = pattern.matcher(sql);
-        while (matcher.find()) {
-            fields.add(matcher.group(1));
-        }
-        return null;
     }
 
     private void resetBoundSql(String sql,BoundSql boundSql)
     {
         PluginUtils.mpBoundSql(boundSql).sql(sql);
     }
-
     @Override
     public Object plugin(Object target) {
         if (target instanceof Executor) {

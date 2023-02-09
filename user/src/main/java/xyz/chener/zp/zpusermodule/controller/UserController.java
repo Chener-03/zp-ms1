@@ -32,6 +32,7 @@ import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class UserController {
     public PageInfo<UserAllInfoDto> getUserAllInfo(@ModelAttribute UserAllInfoDto userAllInfo
             , @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size
             ,@RequestParam(defaultValue = "false") Boolean isLike
-            ,@RequestParam(defaultValue = "false") Boolean roleNotNull,@ModelAttribute CustomFieldQuery c)
+            ,@RequestParam(defaultValue = "false") Boolean roleNotNull )
     {
         try {
             if (isLike)
@@ -95,7 +96,6 @@ public class UserController {
                 Optional.ofNullable(userAllInfo.getEmail()).ifPresent(s -> userAllInfo.setEmail("%" + s + "%"));
                 Optional.ofNullable(userAllInfo.getNameCn()).ifPresent(s -> userAllInfo.setNameCn("%" + s + "%"));
             }
-
             return userBaseService.getUserAllInfo(userAllInfo,page,size,roleNotNull);
         }catch (Exception exception)
         {
