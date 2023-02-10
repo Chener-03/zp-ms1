@@ -47,6 +47,6 @@ zp:
   jwt:
     salt: sdadaddadada
     expires: 1000000000
-#  security:
-#    write-list:
-#      - /api/web/userDoLogin
+  security:
+    write-list:
+      - /ws/web/connect

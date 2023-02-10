@@ -16,6 +16,7 @@ configurations {
 dependencies {
     implementation project(':common')
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework:spring-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'

@@ -1,6 +1,5 @@
 package xyz.chener.zp.zpusermodule.controller;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -18,16 +17,17 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
-import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserExtend;
+import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 import xyz.chener.zp.zpusermodule.error.SqlRunException;
 import xyz.chener.zp.zpusermodule.error.user.DisableUserIsConcurrent;
 import xyz.chener.zp.zpusermodule.error.user.UserIsExitsException;
+import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
@@ -53,11 +53,13 @@ public class UserController {
     private final UserBaseServiceImpl userBaseService;
     private final UserExtendServiceImpl userExtendService;
     private final DictionariesServiceImpl dictionariesService;
+    private final UserLoginEventRecordService loginEventRecordService;
 
-    public UserController(UserBaseServiceImpl userBaseService, UserExtendServiceImpl userExtendService, DictionariesServiceImpl dictionariesService) {
+    public UserController(UserBaseServiceImpl userBaseService, UserExtendServiceImpl userExtendService, DictionariesServiceImpl dictionariesService, UserLoginEventRecordService loginEventRecordService) {
         this.userBaseService = userBaseService;
         this.userExtendService = userExtendService;
         this.dictionariesService = dictionariesService;
+        this.loginEventRecordService = loginEventRecordService;
     }
 
     @GetMapping("/getUserBaseInfo")
@@ -218,5 +220,26 @@ public class UserController {
             throw new SqlRunException(R.ErrorMessage.SQL_RUN_ERROR.get());
         }
     }
+
+
+    @GetMapping("/userIsFirstLogin")
+    @PreAuthorize("hasAnyRole('microservice_call','get_own_information')")
+    public Boolean userIsFirstLogin()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.nonNull(authentication) && StringUtils.hasText(authentication.getName()))
+        {
+            UserBase user = userBaseService.lambdaQuery().select(UserBase::getId)
+                    .eq(UserBase::getUsername, authentication.getName()).one();
+            if (user!=null)
+            {
+                List<UserLoginEventRecord> l = loginEventRecordService.lambdaQuery().select(UserLoginEventRecord::getId)
+                        .eq(UserLoginEventRecord::getUserId, user.getId()).last("limit 2").list();
+                return l.size() < 2;
+            }
+        }
+        return false;
+    }
+
 
 }

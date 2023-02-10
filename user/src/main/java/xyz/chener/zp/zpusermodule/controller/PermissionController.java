@@ -1,6 +1,8 @@
 package xyz.chener.zp.zpusermodule.controller;
 
 
+import com.alibaba.nacos.shaded.com.google.common.base.Function;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.entity.Permission;
@@ -28,6 +31,7 @@ import xyz.chener.zp.zpusermodule.service.impl.UiRoutingServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @RestController
 @UnifiedReturn
@@ -88,10 +92,12 @@ public class PermissionController {
     @GetMapping("/getRoleList")
     @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
     public PageInfo<Role> getRoleList(@ModelAttribute Role role
+            , @ModelAttribute CustomFieldQuery query
             , @RequestParam(defaultValue = "1") Integer page
             , @RequestParam(defaultValue = "10") Integer size)
     {
         PageHelper.startPage(page,size);
+        CustomFieldQuery.StartQuery(query,Role.class);
         return new PageInfo<>(roleService.lambdaQuery(role).list());
     }
 

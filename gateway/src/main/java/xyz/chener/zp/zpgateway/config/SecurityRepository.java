@@ -36,8 +36,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 /**
  * @Author: chenzp
@@ -81,7 +80,38 @@ public class SecurityRepository implements WebFilter {
 
         if (Objects.nonNull(userDetails))
         {
-            try {
+            return Mono.fromFuture(CompletableFuture.supplyAsync(() -> userModuleService.getUserBaseInfoByName(userDetails.getUsername())))
+                    .flatMap(userBaseInfo -> {
+                        if (userBaseInfo.getList().size() == 0)
+                            return getResponseMono(exchange,new UserNotFoundError());
+                        UserBase userBase = userBaseInfo.getList().get(0);
+                        try {
+                            AssertUrils.state(Objects.equals(userDetails.getDs(),userBase.getDs()), TokenOverdueException.class);
+                            if (checkUser(userBase)) {
+                                return Mono.fromFuture(CompletableFuture.supplyAsync(() -> userModuleService.getUserRoleById(userBase.getRoleId())))
+                                        .flatMap(rolePageInfo -> {
+                                            if (rolePageInfo.getList().size() == 0)
+                                                return getResponseMono(exchange,new UserAuthNotFoundError());
+                                            Role role = rolePageInfo.getList().get(0);
+                                            ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange
+                                                    , CommonVar.REQUEST_USER, userBase.getUsername()
+                                                    ,CommonVar.REQUEST_USER_AUTH, role.getPermissionEnNameList());
+                                            Context ctx = ReactiveSecurityContextHolder.withAuthentication(
+                                                    new UsernamePasswordAuthenticationToken(
+                                                            userBase.getUsername(), null,
+                                                            AuthorityUtils.commaSeparatedStringToAuthorityList(role.getPermissionEnNameList()))
+                                            );
+                                            return chain.filter(newExchange).contextWrite(ctx);
+                                        });
+                            }
+                        }catch (Exception ex){
+                            log.error(ex.getMessage());
+                            if (ex instanceof HttpErrorException e)
+                                return getResponseMono(exchange,e);
+                        }
+                        return chain.filter(exchange);
+                    });
+            /*            try {
                 CompletableFuture<PageInfo<UserBase>> result = CompletableFuture.supplyAsync(() -> userModuleService.getUserBaseInfoByName(userDetails.getUsername()));
                 PageInfo<UserBase> userBaseInfo = result.get();
                 if (userBaseInfo.getList().size() == 0)
@@ -109,7 +139,7 @@ public class SecurityRepository implements WebFilter {
                 log.error(exception.getMessage());
                 if (exception instanceof HttpErrorException ex)
                     return getResponseMono(exchange,ex);
-            }
+            }*/
         }
 
         return chain.filter(exchange);

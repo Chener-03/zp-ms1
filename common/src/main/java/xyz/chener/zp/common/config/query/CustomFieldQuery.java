@@ -58,6 +58,8 @@ public class CustomFieldQuery {
 
     public static <T> LambdaQueryChainWrapper<T> StartQuery(CustomFieldQuery query
             ,LambdaQueryChainWrapper<T> mbpLambdaQuery){
+        if (query.getQueryFields().size() == 0)
+            return mbpLambdaQuery;
         mbpLambdaQuery.select(tableFieldInfo -> query.getQueryFields().contains(tableFieldInfo.getEl()));
         return mbpLambdaQuery;
     }
