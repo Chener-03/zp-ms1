@@ -25,6 +25,8 @@ public class GZipUtils {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         GZIPOutputStream gzip = new GZIPOutputStream(os);
         gzip.write(json.getBytes(StandardCharsets.UTF_8));
+        gzip.flush();
+        gzip.close();
         return os.toByteArray();
     }
 

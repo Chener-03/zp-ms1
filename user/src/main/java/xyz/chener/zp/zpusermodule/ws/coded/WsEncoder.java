@@ -1,12 +1,12 @@
-package xyz.chener.zp.zpusermodule.ws;
+package xyz.chener.zp.zpusermodule.ws.coded;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.websocket.EncodeException;
 import jakarta.websocket.Encoder;
 import lombok.extern.slf4j.Slf4j;
 import xyz.chener.zp.common.utils.GZipUtils;
+import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
 
 import java.nio.ByteBuffer;
 

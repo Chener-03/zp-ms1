@@ -1,4 +1,4 @@
-package xyz.chener.zp.zpusermodule.ws;
+package xyz.chener.zp.zpusermodule.ws.entity;
 
 /**
  * @Author: chenzp
@@ -8,6 +8,11 @@ package xyz.chener.zp.zpusermodule.ws;
 public class WsMessageConstVar {
 
     public static final int UNKNOWN_CODE = 0;
+
+    public static final int HEART_BEAT_CODE = 1;
+
+    public static final int MESSAGE_NOTIFY = 2;
+
 
 
 }

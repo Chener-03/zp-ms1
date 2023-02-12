@@ -21,10 +21,11 @@ spring:
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
+
+
   config:
     import:
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=zp
-
   mvc:
     throw-exception-if-no-handler-found: true
   web:
@@ -33,7 +34,12 @@ spring:
   datasource:
     hikari:
       max-lifetime: 60000
-
+  rabbitmq:
+    host: chener.xyz
+    port: 5672
+    username: admin
+    password: Czp123456789
+    virtual-host: /zpusermodule
 
 
 server:

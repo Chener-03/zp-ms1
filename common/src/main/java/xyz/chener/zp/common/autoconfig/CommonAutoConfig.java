@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import xyz.chener.zp.common.config.*;
+import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
@@ -66,5 +67,10 @@ public class CommonAutoConfig {
         return new EntryPointProcess();
     }
 
+
+    @Bean
+    public ApplicationContextHolder applicationContextHolder() {
+        return new ApplicationContextHolder();
+    }
 
 }

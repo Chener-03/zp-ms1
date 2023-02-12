@@ -4,6 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -31,6 +34,12 @@ import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
+import xyz.chener.zp.zpusermodule.ws.WsMessageProcesser;
+import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
+import xyz.chener.zp.zpusermodule.ws.entity.WsMessageConstVar;
+import xyz.chener.zp.zpusermodule.ws.mq.RemoteMessageConfig;
+import xyz.chener.zp.zpusermodule.ws.mq.RemoteMessagePublisher;
+import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
 
 import java.util.List;
 import java.util.Objects;
@@ -241,5 +250,28 @@ public class UserController {
         return false;
     }
 
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+
+    @Autowired
+    RemoteMessagePublisher remoteMessagePublisher;
+
+    @WriteList
+    @RequestMapping("/testsend")
+    public void test(String user)
+    {
+        NotifyMessage msg = new NotifyMessage();
+        if (user!=null)
+        {
+            msg.setType(NotifyMessage.TYPE.ONE_USER);
+            msg.setUser(user);
+        }else {
+            msg.setType(NotifyMessage.TYPE.ALL_USER);
+        }
+        msg.setContent("测试消息");
+        remoteMessagePublisher.publishWsUserMessage(msg);
+    }
 
 }
