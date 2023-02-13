@@ -71,16 +71,20 @@ public class WsConnector {
         }catch (Exception ex){}
     }
 
-    public static boolean send(WsMessage wsMessage,String sessionId){
+    public static boolean sendObject(Object obj,String sessionId){
         Session session = cache.get(sessionId);
         if (session != null)
         {
             try {
-                session.getAsyncRemote().sendObject(wsMessage);
+                session.getAsyncRemote().sendObject(obj);
                 return true;
             }catch (Exception ex){ }
         }
         return false;
+    }
+
+    public static boolean sendObject(Object obj,Session session){
+        return sendObject(obj,session.getId());
     }
 
 }

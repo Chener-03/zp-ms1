@@ -27,6 +27,8 @@ public class WsConnect implements Comparable<WsConnect> {
     public boolean equals(Object obj) {
         if (obj instanceof WsConnect conn)
             return this.toString().equals(conn.toString());
+        if (obj instanceof String str)
+            return this.toString().equals(str);
         return super.equals(obj);
     }
 

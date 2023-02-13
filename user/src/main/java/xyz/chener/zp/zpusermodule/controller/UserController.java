@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DuplicateKeyException;
@@ -34,11 +33,7 @@ import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
-import xyz.chener.zp.zpusermodule.ws.WsMessageProcesser;
-import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
-import xyz.chener.zp.zpusermodule.ws.entity.WsMessageConstVar;
-import xyz.chener.zp.zpusermodule.ws.mq.RemoteMessageConfig;
-import xyz.chener.zp.zpusermodule.ws.mq.RemoteMessagePublisher;
+import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
 
 import java.util.List;
@@ -251,12 +246,9 @@ public class UserController {
     }
 
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
-
 
     @Autowired
-    RemoteMessagePublisher remoteMessagePublisher;
+    WsMessagePublisher wsMessagePublisher;
 
     @WriteList
     @RequestMapping("/testsend")
@@ -271,7 +263,7 @@ public class UserController {
             msg.setType(NotifyMessage.TYPE.ALL_USER);
         }
         msg.setContent("测试消息");
-        remoteMessagePublisher.publishWsUserMessage(msg);
+        wsMessagePublisher.publishWsUserMessage(msg);
     }
 
 }

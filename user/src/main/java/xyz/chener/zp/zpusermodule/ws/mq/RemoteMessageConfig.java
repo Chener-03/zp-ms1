@@ -18,12 +18,6 @@ public class RemoteMessageConfig {
     public static final String SMS_USER_MESSAGE = "smsUserMessage.#";
 
 
-    private final RabbitTemplate rabbitTemplate;
-
-    public RemoteMessageConfig(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
-
     @Bean
     @Lazy(false)
     public Exchange wsMessageExchange(){
@@ -31,8 +25,6 @@ public class RemoteMessageConfig {
                 .autoDelete()
                 .durable(false).build();
     }
-
-
 
     @Bean
     @Lazy(false)
@@ -44,7 +36,7 @@ public class RemoteMessageConfig {
 
     @Bean
     @Lazy(false)
-    public Binding notifyMsgQueueBinding() {
+    public Binding wsMessageQueueBinding() {
         return BindingBuilder
                 .bind(wsMessageQueue()).to(wsMessageExchange())
                 .with(WS_USER_MESSAGE).noargs();

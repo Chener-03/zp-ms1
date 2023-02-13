@@ -39,7 +39,7 @@ public class RemoteWsUserMessageListenerRegistry implements ApplicationListener<
             Channel cn = rabbitTemplate.getConnectionFactory()
                     .createConnection()
                     .createChannel(false);
-            cn.basicConsume(RemoteMessageConfig.WS_MESSAGE_QUEUE,true,new MqQueueConsumerDispatch(cn,listeners));
+            cn.basicConsume(RemoteMessageConfig.WS_MESSAGE_QUEUE,true,new MqWsMessageListenerDispatch(cn,listeners));
         }catch (Exception exception){
             throw new RuntimeException(exception);
         }
@@ -51,9 +51,9 @@ public class RemoteWsUserMessageListenerRegistry implements ApplicationListener<
     }
 
     @Slf4j
-    public static class MqQueueConsumerDispatch extends DefaultConsumer{
+    public static class MqWsMessageListenerDispatch extends DefaultConsumer{
         private final List<MqListener> listeners;
-        public MqQueueConsumerDispatch(Channel channel,List<MqListener> listeners) {
+        public MqWsMessageListenerDispatch(Channel channel,List<MqListener> listeners) {
             super(channel);
             this.listeners = listeners;
         }

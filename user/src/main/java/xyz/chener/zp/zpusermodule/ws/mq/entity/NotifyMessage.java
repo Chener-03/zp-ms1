@@ -2,6 +2,9 @@ package xyz.chener.zp.zpusermodule.ws.mq.entity;
 
 import java.io.Serializable;
 
+/**
+ * @Description: MQ页面通知类消息实体类
+ */
 public class NotifyMessage implements Serializable {
 
     private String type;

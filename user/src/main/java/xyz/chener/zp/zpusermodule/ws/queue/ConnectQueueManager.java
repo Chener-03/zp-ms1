@@ -1,7 +1,7 @@
 package xyz.chener.zp.zpusermodule.ws.queue;
 
 import org.springframework.util.StringUtils;
-import xyz.chener.zp.zpusermodule.ws.listener.ConnectExpListener;
+import xyz.chener.zp.zpusermodule.ws.queue.listener.ConnectExpListener;
 import xyz.chener.zp.zpusermodule.ws.queue.entity.WsConnect;
 import xyz.chener.zp.zpusermodule.ws.queue.listener.QueueListener;
 
@@ -70,7 +70,7 @@ public class ConnectQueueManager {
                     continue;
                 }
                 connectSet.removeIf(wsConnect -> wsConnect.equals(first));
-                notifyListeners(first);
+                notifyConnectExpListeners(first);
             }catch (Exception ignored) {}
             finally {
                 lock.unlock();
@@ -119,15 +119,11 @@ public class ConnectQueueManager {
         }
     }
 
-    private void notifyListeners(Object obj)
+    private void notifyConnectExpListeners(Object obj)
     {
         executor.submit(()->{
             for (QueueListener<?> listener : listeners) {
-                if (((ParameterizedType) listener.getClass()
-                        .getGenericInterfaces()[0])
-                        .getActualTypeArguments()[0].getTypeName().equals(WsConnect.class.getName())) {
-                    listener.onEvent(obj);
-                }
+                listener.onEvent(obj);
             }
         });
     }

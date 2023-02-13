@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StreamUtils;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
+import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.error.HttpErrorException;
 
@@ -130,6 +133,19 @@ public class UnifiedErrorReturn {
     }
 
 
+    @DispatchException(value = AccessDeniedException.class,otherParams = {HttpServletRequest.class,HttpServletResponse.class})
+    public R<String> accessDeniedException(AccessDeniedException exception, HttpServletRequest request, HttpServletResponse response)
+    {
+        try {
+            AccessDeniedProcess accessDeniedProcess = ApplicationContextHolder
+                    .getApplicationContext()
+                    .getBean(AccessDeniedProcess.class);
+            accessDeniedProcess.handle(request,response,exception);
+        } catch (Exception e) { }
+        return new R<>();
+    }
+
+
     @ExceptionHandler(Exception.class)
     public R<String> exceptionDispatch(Exception exception, HttpServletRequest request, HttpServletResponse response)
     {
@@ -171,7 +187,6 @@ public class UnifiedErrorReturn {
 
         if (Objects.isNull(res.get()))
         {
-            exception.printStackTrace();
             log.error(exception.getMessage());
             return R.Builder.<String>getInstance()
                     .setCode(R.HttpCode.HTTP_ERR.get())

@@ -5,6 +5,8 @@ package xyz.chener.zp.zpusermodule.ws.entity;
  * @Date: 2023/02/10/15:40
  * @Email: chen@chener.xyz
  */
+// 页面消息传输实体类code枚举
+
 public class WsMessageConstVar {
 
     public static final int UNKNOWN_CODE = 0;

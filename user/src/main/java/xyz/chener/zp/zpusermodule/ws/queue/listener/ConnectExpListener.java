@@ -1,4 +1,4 @@
-package xyz.chener.zp.zpusermodule.ws.listener;
+package xyz.chener.zp.zpusermodule.ws.queue.listener;
 
 import xyz.chener.zp.zpusermodule.ws.WsConnector;
 import xyz.chener.zp.zpusermodule.ws.queue.listener.QueueListener;

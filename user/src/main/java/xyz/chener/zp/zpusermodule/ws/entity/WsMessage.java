@@ -6,7 +6,9 @@ import java.io.Serializable;
  * @Author: chenzp
  * @Date: 2023/02/10/15:35
  * @Email: chen@chener.xyz
+ * @Description: 页面消息传输实体类
  */
+
 public class WsMessage implements Serializable {
 
     public static final WsMessage EMPTY_MESSAGE = new WsMessage(WsMessageConstVar.UNKNOWN_CODE);

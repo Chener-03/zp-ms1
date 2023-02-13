@@ -10,15 +10,23 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
+import org.springframework.cloud.endpoint.event.RefreshEventListener;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
+import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Configuration
 public class WriteListListener implements CommandLineRunner, ApplicationContextAware {
@@ -61,6 +69,7 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
         properties.setProperty("username", username);
         properties.setProperty("password", password);
         NamingService namingService = NacosFactory.createNamingService(properties);
+        AtomicBoolean isFirstRefresh = new AtomicBoolean(true);
         gatewayProperties.getRoutes().forEach(route ->{
             String uri =route.getUri().toString();
             if (uri.indexOf("lb://")==0) {
@@ -73,7 +82,9 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                             {
                                 List<Instance> instances = ev.getInstances();
                                 if (instances.isEmpty()) {
-                                    writeListMap.get(modelName).clear();
+                                    CopyOnWriteArrayList<String> m = writeListMap.get(modelName);
+                                    if (Objects.nonNull(m))
+                                        m.clear();
                                     writeListMap.remove(modelName);
                                 }else
                                 {
@@ -97,9 +108,41 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                                     });
                                     writeListMap.put(modelName,urls);
                                     applicationContext.publishEvent(new RefreshEvent(this, null, "writeList Refresh Event"));
+                                    if (isFirstRefresh.get()) {
+                                        waitRefreshListenerRunning();
+                                    }
                                 }
                             }
                         }
+
+                        private void waitRefreshListenerRunning(){
+                            // 暂时解决 refresh 事件在 RefreshEventListener 未初始化完成时就发布的问题
+                            CompletableFuture.runAsync(()->{
+                                try {
+                                    RefreshEventListener rel = applicationContext.getBean(RefreshEventListener.class);
+                                    if (rel != null)
+                                    {
+                                        Field ready = RefreshEventListener.class.getDeclaredField("ready");
+                                        boolean ac = ready.canAccess(rel);
+                                        ready.setAccessible(true);
+                                        AtomicBoolean o = (AtomicBoolean) ready.get(rel);
+                                        ready.setAccessible(ac);
+                                        int i = 0;
+                                        while (!o.get() && i++ < 100)
+                                        {
+                                            Thread.sleep(500);
+                                        }
+                                        if (isFirstRefresh.compareAndSet(true,false)) {
+                                            applicationContext.publishEvent(new RefreshEvent(this, null, "writeList Refresh Event"));
+                                        }
+                                    }
+                                }catch (Exception ignored) {
+                                    isFirstRefresh.set(false);
+                                    System.out.println("waitRefreshListenerRunning error");
+                                }
+                            });
+                        }
+
                     });
                 } catch (NacosException e) {
                     throw new RuntimeException(e);
@@ -112,4 +155,5 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
+
 }

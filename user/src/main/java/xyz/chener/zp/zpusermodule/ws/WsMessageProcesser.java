@@ -29,12 +29,12 @@ public class WsMessageProcesser {
     public static void heartBeat(WsMessage message, Session session) {
         System.out.println("heartBeat："+session.getId());
         ConnectQueueManager.getInstance().renewal(session.getId(), message.getUsername());
-        WsConnector.send(message, session.getId());
+        WsConnector.sendObject(message, session.getId());
     }
 
     public static void sendAll(WsMessage message) {
         ConnectQueueManager.getInstance().getValidConnection().forEach(wsConnect -> {
-            WsConnector.send(message, wsConnect.getConnect_uid());
+            WsConnector.sendObject(message, wsConnect.getConnect_uid());
         });
     }
 
@@ -42,7 +42,7 @@ public class WsMessageProcesser {
         AtomicBoolean rt = new AtomicBoolean(false);
         ConnectQueueManager.getInstance().getValidConnection().forEach(wsc -> {
             if(ObjectUtils.nullSafeEquals(wsc.getConnect_user(),username)){
-                WsConnector.send(message, wsc.getConnect_uid());
+                WsConnector.sendObject(message, wsc.getConnect_uid());
                 rt.set(true);
             }
         });
