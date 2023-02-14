@@ -29,7 +29,9 @@ import java.util.ArrayList;
 @EnableMethodSecurity(prePostEnabled =true)
 @EnableConfigurationProperties(CommonConfig.class)
 @AutoConfigureAfter(CommonAutoConfig.class)
-@AutoConfigureBefore(value = {SecurityFilterAutoConfiguration.class, SecurityAutoConfiguration.class})
+@AutoConfigureBefore(value = {SecurityFilterAutoConfiguration.class
+        , SecurityAutoConfiguration.class},
+name={"org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration"})
 public class SecurityConfig {
 
 
