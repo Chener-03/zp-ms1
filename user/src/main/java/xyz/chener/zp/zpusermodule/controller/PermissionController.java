@@ -145,4 +145,11 @@ public class PermissionController {
     }
 
 
+    @PostMapping("/flushUiRouting")
+    @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
+    public void flushUiRouting()
+    {
+        permissionService.flushUiPermission();
+    }
+
 }

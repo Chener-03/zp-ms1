@@ -11,5 +11,7 @@ import xyz.chener.zp.zpusermodule.entity.Permission;
  */
 public interface PermissionService extends IService<Permission> {
 
+    void flushUiPermission();
+
 }
 

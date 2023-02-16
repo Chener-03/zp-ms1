@@ -6,6 +6,8 @@ import xyz.chener.zp.zpusermodule.dao.PermissionDao;
 import xyz.chener.zp.zpusermodule.entity.Permission;
 import xyz.chener.zp.zpusermodule.service.PermissionService;
 
+import java.util.List;
+
 /**
  * (Permission)表服务实现类
  *
@@ -15,5 +17,10 @@ import xyz.chener.zp.zpusermodule.service.PermissionService;
 @Service
 public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission> implements PermissionService {
 
+    @Override
+    public void flushUiPermission() {
+        List<Permission> ui = this.lambdaQuery().likeRight(Permission::getPermissionEnName, "UI_").list();
+        System.out.println();
+    }
 }
 
