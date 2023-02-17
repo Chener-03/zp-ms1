@@ -20,7 +20,7 @@ import xyz.chener.zp.zpusermodule.service.GoogleRequest;
 @Configuration
 public class HttpRequestConfig {
 
-    @Bean
+/*    @Bean
     public WebClient webClient() {
         return WebClient.builder()
                 .defaultStatusHandler(HttpStatusCode::isError
@@ -33,5 +33,5 @@ public class HttpRequestConfig {
         HttpServiceProxyFactory factory =
                 HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient())).build();
         return factory.createClient(GoogleRequest.class);
-    }
+    }*/
 }

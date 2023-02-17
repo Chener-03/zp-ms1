@@ -33,6 +33,8 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'com.github.jsqlparser:jsqlparser:4.5'
 
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
+
 }
 
 dependencyManagement {

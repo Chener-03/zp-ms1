@@ -1,10 +1,14 @@
 package xyz.chener.zp.zpusermodule.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
 import xyz.chener.zp.zpusermodule.entity.dto.MenuNameDto;
 import xyz.chener.zp.zpusermodule.service.MenuService;
@@ -59,6 +63,8 @@ public class MenuController {
     public Boolean deleteMenuInfo(@RequestParam Integer id) {
         return uiRoutingService.removeById(id);
     }
+
+
 
     @GetMapping("/getAllParentMenus")
     @PreAuthorize("hasAnyRole('menu_list_query')")
