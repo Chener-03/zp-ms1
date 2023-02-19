@@ -5,8 +5,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.zpusermodule.entity.dto.OrgInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgTreeDto;
 import xyz.chener.zp.zpusermodule.service.OrgBaseService;
 
@@ -38,5 +40,10 @@ public class OrgController {
         return orgBaseService.getOrgTree();
     }
 
+    @GetMapping("/getOrgInfo")
+    @PreAuthorize("hasAnyRole('org_list_query')")
+    public OrgInfoDto getOrgInfo(@RequestParam Integer id) {
+        return orgBaseService.getOrgInfo(id);
+    }
 
 }

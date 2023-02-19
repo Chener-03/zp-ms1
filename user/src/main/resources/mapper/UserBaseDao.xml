@@ -43,6 +43,7 @@
                 and b.name_cn like #{userAllInfo.nameCn}
             </if>
         </where>
+        order by id asc
     </select>
 </mapper>
 

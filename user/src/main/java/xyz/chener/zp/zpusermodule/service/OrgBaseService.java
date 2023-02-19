@@ -1,7 +1,9 @@
 package xyz.chener.zp.zpusermodule.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestParam;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
+import xyz.chener.zp.zpusermodule.entity.dto.OrgInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgTreeDto;
 
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
 public interface OrgBaseService extends IService<OrgBase> {
 
     List<OrgTreeDto> getOrgTree();
+
+    OrgInfoDto getOrgInfo(Integer id);
 
 }
 

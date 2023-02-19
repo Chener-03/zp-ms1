@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule.service;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
@@ -14,7 +15,6 @@ import org.springframework.web.service.annotation.PostExchange;
 public interface GoogleRequest {
 
     @PostExchange("/recaptcha/api/siteverify")
-    String verify(@RequestPart("secret") String secret
-            , @RequestPart("response") String response);
+    String verify(@RequestParam("secret") String secret, @RequestParam("response") String response);
 
 }

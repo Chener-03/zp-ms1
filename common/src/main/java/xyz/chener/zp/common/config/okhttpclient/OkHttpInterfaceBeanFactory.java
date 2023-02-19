@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import okhttp3.*;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.*;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -17,6 +16,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import xyz.chener.zp.common.config.okhttpclient.error.OkHttpInterfaceRequestMethodError;
 import xyz.chener.zp.common.config.okhttpclient.error.OkHttpInterfaceUrlBuildError;
+import xyz.chener.zp.common.config.okhttpclient.error.OkHttpResponseError;
 import xyz.chener.zp.common.utils.AssertUrils;
 
 import java.io.Serializable;
@@ -70,7 +70,6 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
         private static class RequestMetaData{
             private String url;
             private String method;
-            private Boolean isJsonBody = false;
             private Map<String,Object> params;
             private Map<String,Object> jsonParams;
             private Map<String,String> headers;
@@ -91,7 +90,8 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
             PostExchange postAnn = method.getAnnotation(PostExchange.class);
             AssertUrils.state(getAnn != null || postAnn != null, OkHttpInterfaceRequestMethodError.class);
             Map<String, String> headers = getHeaders(method, obj,args);
-            Map<String, Object> params = getParams(method, obj, args,md);
+            Map<String, Object> params = getFormDataParams(method, obj, args);
+            Map<String, Object> jsonParams = getJsonParams(method, obj, args);
             Map<String, String> pathParam = getPathParam(method, obj, args);
             if (getAnn != null) {
                 md.setMethod("GET");
@@ -99,12 +99,9 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
                 md.setMethod("POST");
             }
             md.setHeaders(headers);
-            if (md.getIsJsonBody()) {
-                md.setJsonParams(params);
-            }else {
-                md.setParams(params);
-            }
             md.setPathParams(pathParam);
+            md.setParams(params);
+            md.setJsonParams(jsonParams);
             return md;
         }
 
@@ -147,22 +144,31 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
             return obj.toString();
         }
 
-        private Map<String,Object> getParams(Method method,Object obj,Object[] args,RequestMetaData md){
+        private Map<String,Object> getFormDataParams(Method method, Object obj, Object[] args){
+            Annotation[][] ann = method.getParameterAnnotations();
+            Map<String, Object> map = new HashMap<>();
+            for (int i = 0; i < ann.length; i++) {
+                Annotation[] ans = ann[i];
+                for (Annotation a : ans) {
+                    if (a.annotationType().getName().equals(RequestParam.class.getName())) {
+                        RequestParam rh = (RequestParam) a;
+                        map.put(rh.value(), safeGetObjectString(args[i]));
+                        break;
+                    }
+                }
+            }
+            return map;
+        }
+
+        private Map<String,Object> getJsonParams(Method method, Object obj, Object[] args){
             Annotation[][] ann = method.getParameterAnnotations();
             Map<String, Object> map = new HashMap<>();
             END:for (int i = 0; i < ann.length; i++) {
                 Annotation[] ans = ann[i];
                 for (Annotation a : ans) {
-                    if (a.annotationType().getName().equals(RequestParam.class.getName())) {
-                        md.setIsJsonBody(false);
-                        RequestParam rh = (RequestParam) a;
-                        map.put(rh.value(), safeGetObjectString(args[i]));
-                        break;
-                    }
                     if (a.annotationType().getName().equals(org.springframework.web.bind.annotation.RequestBody.class.getName())){
                         Class<?> parameterType = method.getParameterTypes()[i];
                         Object lsarg = args[i];
-                        md.setIsJsonBody(true);
                         Arrays.stream(ReflectionUtils.getAllDeclaredMethods(parameterType)).forEach(e->{
                             if (e.getName().indexOf("get")==0 && e.getModifiers()== Modifier.PUBLIC)
                             {
@@ -178,6 +184,7 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
             }
             return map;
         }
+
 
 
         private String getUrl(Method method){
@@ -239,9 +246,7 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
                         } else {
                             try {
                                 formBodyBuilder.add(k, om.writeValueAsString(v));
-                            } catch (JsonProcessingException e) {
-
-                            }
+                            } catch (JsonProcessingException e) { }
                         }
                     });
                     body = formBodyBuilder.build();
@@ -255,7 +260,13 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
             }
             try {
                 String bodyStr = resp.body().string();
-                Assert.state(resp.isSuccessful(), String.format("request error,code:%s ,msg:%s ,body:%s", resp.code(), resp.message(), bodyStr));
+                if (!resp.isSuccessful()) {
+                    OkHttpResponseError err = new OkHttpResponseError();
+                    err.setBodyStr(bodyStr);
+                    err.setHttpCode(resp.code());
+                    err.setHttpErrorMessage(resp.message());
+                    throw err;
+                }
                 om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
                 if (method.getReturnType().getName().equals(String.class.getName()))
                     return bodyStr;

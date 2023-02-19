@@ -2,6 +2,7 @@ package xyz.chener.zp.common.utils;
 
 import xyz.chener.zp.common.entity.SFunction;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -13,6 +14,15 @@ import java.util.Arrays;
  */
 public class ObjectUtils extends org.springframework.util.ObjectUtils {
 
+
+    /**
+     * 比较两个对象的字段是否相等
+     * @param o1
+     * @param o2
+     * @param fields
+     * @return
+     * @param <T>
+     */
     @SafeVarargs
     public static <T> boolean objectFieldsEquals(T o1, T o2, SFunction<T, ?> ... fields)
     {
@@ -57,6 +67,12 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
     }
 
 
+    /**
+     * 获取Function的方法名
+     * @param e
+     * @param <T>
+     * @return
+     */
     public static <T> String getSFunctionName(SFunction<T,?> e)
     {
         try {
@@ -73,5 +89,23 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
         }
     }
 
+
+    public static void copyFields(Object source, Object target)
+    {
+        if(source == null || target == null) return;
+        Class<?> clz2 = target.getClass();
+        Arrays.stream(source.getClass().getDeclaredFields()).forEach(e->{
+            try {
+                Field f = clz2.getDeclaredField(e.getName());
+                boolean targetAccess = f.canAccess(target);
+                boolean sourceAccess = e.canAccess(source);
+                f.setAccessible(true);
+                e.setAccessible(true);
+                f.set(target,e.get(source));
+                f.setAccessible(targetAccess);
+                e.setAccessible(sourceAccess);
+            }catch (Exception exception){}
+        });
+    }
 
 }

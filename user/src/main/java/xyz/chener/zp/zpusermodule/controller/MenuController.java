@@ -1,18 +1,14 @@
 package xyz.chener.zp.zpusermodule.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
 import xyz.chener.zp.zpusermodule.entity.dto.MenuNameDto;
 import xyz.chener.zp.zpusermodule.service.MenuService;
-import xyz.chener.zp.zpusermodule.service.UiRoutingService;
+import xyz.chener.zp.zpusermodule.service.PermissionService;
 import xyz.chener.zp.zpusermodule.service.impl.UiRoutingServiceImpl;
 
 import java.util.List;
@@ -32,10 +28,12 @@ public class MenuController {
 
     private final MenuService menuService;
     private final UiRoutingServiceImpl uiRoutingService;
+    private final PermissionService permissionService;
 
-    public MenuController(MenuService menuService, UiRoutingServiceImpl uiRoutingService) {
+    public MenuController(MenuService menuService, UiRoutingServiceImpl uiRoutingService, PermissionService permissionService) {
         this.menuService = menuService;
         this.uiRoutingService = uiRoutingService;
+        this.permissionService = permissionService;
     }
 
 
@@ -55,13 +53,21 @@ public class MenuController {
     @PostMapping("/saveMenuInfo")
     @PreAuthorize("hasAnyRole('menu_list_query')")
     public UiRouting saveMenuInfo(@ModelAttribute UiRouting uiRouting) {
-        return uiRoutingService.saveOrUpdate(uiRouting) ? uiRouting : null;
+        UiRouting res = uiRoutingService.saveOrUpdate(uiRouting) ? uiRouting : null;
+        if (res != null){
+            permissionService.flushUiPermission();
+        }
+        return res;
     }
 
     @PostMapping("/deleteMenuInfo")
     @PreAuthorize("hasAnyRole('menu_list_query')")
     public Boolean deleteMenuInfo(@RequestParam Integer id) {
-        return uiRoutingService.removeById(id);
+        boolean res = uiRoutingService.removeById(id);
+        if (res){
+            permissionService.flushUiPermission();
+        }
+        return res;
     }
 
 

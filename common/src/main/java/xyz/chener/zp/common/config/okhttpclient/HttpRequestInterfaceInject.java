@@ -42,7 +42,7 @@ public class HttpRequestInterfaceInject implements BeanDefinitionRegistryPostPro
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] res = resolver.getResources("classpath*:**/*.class");
+            Resource[] res = resolver.getResources("**/*.class");
             SimpleMetadataReaderFactory metadataReaderFactory = new SimpleMetadataReaderFactory(resolver);
             Arrays.stream(res).filter(e -> {
                 try {

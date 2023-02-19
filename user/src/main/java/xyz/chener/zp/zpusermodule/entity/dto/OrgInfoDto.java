@@ -1,27 +1,14 @@
-package xyz.chener.zp.zpusermodule.entity;
+package xyz.chener.zp.zpusermodule.entity.dto;
 
-import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serializable;
+import java.util.Date;
 
-/**
- * (OrgBase)表实体类
- *
- * @author makejava
- * @since 2023-02-16 10:45:33
- */
-@SuppressWarnings("serial")
-public class OrgBase extends Model<OrgBase> {
+public class OrgInfoDto {
 
-    @TableId(type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     //中文全称
@@ -54,24 +41,15 @@ public class OrgBase extends Model<OrgBase> {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long mainUserId;
 
+    private String username;
+
+
+    private String userChName;
+
     @JsonSerialize(using = ToStringSerializer.class)
     private Long roleId;
 
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public Boolean getDisable() {
-        return disable;
-    }
-
-    public void setDisable(Boolean disable) {
-        this.disable = disable;
-    }
+    private String roleName;
 
     public Long getId() {
         return id;
@@ -161,7 +139,13 @@ public class OrgBase extends Model<OrgBase> {
         this.createTime = createTime;
     }
 
+    public Boolean getDisable() {
+        return disable;
+    }
 
+    public void setDisable(Boolean disable) {
+        this.disable = disable;
+    }
 
     public Long getMainUserId() {
         return mainUserId;
@@ -171,6 +155,35 @@ public class OrgBase extends Model<OrgBase> {
         this.mainUserId = mainUserId;
     }
 
-
+    public String getUsername() {
+        return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserChName() {
+        return userChName;
+    }
+
+    public void setUserChName(String userChName) {
+        this.userChName = userChName;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+}
