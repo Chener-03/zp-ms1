@@ -1,0 +1,13 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.zpusermodule.dao.OrgUserMapDao">
+
+
+    <select id="getOrgUsers" resultType="xyz.chener.zp.zpusermodule.entity.dto.OrgUserDto">
+
+        select a.*,b.username as user_name,c.name_cn as user_ch_name
+        from org_user_map a,user_base b,user_extend c where a.org_id = #{id}
+        and a.user_id = b.id and b.id = c.user_id order by a.id
+
+    </select>
+</mapper>
+

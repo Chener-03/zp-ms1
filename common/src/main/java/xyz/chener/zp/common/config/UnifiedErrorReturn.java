@@ -192,7 +192,7 @@ public class UnifiedErrorReturn {
                     .setCode(R.HttpCode.HTTP_ERR.get())
                     .setMessage(String.format("%s [%s]"
                             ,R.ErrorMessage.HTTP_ERR.get()
-                            ,exception.getClass().getName()))
+                            ,exception.getClass().getSimpleName()))
                     .build();
         }
         return res.get();
