@@ -3,6 +3,7 @@ package xyz.chener.zp.zpusermodule.entity.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -12,8 +13,10 @@ public class OrgInfoDto {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     //中文全称
+    @NotNull(message = "机构名称不能为空")
     private String orgChName;
     //中文简称
+    @NotNull(message = "机构简称不能为空")
     private String orgChSimpleName;
     //描述
     private String orgMessage;
@@ -21,10 +24,13 @@ public class OrgInfoDto {
     private Integer orgType;
     //父Id
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "父机构不能为空")
     private Long parentId;
     //子机构数量
+    @NotNull(message = "子机构数量不能为空")
     private Integer subsidiaryNum;
     //人数
+    @NotNull(message = "人数不能为空")
     private Integer peopleNum;
     //等级
     private Integer orgLevel;
@@ -39,6 +45,7 @@ public class OrgInfoDto {
     private Boolean disable;
     //负责人ID
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "负责人不能为空")
     private Long mainUserId;
 
     private String username;
@@ -47,6 +54,7 @@ public class OrgInfoDto {
     private String userChName;
 
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "角色不能为空")
     private Long roleId;
 
     private String roleName;

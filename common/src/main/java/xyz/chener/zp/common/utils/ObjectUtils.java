@@ -90,6 +90,11 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
     }
 
 
+    /**
+     * 拷贝对象的字段
+     * @param source
+     * @param target
+     */
     public static void copyFields(Object source, Object target)
     {
         if(source == null || target == null) return;

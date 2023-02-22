@@ -20,5 +20,7 @@ public interface OrgBaseService extends IService<OrgBase> {
 
     OrgInfoDto getOrgInfo(Integer id);
 
+    boolean saveOrUpdateOrg(OrgInfoDto orgInfoDto);
+
 }
 

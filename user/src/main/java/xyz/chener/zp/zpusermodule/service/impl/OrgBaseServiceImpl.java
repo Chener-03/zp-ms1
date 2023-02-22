@@ -62,6 +62,13 @@ public class OrgBaseServiceImpl extends ServiceImpl<OrgBaseDao, OrgBase> impleme
         return res;
     }
 
+    @Override
+    public boolean saveOrUpdateOrg(OrgInfoDto orgInfoDto) {
+        OrgBase orgBase = new OrgBase();
+        ObjectUtils.copyFields(orgInfoDto,orgBase);
+        return this.saveOrUpdate(orgBase);
+    }
+
 
     private void getOrgTree(List<OrgTreeDto> list, Long parentId) {
         List<OrgBase> orgBases = null;
