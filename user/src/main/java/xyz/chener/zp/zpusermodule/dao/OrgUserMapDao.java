@@ -17,7 +17,7 @@ import java.util.List;
 @Mapper
 public interface OrgUserMapDao extends BaseMapper<OrgUserMap> {
 
-    List<OrgUserDto> getOrgUsers(@Param("id") Integer id);
+    List<OrgUserDto> getOrgUsers(@Param("id") Long id);
 
 }
 

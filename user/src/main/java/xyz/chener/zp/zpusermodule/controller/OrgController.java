@@ -3,6 +3,8 @@ package xyz.chener.zp.zpusermodule.controller;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
@@ -22,6 +24,7 @@ import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.OrgUserMapServiceImpl;
 
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -52,26 +55,29 @@ public class OrgController {
     @GetMapping("/getAllOrgTree")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
     public List<OrgTreeDto> getAllOrgTree() {
-        return orgBaseService.getOrgTree();
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long orgId = orgBaseService.getUserSelectOrgAuthorities(authorities,username);
+        return orgBaseService.getOrgTree(orgId);
     }
 
     @GetMapping("/getOrgInfo")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
-    public OrgInfoDto getOrgInfo(@RequestParam Integer id) {
+    public OrgInfoDto getOrgInfo(@RequestParam Long id) {
         return orgBaseService.getOrgInfo(id);
     }
 
 
     @GetMapping("/getOrgExtendInfo")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
-    public OrgExtendInfoDto getOrgExtendInfo(@RequestParam Integer id) {
+    public OrgExtendInfoDto getOrgExtendInfo(@RequestParam Long id) {
         return orgUserMapService.getOrgExtendInfo(id);
     }
 
 
     @GetMapping("/getOrgUsers")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
-    public PageInfo<OrgUserDto> getOrgUsers(@RequestParam Integer id
+    public PageInfo<OrgUserDto> getOrgUsers(@RequestParam Long id
                 , @RequestParam(defaultValue = "1") Integer page
                 , @RequestParam(defaultValue = "10") Integer size)
     {

@@ -24,7 +24,6 @@ public class OrgInfoDto {
     private Integer orgType;
     //父Id
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "父机构不能为空")
     private Long parentId;
     //子机构数量
     @NotNull(message = "子机构数量不能为空")

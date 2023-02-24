@@ -35,7 +35,7 @@ public class OrgUserMapServiceImpl extends ServiceImpl<OrgUserMapDao, OrgUserMap
     }
 
     @Override
-    public OrgExtendInfoDto getOrgExtendInfo(Integer id) {
+    public OrgExtendInfoDto getOrgExtendInfo(Long id) {
         List<OrgUserMap> users = lambdaQuery().eq(OrgUserMap::getOrgId, id)
                 .select(OrgUserMap::getUserId).list();
         OrgExtendInfoDto res = new OrgExtendInfoDto();
@@ -55,7 +55,7 @@ public class OrgUserMapServiceImpl extends ServiceImpl<OrgUserMapDao, OrgUserMap
     }
 
     @Override
-    public PageInfo<OrgUserDto> getOrgUsers(Integer id, Integer page, Integer size) {
+    public PageInfo<OrgUserDto> getOrgUsers(Long id, Integer page, Integer size) {
         PageHelper.startPage(page, size);
         List<OrgUserDto> orgUserDtos = baseMapper.getOrgUsers(id);
         return new PageInfo<>(orgUserDtos);

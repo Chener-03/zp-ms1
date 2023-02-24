@@ -17,9 +17,9 @@ import java.util.List;
  */
 public interface OrgUserMapService extends IService<OrgUserMap> {
 
-    OrgExtendInfoDto getOrgExtendInfo(Integer id);
+    OrgExtendInfoDto getOrgExtendInfo(Long id);
 
-    PageInfo<OrgUserDto> getOrgUsers(Integer id, Integer page, Integer size);
+    PageInfo<OrgUserDto> getOrgUsers(Long id, Integer page, Integer size);
 
 }
 
