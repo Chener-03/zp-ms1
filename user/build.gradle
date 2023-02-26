@@ -37,6 +37,9 @@ dependencies {
 
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
     implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
+
+    implementation 'org.apache.skywalking:apm-toolkit-trace:8.14.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
 }
 
 dependencyManagement {

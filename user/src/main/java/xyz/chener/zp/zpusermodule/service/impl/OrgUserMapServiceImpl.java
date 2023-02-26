@@ -7,13 +7,16 @@ import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.zpusermodule.dao.OrgUserMapDao;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
 import xyz.chener.zp.zpusermodule.entity.OrgUserMap;
+import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgExtendInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgUserDto;
 import xyz.chener.zp.zpusermodule.service.OrgUserMapService;
 import org.springframework.stereotype.Service;
+import xyz.chener.zp.zpusermodule.service.UserBaseService;
 import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,10 +31,12 @@ public class OrgUserMapServiceImpl extends ServiceImpl<OrgUserMapDao, OrgUserMap
 
     private final UserLoginEventRecordServiceImpl userLoginEventRecordService;
     private final OrgBaseServiceImpl orgBaseService;
+    private final UserBaseServiceImpl userBaseService;
 
-    public OrgUserMapServiceImpl(UserLoginEventRecordServiceImpl userLoginEventRecordService, OrgBaseServiceImpl orgBaseService) {
+    public OrgUserMapServiceImpl(UserLoginEventRecordServiceImpl userLoginEventRecordService, OrgBaseServiceImpl orgBaseService, UserBaseServiceImpl userBaseService) {
         this.userLoginEventRecordService = userLoginEventRecordService;
         this.orgBaseService = orgBaseService;
+        this.userBaseService = userBaseService;
     }
 
     @Override
@@ -59,6 +64,45 @@ public class OrgUserMapServiceImpl extends ServiceImpl<OrgUserMapDao, OrgUserMap
         PageHelper.startPage(page, size);
         List<OrgUserDto> orgUserDtos = baseMapper.getOrgUsers(id);
         return new PageInfo<>(orgUserDtos);
+    }
+
+    @Override
+    public Boolean addOrgUser(Long orgId, List<Long> userIds) {
+        ArrayList<OrgUserMap> ous = new ArrayList<>();
+        userIds.forEach(e->{
+            OrgUserMap ou = new OrgUserMap();
+            ou.setOrgId(orgId);
+            ou.setUserId(e);
+            ou.setAuthDisable(false);
+            ou.setBindTime(new Date());
+            ous.add(ou);
+        });
+        this.saveBatch(ous);
+        return true;
+    }
+
+    @Override
+    public Boolean deleteOrgUser(Long orgId, List<Long> userIds) {
+        userIds.forEach(e->{
+            userBaseService.lambdaUpdate().set(UserBase::getRoleId, null)
+                    .eq(UserBase::getId, e).update();
+            this.lambdaUpdate().eq(OrgUserMap::getOrgId, orgId)
+                    .eq(OrgUserMap::getUserId, e).remove();
+        });
+        return true;
+    }
+
+    @Override
+    public Boolean flushOrgUserAuth(Long orgId) {
+        return null;
+    }
+
+    @Override
+    public Boolean disableUserAuth(Long orgId, Long userIds,Boolean disable) {
+        this.lambdaUpdate().eq(OrgUserMap::getOrgId, orgId)
+                .eq(OrgUserMap::getUserId, userIds)
+                .set(OrgUserMap::getAuthDisable, disable).update();
+        return null;
     }
 }
 

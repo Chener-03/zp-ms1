@@ -4,12 +4,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.common.entity.SecurityVar;
+import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.common.utils.SecurityUtils;
 import xyz.chener.zp.zpusermodule.dao.OrgBaseDao;
 import xyz.chener.zp.zpusermodule.entity.*;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgTreeDto;
+import xyz.chener.zp.zpusermodule.error.org.OnlyOneRootOrg;
+import xyz.chener.zp.zpusermodule.error.org.OrgNotFoundError;
+import xyz.chener.zp.zpusermodule.error.org.RootOrgNotDelete;
 import xyz.chener.zp.zpusermodule.service.*;
 import org.springframework.stereotype.Service;
 
@@ -56,12 +63,8 @@ public class OrgBaseServiceImpl extends ServiceImpl<OrgBaseDao, OrgBase> impleme
 
     @Override
     public Long getUserSelectOrgAuthorities(Collection<? extends GrantedAuthority> auths,String username) {
-        if (auths instanceof List list){
-            for (Object o : list) {
-                GrantedAuthority gen = (GrantedAuthority) o;
-                if (gen.getAuthority().equals(SecurityVar.ROLE_PREFIX+"org_list_query"))
-                    return null;
-            }
+        if (SecurityUtils.hasAnyAuthority("org_list_query")) {
+            return null;
         }
         UserBase user = userBaseService.lambdaQuery().select(UserBase::getId).eq(UserBase::getUsername, username).one();
         OrgBase org = this.lambdaQuery().select(OrgBase::getId).eq(OrgBase::getMainUserId, user.getId()).one();
@@ -78,6 +81,8 @@ public class OrgBaseServiceImpl extends ServiceImpl<OrgBaseDao, OrgBase> impleme
 
     @Override
     public OrgInfoDto getOrgInfo(Long id) {
+
+
         OrgInfoDto res = new OrgInfoDto();
         OrgBase org = lambdaQuery().eq(OrgBase::getId, id).one();
         if (org == null) {
@@ -96,9 +101,40 @@ public class OrgBaseServiceImpl extends ServiceImpl<OrgBaseDao, OrgBase> impleme
 
     @Override
     public boolean saveOrUpdateOrg(OrgInfoDto orgInfoDto) {
+        checkUserAuth(SecurityContextHolder.getContext().getAuthentication().getName(),orgInfoDto);
         OrgBase orgBase = new OrgBase();
         ObjectUtils.copyFields(orgInfoDto,orgBase);
         return this.saveOrUpdate(orgBase);
+    }
+
+    @Override
+    public boolean deleteOrg(Long id) {
+        OrgBase org = this.lambdaQuery().select(OrgBase::getParentId,OrgBase::getId).eq(OrgBase::getId, id).one();
+        AssertUrils.state(org != null , OrgNotFoundError.class);
+        AssertUrils.state(org.getParentId() != null, RootOrgNotDelete.class);
+        deleteAll(id);
+        return true;
+    }
+
+    private void deleteAll(Long id){
+        List<OrgBase> orgBases = this.lambdaQuery().select(OrgBase::getId).eq(OrgBase::getParentId, id).list();
+        for (OrgBase orgBase : orgBases) {
+            deleteAll(orgBase.getId());
+        }
+        this.removeById(id);
+        orgUserMapService.lambdaQuery().eq(OrgUserMap::getOrgId,id).select(OrgUserMap::getUserId).list().forEach(e->{
+            userBaseService.lambdaUpdate().set(UserBase::getRoleId,null).eq(UserBase::getId,e.getUserId()).update();
+        });
+        orgUserMapService.lambdaUpdate().eq(OrgUserMap::getOrgId,id).remove();
+    }
+
+    private void checkUserAuth(String username,OrgInfoDto orgInfoDto){
+        if (SecurityUtils.hasAnyAuthority("org_list_query")) {
+            return;
+        }
+        AssertUrils.state(orgInfoDto.getId() == null
+                        && orgInfoDto.getParentId() == null
+                        , OnlyOneRootOrg.class);
     }
 
 

@@ -21,5 +21,13 @@ public interface OrgUserMapService extends IService<OrgUserMap> {
 
     PageInfo<OrgUserDto> getOrgUsers(Long id, Integer page, Integer size);
 
+    Boolean addOrgUser( Long orgId, List<Long> userIds);
+
+    Boolean deleteOrgUser(Long orgId, List<Long> userIds);
+
+    Boolean flushOrgUserAuth(Long orgId);
+
+    Boolean disableUserAuth(Long orgId, Long userIds,Boolean disable);
+
 }
 

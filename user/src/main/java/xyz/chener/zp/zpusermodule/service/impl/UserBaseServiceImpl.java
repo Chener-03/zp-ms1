@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.LoginUserDetails;
+import xyz.chener.zp.common.entity.SecurityVar;
 import xyz.chener.zp.common.utils.*;
 import xyz.chener.zp.zpusermodule.dao.UserBaseDao;
 import xyz.chener.zp.zpusermodule.entity.*;
@@ -181,7 +182,13 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
                 information.getRoleList()
                         .addAll(Arrays.stream(role.getPermissionEnNameList().split("[,]"))
                                 .filter(StringUtils::hasText)
-                                .map(s -> s.substring(5)).toList());
+                                .map(ns->{
+                                    if (ns.indexOf(SecurityVar.ROLE_PREFIX)==0)
+                                        return ns.substring(SecurityVar.ROLE_PREFIX.length());
+                                    if (ns.indexOf(SecurityVar.UI_PREFIX)==0)
+                                        return ns.substring(SecurityVar.UI_PREFIX.length());
+                                    return ns;
+                                }).toList());
             }
         }catch (Exception exception)
         {

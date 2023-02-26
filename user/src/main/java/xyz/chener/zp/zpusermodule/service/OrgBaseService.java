@@ -26,5 +26,7 @@ public interface OrgBaseService extends IService<OrgBase> {
 
     boolean saveOrUpdateOrg(OrgInfoDto orgInfoDto);
 
+    boolean deleteOrg(Long id);
+
 }
 

@@ -8,9 +8,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
+import xyz.chener.zp.zpusermodule.entity.OrgBase;
 import xyz.chener.zp.zpusermodule.entity.OrgUserMap;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgExtendInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgInfoDto;
@@ -63,8 +65,15 @@ public class OrgController {
 
     @GetMapping("/getOrgInfo")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
-    public OrgInfoDto getOrgInfo(@RequestParam Long id) {
+    public OrgInfoDto getOrgInfo(@RequestParam Long id ) {
         return orgBaseService.getOrgInfo(id);
+    }
+
+    @GetMapping("/getOrgBaseInfo")
+    @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
+    public OrgBase getOrgBaseInfo(@RequestParam Long id,@ModelAttribute CustomFieldQuery query) {
+        CustomFieldQuery.StartQuery(query, OrgBase.class);
+        return orgBaseService.lambdaQuery().eq(OrgBase::getId,id).one();
     }
 
 
@@ -100,6 +109,31 @@ public class OrgController {
         } else {
             return null;
         }
+    }
+
+    @PostMapping("/deleteOrg")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean deleteOrg(@RequestParam Long id) {
+        return orgBaseService.deleteOrg(id);
+    }
+
+    @PostMapping("/disableOrg")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean disableOrg(@RequestParam Long id,@RequestParam Boolean disable) {
+        return orgBaseService.lambdaUpdate().set(OrgBase::getDisable,disable).eq(OrgBase::getId,id).update();
+    }
+
+
+    @PostMapping("/addOrgUser")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean addOrgUser(@RequestParam Long orgId,@RequestParam List<Long> userIds) {
+        return orgUserMapService.addOrgUser(orgId,userIds);
+    }
+
+    @PostMapping("/deleteOrgUser")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean deleteOrgUser(@RequestParam Long orgId,@RequestParam List<Long> userIds) {
+        return orgUserMapService.deleteOrgUser(orgId,userIds);
     }
 
 

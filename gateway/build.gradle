@@ -33,6 +33,8 @@ dependencies {
     implementation 'com.alibaba.csp:sentinel-datasource-nacos:1.8.6'
 //    implementation 'com.alibaba.csp:sentinel-spring-cloud-gateway-adapter'
 
+    implementation 'org.apache.skywalking:apm-toolkit-trace:8.14.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
 }
 
 dependencyManagement {

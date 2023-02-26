@@ -174,7 +174,9 @@ public class CustomFieldQuery {
     private List<String> queryFields = new ArrayList<>();
 
     public List<String> getQueryFields() {
-        return queryFields;
+        if (queryFields == null)
+            return Collections.EMPTY_LIST;
+        return Collections.unmodifiableList(queryFields);
     }
 
     public void setQueryFields(List<String> queryFields) {
