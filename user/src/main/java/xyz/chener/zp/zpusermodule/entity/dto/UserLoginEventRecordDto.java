@@ -1,8 +1,5 @@
-package xyz.chener.zp.zpusermodule.entity;
+package xyz.chener.zp.zpusermodule.entity.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -11,27 +8,32 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 /**
- * (UserLoginEventRecord)表实体类
- *
- * @author makejava
- * @since 2023-01-16 15:59:34
+ * @Author: chenzp
+ * @Date: 2023/02/27/17:12
+ * @Email: chen@chener.xyz
  */
-@SuppressWarnings("serial")
-public class UserLoginEventRecord extends Model<UserLoginEventRecord> {
+public class UserLoginEventRecordDto {
 
-    @TableId(type = IdType.AUTO)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
+    private String userName;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date time;
-    
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
     private String ip;
-    
+
     private String os;
     //0 is false ; 1 is success
     private Integer isSuccess;
@@ -53,6 +55,14 @@ public class UserLoginEventRecord extends Model<UserLoginEventRecord> {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public Date getTime() {
@@ -94,7 +104,4 @@ public class UserLoginEventRecord extends Model<UserLoginEventRecord> {
     public void setFailReason(String failReason) {
         this.failReason = failReason;
     }
-
-
-    }
-
+}

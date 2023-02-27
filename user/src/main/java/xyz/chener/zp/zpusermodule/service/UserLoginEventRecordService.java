@@ -11,5 +11,7 @@ import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
  */
 public interface UserLoginEventRecordService extends IService<UserLoginEventRecord> {
 
+
+
 }
 

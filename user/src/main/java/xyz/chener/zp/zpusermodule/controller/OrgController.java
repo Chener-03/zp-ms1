@@ -26,6 +26,7 @@ import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.OrgUserMapServiceImpl;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -136,5 +137,17 @@ public class OrgController {
         return orgUserMapService.deleteOrgUser(orgId,userIds);
     }
 
+
+    @PostMapping("/flushOrgUserAuth")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean flushOrgUserAuth(@RequestParam Long orgId) {
+        return orgUserMapService.flushOrgUserAuth(orgId);
+    }
+
+    @PostMapping("/disableOrgUserAuth")
+    @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    public Boolean disableOrgUserAuth(@RequestParam Long orgId,@RequestParam Long userIds,@RequestParam Boolean disable) {
+        return orgUserMapService.disableUserAuth(orgId,userIds,disable);
+    }
 
 }

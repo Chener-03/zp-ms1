@@ -1,0 +1,19 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.zpusermodule.dao.UserLoginEventRecordDao">
+
+
+    <select id="getList" resultType="xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto">
+        select a.*,b.username from user_login_event_record a,user_base b WHERE a.user_id=b.id
+        <if test="dto.userName != null and dto.userName != ''">
+            and b.username like concat('%',#{dto.userName},'%')
+        </if>
+        <if test="dto.startTime != null">
+            and a.time &gt;= #{dto.startTime}
+        </if>
+        <if test="dto.endTime != null">
+            and a.time &lt;= #{dto.endTime}
+        </if>
+        order by a.id desc
+    </select>
+</mapper>
+

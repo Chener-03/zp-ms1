@@ -2,7 +2,9 @@ package xyz.chener.zp.zpusermodule.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
+import xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto;
 
 /**
  * (UserLoginEventRecord)表数据库访问层
@@ -12,6 +14,8 @@ import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
  */
 @Mapper
 public interface UserLoginEventRecordDao extends BaseMapper<UserLoginEventRecord> {
+
+    UserLoginEventRecordDto getList(@Param("dto") UserLoginEventRecordDto dto);
 
 }
 
