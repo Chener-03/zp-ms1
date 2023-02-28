@@ -40,6 +40,8 @@ dependencies {
 
     implementation 'org.apache.skywalking:apm-toolkit-trace:8.14.0'
     implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
+
+    implementation 'org.lionsoul:ip2region:2.7.0'
 }
 
 dependencyManagement {

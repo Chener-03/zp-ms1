@@ -22,17 +22,19 @@ public class UserLoginEventRecordDto {
 
     private String userName;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date time;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startTime;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endTime;
 
     private String ip;
+
+    private String address;
 
     private String os;
     //0 is false ; 1 is success
@@ -41,12 +43,36 @@ public class UserLoginEventRecordDto {
     private String failReason;
 
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Long getUserId() {

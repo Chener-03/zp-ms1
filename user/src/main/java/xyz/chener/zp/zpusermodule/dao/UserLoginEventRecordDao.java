@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
 import xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto;
 
+import java.util.List;
+
 /**
  * (UserLoginEventRecord)表数据库访问层
  *
@@ -15,7 +17,7 @@ import xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto;
 @Mapper
 public interface UserLoginEventRecordDao extends BaseMapper<UserLoginEventRecord> {
 
-    UserLoginEventRecordDto getList(@Param("dto") UserLoginEventRecordDto dto);
+    List<UserLoginEventRecordDto> getList(@Param("dto") UserLoginEventRecordDto dto);
 
 }
 
