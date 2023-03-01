@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import xyz.chener.zp.common.config.query.CustomFieldQuery;
-import xyz.chener.zp.common.entity.SecurityVar;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.common.utils.SecurityUtils;

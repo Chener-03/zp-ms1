@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.chener.zp.common.config.query.CustomFieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.dao.OrgUserMapDao;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
@@ -16,8 +15,6 @@ import xyz.chener.zp.zpusermodule.entity.dto.OrgUserDto;
 import xyz.chener.zp.zpusermodule.error.org.OrgNotFoundError;
 import xyz.chener.zp.zpusermodule.service.OrgUserMapService;
 import org.springframework.stereotype.Service;
-import xyz.chener.zp.zpusermodule.service.UserBaseService;
-import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 
 import java.util.ArrayList;
 import java.util.Date;

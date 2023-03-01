@@ -2,31 +2,20 @@ package xyz.chener.zp.common.config.query;
 
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.Alias;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.io.StringReader;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @Author: chenzp
@@ -59,7 +48,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
             cacheKey = (CacheKey) args[4];
             boundSql = (BoundSql) args[5];
         }
-        List<CustomFieldQuery.TableField> query = CustomFieldQuery.getQuery();
+        List<QueryHelper.TableField> query = QueryHelper.getQuery();
 
         if (query.size() == 0)
         {
@@ -77,7 +66,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         }
     }
 
-    private String processBoundSql(BoundSql boundSql,List<CustomFieldQuery.TableField> query) throws Exception
+    private String processBoundSql(BoundSql boundSql,List<QueryHelper.TableField> query) throws Exception
     {
         PluginUtils.MPBoundSql mpBoundSql = PluginUtils.mpBoundSql(boundSql);
         String oldSql = mpBoundSql.sql();
@@ -112,7 +101,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
             });
         });*/
 
-        List<CustomFieldQuery.TableField> allowedFields = query.stream()
+        List<QueryHelper.TableField> allowedFields = query.stream()
                 .filter(e -> containsTable(allTable, e.tableName)).toList();
         List<SelectItem> selectItems = buildSelectItem(allowedFields, allTable);
         if (selectItems.size() > 0)
@@ -133,7 +122,7 @@ public class CustomFieldsQueryInterceptor implements Interceptor {
         return tables.stream().filter(it->it.getName().equals(tableName)).findFirst().orElse(null);
     }
 
-    private List<SelectItem> buildSelectItem(List<CustomFieldQuery.TableField> fields
+    private List<SelectItem> buildSelectItem(List<QueryHelper.TableField> fields
             ,List<Table> allTable)
     {
         List<SelectItem> item = new ArrayList<>();

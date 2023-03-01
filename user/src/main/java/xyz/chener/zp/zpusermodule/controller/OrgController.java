@@ -8,28 +8,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.config.query.CustomFieldQuery;
+import xyz.chener.zp.common.config.query.FieldQuery;
+import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
-import xyz.chener.zp.zpusermodule.entity.OrgUserMap;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgExtendInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgInfoDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgTreeDto;
 import xyz.chener.zp.zpusermodule.entity.dto.OrgUserDto;
 import xyz.chener.zp.zpusermodule.error.dic.NoSuchDictoriesError;
-import xyz.chener.zp.zpusermodule.service.DictionariesService;
 import xyz.chener.zp.zpusermodule.service.OrgBaseService;
-import xyz.chener.zp.zpusermodule.service.OrgUserMapService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.OrgUserMapServiceImpl;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author: chenzp
@@ -72,8 +67,8 @@ public class OrgController {
 
     @GetMapping("/getOrgBaseInfo")
     @PreAuthorize("hasAnyRole('org_list_query','org_list_query_only_sub')")
-    public OrgBase getOrgBaseInfo(@RequestParam Long id,@ModelAttribute CustomFieldQuery query) {
-        CustomFieldQuery.StartQuery(query, OrgBase.class);
+    public OrgBase getOrgBaseInfo(@RequestParam Long id,@ModelAttribute FieldQuery query) {
+        QueryHelper.StartQuery(query, OrgBase.class);
         return orgBaseService.lambdaQuery().eq(OrgBase::getId,id).one();
     }
 
