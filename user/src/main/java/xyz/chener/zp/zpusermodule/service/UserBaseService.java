@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
+import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 
 /**
@@ -27,6 +28,8 @@ public interface UserBaseService extends IService<UserBase> {
     PageInfo<UserAllInfoDto> getUserAllInfo(UserAllInfoDto userAllInfo , Integer page, Integer size,Boolean roleNotNull);
 
     UserBase addOrUpdateUser(UserBase userBase);
+
+    ResetPasswordDto resetPassword(String username, String newPassword, String oldPassword);
 
 
 }

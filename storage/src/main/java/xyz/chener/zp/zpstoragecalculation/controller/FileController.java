@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -92,9 +93,11 @@ public class FileController {
 
     @PostMapping("/uploadFilePublic")
     @PreAuthorize("hasAnyRole('file_public')")
-    public UploadResultDto uploadFilePublic(@RequestParam String filename
+    public UploadResultDto uploadFilePublic(@RequestParam(required = false,defaultValue = "") String filename
             , @RequestParam MultipartFile file ) {
         try {
+            if (!StringUtils.hasText(filename))
+                filename = file.getOriginalFilename();
             return fileSystemMapService.uploadFile(null, filename, file.getBytes());
         } catch (IOException e) {
             throw new FileTransferException();

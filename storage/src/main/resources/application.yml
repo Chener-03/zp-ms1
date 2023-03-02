@@ -7,18 +7,18 @@ spring:
     nacos:
       config:
         group: zp
-        server-addr: localhost:8848
+        server-addr: 101.42.12.133:8848
         namespace: 31566b11-faba-4430-ab6c-353aa99c9874
         username: nacos
-        password: 123456
+        password: nacos123456
         file-extension: yml
         enabled: false
       discovery:
         group: zp
-        server-addr: localhost:8848
+        server-addr: 101.42.12.133:8848
         namespace: 31566b11-faba-4430-ab6c-353aa99c9874
         username: nacos
-        password: 123456
+        password: nacos123456
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
@@ -44,7 +44,7 @@ spring:
   data:
     redis:
       database: 3
-      host: 127.0.0.1
+      host: 82.156.191.218
       port: 6379
       password: admin123654
       connect-timeout: 10000

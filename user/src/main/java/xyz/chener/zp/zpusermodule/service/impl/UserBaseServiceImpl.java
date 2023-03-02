@@ -22,6 +22,7 @@ import xyz.chener.zp.zpusermodule.dao.UserBaseDao;
 import xyz.chener.zp.zpusermodule.entity.*;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
+import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 import xyz.chener.zp.zpusermodule.error.user.UserDisableException;
 import xyz.chener.zp.zpusermodule.error.user.UserExpireException;
@@ -231,6 +232,23 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
                 .set(UserBase::getDisable,userBase.getDisable())
                 .eq(UserBase::getId,userBase.getId()).update()? userBase : null;
 
+    }
+
+    @Override
+    public ResetPasswordDto resetPassword(String username, String newPassword, String oldPassword) {
+        ResetPasswordDto res = new ResetPasswordDto();
+        UserBase user = lambdaQuery().select(UserBase::getPassword)
+                .eq(UserBase::getUsername, username).one();
+        if (!bCryptPasswordEncoder.matches(oldPassword,user.getPassword())) {
+            res.setSuccess(false);
+            res.setMessage("旧密码错误");
+            return res;
+        }
+        var b = lambdaUpdate().set(UserBase::getPassword, bCryptPasswordEncoder.encode(newPassword))
+                .set(UserBase::getDs, UUID.randomUUID().toString())
+                .eq(UserBase::getUsername, username).update();
+        res.setSuccess(b);
+        return res;
     }
 
 }

@@ -21,12 +21,15 @@ public class UserExtendServiceImpl extends ServiceImpl<UserExtendDao, UserExtend
         UserExtend ue = lambdaQuery().eq(UserExtend::getUserId, userExtend.getUserId()).one();
         if (ue != null)
         {
-            if (ObjectUtils.objectFieldsEquals(ue, userExtend
-                    ,UserExtend::getEmail,UserExtend::getPhone,UserExtend::getPost,UserExtend::getAutograph,UserExtend::getNameCn,UserExtend::getIntroduce))
+            if (ObjectUtils.objectFieldsEquals(ue, userExtend,UserExtend::getAvatarId
+                    ,UserExtend::getEmail,UserExtend::getPhone
+                    ,UserExtend::getPost,UserExtend::getAutograph
+                    ,UserExtend::getNameCn,UserExtend::getIntroduce))
             {
                 return ue;
             }
             return lambdaUpdate().set(UserExtend::getEmail,userExtend.getEmail())
+                    .set(UserExtend::getAvatarId,userExtend.getAvatarId())
                     .set(UserExtend::getPhone,userExtend.getPhone())
                     .set(UserExtend::getPost,userExtend.getPost())
                     .set(UserExtend::getAutograph,userExtend.getAutograph())
