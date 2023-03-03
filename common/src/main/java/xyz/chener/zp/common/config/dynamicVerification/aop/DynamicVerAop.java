@@ -8,10 +8,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.CommonConfig;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.Ds;
+import xyz.chener.zp.common.config.dynamicVerification.annotation.DsEntityField;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.DsTargetField;
 import xyz.chener.zp.common.config.dynamicVerification.error.DynamicVerificationError;
 import xyz.chener.zp.common.config.dynamicVerification.rules.DynamicVerRuleInterface;
@@ -71,12 +71,20 @@ public class DynamicVerAop {
                     DynamicVerRuleInterface dsInstance = getDsInstance(dsClazz);
                     ArrayList<String> args = new ArrayList<>();
                     metadataSet.forEach(e->{
-                        if (isBaseType(e.fieldClass)) {
-                            args.add(processBaseType(pjp.getArgs()[e.argIndex]));
+                        Object argObject = pjp.getArgs()[e.argIndex];
+                        if (ObjectUtils.isBasicType(e.fieldClass)) {
+                            args.add(processBaseType(argObject));
+                        }else if (argObject instanceof Date){
+                            args.add(processBaseType(argObject));
+                        }else if(argObject instanceof Collection list){
+                            list.forEach(ls->{
+                                processObjectType(ls,e,args);
+                            });
                         }else {
-                            args.add(processUnBaseType(pjp.getArgs()[e.argIndex],e.dsObjectFieldNames));
+                            processObjectType(argObject,e,args);
                         }
                     });
+
                     String[] parameterNames = methodSignature.getParameterNames();
                     String dsValue = null;
                     for (int i = 0; i < parameterNames.length; i++) {
@@ -86,71 +94,131 @@ public class DynamicVerAop {
                                 dsValue = (String) pjp.getArgs()[i];
                                 if (dsValue != null) dsValue = dsValue.toLowerCase();
                             }catch (Exception ex){
-                                log.error("ds field must be String");
-                                throw new RuntimeException();
+                                throw new RuntimeException("ds field must be String");
                             }
                             break;
                         }
                     }
                     String[] argsArr = args.toArray(new String[0]);
-                    AssertUrils.state(ObjectUtils.nullSafeEquals(dsInstance.verify((Object[]) argsArr),dsValue),new RuntimeException());
+                    AssertUrils.state(ObjectUtils.nullSafeEquals(dsInstance.verify((Object[]) argsArr),dsValue),new RuntimeException("MD5 verification failed"));
                 }
             }
         }catch (Exception e){
+            log.error(e.getMessage());
             throw new DynamicVerificationError();
         }
         return pjp.proceed();
     }
 
-    private String processUnBaseType(Object obj,String[] inlineTypeName){
-        if(obj == null) return "";
-        StringBuilder sb = new StringBuilder();
-        if (obj instanceof List<?> list)
-        {
-            list.forEach(e->{
-                sb.append(processUnBaseType(e,inlineTypeName));
-            });
-            return sb.toString();
-        }
-
-        if (obj instanceof Map<?,?> map)
-        {
-            for (String s : inlineTypeName) {
-                sb.append(processBaseType(map.get(s)));
+    private void processObjectType(Object obj,DsFieldsMetadata metadata,List<String> resList){
+        processObjectType(obj,metadata,resList,false);
+    }
+    private void processObjectType(Object obj,DsFieldsMetadata metadata,List<String> resList,Boolean isObjectRecurrence)
+    {
+        if (obj instanceof Map && !isObjectRecurrence){
+            if (metadata.dsObjectFieldNames.length == 0) {
+                log.warn("The target field of dynamic validation is of map type, but the verified field is not marked");
+            }else {
+                for (String key : metadata.dsObjectFieldNames) {
+                    Object o = getObjectWithMultistageKey(obj, key);
+                    if (ObjectUtils.isBasicType(o))
+                    {
+                        resList.add(processBaseType(o));
+                    }else {
+                        log.warn("The target field in the map must be a certain data type");
+                    }
+                }
             }
-            return sb.toString();
-        }
-
-        for (String s : inlineTypeName) {
-            try {
-                Field field = obj.getClass().getDeclaredField(s);
-                boolean b = field.canAccess(obj);
-                field.setAccessible(true);
-                Object o = field.get(obj);
-                field.setAccessible(b);
-                sb.append(processBaseType(o));
+        }else {
+            ArrayList<String> objTypeString = new ArrayList<>();
+            if (metadata.dsObjectFieldNames.length > 0){
+                for (String key : metadata.dsObjectFieldNames) {
+                    Object o = getObjectWithMultistageKey(obj, key);
+                    if (ObjectUtils.isBasicType(o))
+                    {
+                        objTypeString.add(processBaseType(o));
+                    } else if (o instanceof Date){
+                        objTypeString.add(processBaseType(o));
+                    }else {
+                        log.warn("The target field in the map must be a certain data type");
+                    }
+                }
+            }else {
+                Field[] declaredFields = obj.getClass().getDeclaredFields();
+                Arrays.stream(declaredFields)
+                        .filter(e-> e.getAnnotation(DsEntityField.class)!=null)
+                        .sorted((e,p)->{
+                            DsEntityField dsEntityField = e.getAnnotation(DsEntityField.class);
+                            DsEntityField dsEntityField1 = p.getAnnotation(DsEntityField.class);
+                            return dsEntityField.order() - dsEntityField1.order();
+                        })
+                        .forEach(e->{
+                            if (ObjectUtils.isBasicType(e.getType())) {
+                                objTypeString.add(processBaseType(getFieldObject(e,obj)));
+                            } else if (e.getType().equals(Date.class)){
+                                objTypeString.add(processBaseType(getFieldObject(e,obj)));
+                            }else {
+                                processObjectType(getFieldObject(e,obj),metadata,objTypeString,true);
+                            }
+                        });
             }
-            catch (NoSuchFieldException | IllegalAccessException ignored) { }
+
+            if (objTypeString.size()>0){
+                resList.addAll(objTypeString);
+            }else {
+                log.warn("The target field of dynamic validation is of object type, but the verified field is not marked or the entity class is not annotated @DsEntityField");
+            }
         }
-        return sb.toString();
+    }
+
+    private Object getFieldObject(Field field,Object obj){
+        boolean access = field.canAccess(obj);
+        field.setAccessible(true);
+        Object o = null;
+        try {
+            o = field.get(obj);
+        } catch (IllegalAccessException ignored) { }
+        field.setAccessible(access);
+        return o;
+    }
+
+    private Object getObjectWithMultistageKey(Object map,String key){
+        if (key.contains(".")){
+            String[] split = key.split("\\.");
+            for (int i = 0; i < split.length; i++) {
+                if (i == split.length - 1)
+                    return getObjectWithKey(map,split[i]);
+                map = getObjectWithKey(map,split[i]);
+            }
+        }
+        return getObjectWithKey(map,key);
+    }
+
+    private Object getObjectWithKey(Object map,String key){
+        if (map == null) return null;
+        if (map instanceof Map){
+            return ((Map<?,?>) map).get(key);
+        }
+        try {
+            Field field = map.getClass().getDeclaredField(key);
+            boolean access = field.canAccess(map);
+            field.setAccessible(true);
+            Object o = field.get(map);
+            field.setAccessible(access);
+            return o;
+        } catch (Exception ignored) { }
+        return null;
     }
 
     private String processBaseType(Object obj){
         if (obj == null)
             return "";
-        AssertUrils.state(isBaseType(obj.getClass()),new RuntimeException("base type error"));
         if (obj instanceof Date date)
             return String.valueOf(date.getTime());
         return obj.toString();
     }
 
-    private boolean isBaseType(Class<?> clazz) {
-        return clazz.isPrimitive() || clazz == String.class
-                || clazz == Integer.class || clazz == Byte.class
-                || clazz == Long.class || clazz == Double.class
-                || clazz == Float.class || clazz == Date.class
-                || clazz == Short.class || clazz == Boolean.class || clazz == Void.class;
-    }
+
 
     private DynamicVerRuleInterface getDsInstance(Class<?> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (dsInstanceCache.containsKey(clazz.getName())) {
@@ -173,17 +241,17 @@ public class DynamicVerAop {
             Annotation ann = findAnnotation(anns, DsTargetField.class);
             if (ann != null)
             {
-                DsFieldsMetadata fm = new DsFieldsMetadata();
-                fm.fieldAnnotation = ann;
-                fm.fieldName = methodParamName[i];
-                fm.fieldClass = parameterTypes[i];
-                fm.argIndex = i;
+                DsFieldsMetadata fieldsMetadata = new DsFieldsMetadata();
+                fieldsMetadata.fieldAnnotation = ann;
+                fieldsMetadata.fieldName = methodParamName[i];
+                fieldsMetadata.fieldClass = parameterTypes[i];
+                fieldsMetadata.argIndex = i;
                 if (ann instanceof DsTargetField dsTargetField)
                 {
-                    fm.order = dsTargetField.order();
-                    fm.dsObjectFieldNames = dsTargetField.value();
-                }else throw new RuntimeException("annotation type error");
-                resSet.add(fm);
+                    fieldsMetadata.order = dsTargetField.order();
+                    fieldsMetadata.dsObjectFieldNames = dsTargetField.value();
+                }else throw new RuntimeException("Annotation type error!");
+                resSet.add(fieldsMetadata);
             }
         }
         return resSet;

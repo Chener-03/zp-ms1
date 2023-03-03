@@ -14,9 +14,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Ds {
-    /**
-     * ds值的存放字段名
-     */
+
     String value();
 
     Class<?> verImplClass() default DefaultDynamicVer.class;

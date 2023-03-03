@@ -1,14 +1,10 @@
 package xyz.chener.zp.common.autoconfig;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import xyz.chener.zp.common.config.*;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
@@ -18,7 +14,6 @@ import xyz.chener.zp.common.config.okhttpclient.HttpRequestInterfaceInject;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.config.security.AuthFilter;
 import xyz.chener.zp.common.config.security.EntryPointProcess;
-import xyz.chener.zp.common.config.security.SecurityConfig;
 import xyz.chener.zp.common.utils.Jwt;
 
 /**

@@ -12,7 +12,7 @@ public class HttpClientConfig {
 
     @Bean
     public OkHttpClient okHttpClient() {
-        return new OkHttpClient.Builder().callTimeout(Duration.ofHours(1))
+        return new OkHttpClient.Builder().callTimeout(Duration.ofMinutes(1))
                 .build();
     }
 

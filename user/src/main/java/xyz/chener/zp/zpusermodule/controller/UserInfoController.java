@@ -6,8 +6,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 import xyz.chener.zp.common.config.UnifiedReturn;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.Ds;
+import xyz.chener.zp.common.config.dynamicVerification.annotation.DsEntityField;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.DsTargetField;
 import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
@@ -63,6 +65,8 @@ public class UserInfoController {
         return userBaseService.resetPassword(SecurityContextHolder.getContext().getAuthentication().getName()
         ,newPassword,oldPassword);
     }
+
+
 
 
 }

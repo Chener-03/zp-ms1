@@ -5,6 +5,8 @@ import xyz.chener.zp.common.entity.SFunction;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
@@ -111,6 +113,59 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
                 e.setAccessible(sourceAccess);
             }catch (Exception exception){}
         });
+    }
+
+
+    public static Boolean isBasicType(Object obj) {
+        if (obj instanceof String) {
+            return true;
+        } else if (obj instanceof Integer) {
+            return true;
+        } else if (obj instanceof Long) {
+            return true;
+        } else if (obj instanceof Double) {
+            return true;
+        } else if (obj instanceof Float) {
+            return true;
+        } else if (obj instanceof BigDecimal) {
+            return true;
+        } else if (obj instanceof Boolean) {
+            return true;
+        } else if (obj instanceof Byte) {
+            return true;
+        } else if (obj instanceof Character) {
+            return true;
+        } else if (obj instanceof Short) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static Boolean isBasicType(Class<?> clz) {
+        if (clz == String.class) {
+            return true;
+        } else if (clz == Integer.class) {
+            return true;
+        } else if (clz == Long.class) {
+            return true;
+        } else if (clz == Double.class) {
+            return true;
+        } else if (clz == Float.class) {
+            return true;
+        } else if (clz == BigDecimal.class) {
+            return true;
+        } else if (clz == Boolean.class) {
+            return true;
+        } else if (clz == Byte.class) {
+            return true;
+        } else if (clz == Character.class) {
+            return true;
+        } else if (clz == Short.class) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
