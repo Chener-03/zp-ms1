@@ -21,6 +21,7 @@ import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.error.HttpErrorException;
+import xyz.chener.zp.common.utils.LoggerUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -37,8 +38,7 @@ public class UnifiedErrorReturn {
     @DispatchException(HttpErrorException.class)
     public R<String> httpErrorProcess(HttpErrorException exception)
     {
-        log.error(exception.getMessage());
-        exception.printStackTrace();
+        LoggerUtils.logErrorStackTrace(exception,log);
         return R.Builder.<String>getInstance()
                 .setCode(exception.getHttpCode())
                 .setMessage(exception.getHttpErrorMessage())
@@ -187,7 +187,7 @@ public class UnifiedErrorReturn {
 
         if (Objects.isNull(res.get()))
         {
-            log.error(exception.getMessage());
+            LoggerUtils.logErrorStackTrace( exception,log);
             return R.Builder.<String>getInstance()
                     .setCode(R.HttpCode.HTTP_ERR.get())
                     .setMessage(String.format("%s [%s]"

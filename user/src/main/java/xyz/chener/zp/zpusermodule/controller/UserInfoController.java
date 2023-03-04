@@ -15,6 +15,7 @@ import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserExtend;
 import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
+import xyz.chener.zp.zpusermodule.entity.dto.UserOtherInfo;
 import xyz.chener.zp.zpusermodule.error.userinfo.OnlyUpdateSelfError;
 import xyz.chener.zp.zpusermodule.service.UserBaseService;
 import xyz.chener.zp.zpusermodule.service.UserExtendService;
@@ -67,6 +68,12 @@ public class UserInfoController {
     }
 
 
+    @GetMapping("/getSelfOtherInfo")
+    @PreAuthorize("hasAnyRole('user_self_info_query')")
+    public UserOtherInfo getSelfOtherInfo()
+    {
+         return userExtendService.getSelfOtherInfo(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
 
 
 }

@@ -9,5 +9,9 @@
         where a.org_id = #{id}
         and a.user_id = b.id order by a.id
     </select>
+    <select id="getOrgBaseByUserId" resultType="xyz.chener.zp.zpusermodule.entity.OrgBase">
+        select a.* from org_base a,org_user_map b
+        where b.user_id = #{userId} and a.id = b.org_id
+    </select>
 </mapper>
 

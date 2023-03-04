@@ -1,0 +1,27 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.zpusermodule.dao.NoticesDao">
+
+
+    <select id="getList" resultType="xyz.chener.zp.zpusermodule.entity.dto.NoticesDto">
+        select a.* ,b.username as publish_user_name  from notices a LEFT JOIN user_base b ON a.publish_user_id=b.id
+        <where>
+            <if test="pm.createTime1 != null">
+                and a.create_time &gt;= #{pm.createTime1}
+            </if>
+            <if test="pm.createTime2 != null">
+                and a.create_time &lt;= #{pm.createTime2}
+            </if>
+            <if test="pm.endTime1 != null">
+                and a.end_time &gt;= #{pm.endTime1}
+            </if>
+            <if test="pm.endTime2 != null">
+                and a.end_time &lt;= #{pm.endTime2}
+            </if>
+            <if test="pm.type!=null and pm.type!=''">
+                and a.type = #{pm.type}
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+</mapper>
+
