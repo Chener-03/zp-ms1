@@ -5,15 +5,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.TooManyResultsException;
-import org.apache.ibatis.session.SqlSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.StringUtils;
-import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
+import xyz.chener.zp.common.config.feign.loadbalance.LoadbalancerContextHolder;
+import xyz.chener.zp.common.config.feign.loadbalance.ServerInstance;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.LoginUserDetails;
 import xyz.chener.zp.common.entity.SecurityVar;
@@ -31,6 +32,7 @@ import xyz.chener.zp.zpusermodule.error.user.UsernamePasswordErrorException;
 import xyz.chener.zp.zpusermodule.service.DictionariesService;
 import xyz.chener.zp.zpusermodule.service.GoogleRecapthaService;
 import xyz.chener.zp.zpusermodule.service.UserBaseService;
+import xyz.chener.zp.zpusermodule.service.UserModuleService;
 
 import java.util.*;
 
@@ -53,9 +55,18 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
     private final DictionariesService dictionariesService;
 
     private final GoogleRecapthaService googleRecapthaService;
+    private final NacosUtils nacosUtils;
+    private final UserModuleService userModuleService;
+
+    @Value("${spring.application.name}")
+    private String applicationName;
+
+    @Value("${spring.cloud.nacos.discovery.group}")
+    private String applicationNacosGroup;
 
 
-    public UserBaseServiceImpl(Jwt jwt, BCryptPasswordEncoder bCryptPasswordEncoder, UserLoginEventRecordServiceImpl userLoginEventRecordService, DataSourceTransactionManager dataSourceTransactionManager, UserExtendServiceImpl userExtendService, RoleServiceImpl roleService, DictionariesService dictionariesService, GoogleRecapthaService googleRecapthaService) {
+    public UserBaseServiceImpl(Jwt jwt, BCryptPasswordEncoder bCryptPasswordEncoder, UserLoginEventRecordServiceImpl userLoginEventRecordService, DataSourceTransactionManager dataSourceTransactionManager, UserExtendServiceImpl userExtendService, RoleServiceImpl roleService, DictionariesService dictionariesService, GoogleRecapthaService googleRecapthaService, NacosUtils nacosUtils
+            ,@Qualifier("xyz.chener.zp.zpusermodule.service.UserModuleService") UserModuleService userModuleService) {
         this.jwt = jwt;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userLoginEventRecordService = userLoginEventRecordService;
@@ -64,6 +75,8 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
         this.roleService = roleService;
         this.dictionariesService = dictionariesService;
         this.googleRecapthaService = googleRecapthaService;
+        this.nacosUtils = nacosUtils;
+        this.userModuleService = userModuleService;
     }
 
     @Override
@@ -248,6 +261,21 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
                 .set(UserBase::getDs, UUID.randomUUID().toString())
                 .eq(UserBase::getUsername, username).update();
         res.setSuccess(b);
+        return res;
+    }
+
+
+    @Override
+    public List<String> getAllWsOnlineUsersName() {
+        List<ServerInstance> serverInstance = nacosUtils.getServerInstance(applicationName, applicationNacosGroup);
+        if (serverInstance.size() == 0)
+            return Collections.emptyList();
+        ArrayList<String > res = new ArrayList<>();
+        serverInstance.forEach(e->{
+            LoadbalancerContextHolder.setNextInstance(e);
+            List<String> wsOnlineUsersName = userModuleService.getWsOnlineUsersName();
+            res.addAll(wsOnlineUsersName);
+        });
         return res;
     }
 

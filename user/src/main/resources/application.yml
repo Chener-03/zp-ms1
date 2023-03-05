@@ -52,7 +52,7 @@ feign:
 zp:
   jwt:
     salt: sdadaddadada
-    expires: 1000000000
+    expires: 3600000
   security:
     write-list:
       - /ws/web/connect

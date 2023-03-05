@@ -34,9 +34,28 @@ public class Notices extends Model<Notices> {
     //类型: 1 发送所有用户    2发送部分用户  3 首页通知   4 仅在线用户通知
     private String type;
 
+    private String ditch;
+
     @JsonSerialize(using = ToStringSerializer.class)
     private Long publishUserId;
 
+    private String users;
+
+    public String getUsers() {
+        return users;
+    }
+
+    public void setUsers(String users) {
+        this.users = users;
+    }
+
+    public String getDitch() {
+        return ditch;
+    }
+
+    public void setDitch(String ditch) {
+        this.ditch = ditch;
+    }
 
     public Integer getId() {
         return id;

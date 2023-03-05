@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.client.WebSocketConnectionManager;
 import xyz.chener.zp.common.config.UnifiedReturn;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.R;
@@ -35,6 +36,8 @@ import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
+import xyz.chener.zp.zpusermodule.ws.queue.ConnectQueueManager;
+import xyz.chener.zp.zpusermodule.ws.queue.entity.WsConnect;
 
 import java.util.List;
 import java.util.Objects;
@@ -246,6 +249,15 @@ public class UserController {
     }
 
 
+    @GetMapping("/getWsOnlineUsersForMs")
+    @PreAuthorize("hasAnyRole('microservice_call')")
+    public List<String> getWsOnlineUsersName(){
+        return ConnectQueueManager.getInstance()
+                .getValidConnection().stream()
+                .map(WsConnect::getConnect_user).distinct().toList();
+    }
+
+
 
     @Autowired
     WsMessagePublisher wsMessagePublisher;
@@ -254,6 +266,7 @@ public class UserController {
     @RequestMapping("/testsend")
     public void test(String user)
     {
+        List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
         NotifyMessage msg = new NotifyMessage();
         if (user!=null)
         {

@@ -8,6 +8,8 @@ import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 
+import java.util.List;
+
 /**
  * (UserBase)表服务接口
  *
@@ -31,6 +33,9 @@ public interface UserBaseService extends IService<UserBase> {
 
     ResetPasswordDto resetPassword(String username, String newPassword, String oldPassword);
 
+
+
+    List<String> getAllWsOnlineUsersName();
 
 }
 

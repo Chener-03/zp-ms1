@@ -15,6 +15,7 @@ import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.config.security.AuthFilter;
 import xyz.chener.zp.common.config.security.EntryPointProcess;
 import xyz.chener.zp.common.utils.Jwt;
+import xyz.chener.zp.common.utils.NacosUtils;
 
 /**
  * @Author: chenzp
@@ -71,5 +72,11 @@ public class CommonAutoConfig {
     public ApplicationContextHolder applicationContextHolder() {
         return new ApplicationContextHolder();
     }
+
+    @Bean
+    public NacosUtils nacosUtils() {
+        return new NacosUtils();
+    }
+
 
 }

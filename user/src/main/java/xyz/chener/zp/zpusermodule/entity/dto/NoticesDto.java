@@ -17,7 +17,7 @@ public class NoticesDto{
     private Integer id;
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -25,7 +25,8 @@ public class NoticesDto{
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTime2;
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endTime1;
@@ -43,8 +44,27 @@ public class NoticesDto{
     @JsonSerialize(using = ToStringSerializer.class)
     private Long publishUserId;
 
+    private String ditch;
+
     private String publishUserName;
 
+    public String getDitch() {
+        return ditch;
+    }
+
+    public void setDitch(String ditch) {
+        this.ditch = ditch;
+    }
+
+    private String users;
+
+    public String getUsers() {
+        return users;
+    }
+
+    public void setUsers(String users) {
+        this.users = users;
+    }
     public Integer getId() {
         return id;
     }

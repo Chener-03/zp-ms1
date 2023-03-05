@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 文件服务 自定义负载均衡 按照硬件uid分配
+ */
 public class CustomLoadBalance implements ReactorServiceInstanceLoadBalancer {
 
 

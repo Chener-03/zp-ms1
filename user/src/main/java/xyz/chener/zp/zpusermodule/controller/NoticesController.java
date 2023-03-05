@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
+import xyz.chener.zp.zpusermodule.entity.Notices;
 import xyz.chener.zp.zpusermodule.entity.dto.NoticesDto;
 import xyz.chener.zp.zpusermodule.service.DictionariesService;
 import xyz.chener.zp.zpusermodule.service.NoticesService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.NoticesServiceImpl;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -46,5 +48,28 @@ public class NoticesController {
         Dictionaries dictionaries = dictionariesService.lambdaQuery().eq(Dictionaries::getId, DictionariesKeyEnum.NOTICES_TYPE).one();
         return dictionaries.getValue0();
     }
+
+    @GetMapping("/getNoticesDitchJson")
+    public String getNoticesDitchJson(){
+        Dictionaries dictionaries = dictionariesService.lambdaQuery().eq(Dictionaries::getId, DictionariesKeyEnum.NOTICES_DITCH).one();
+        return dictionaries.getValue0();
+    }
+
+
+    @PostMapping("/publishNotices")
+    public Boolean publishNotices(@ModelAttribute NoticesDto dto
+            ,@RequestParam(value = "userNames",required = false) List<String> userNames
+            ,@RequestParam(value = "ditchs",required = false) List<String> ditchs)
+    {
+        return noticesService.publish(dto,userNames,ditchs);
+    }
+
+    @PostMapping("/notificationExpiration")
+    public Boolean notificationExpiration(@RequestParam(value = "id") Integer id)
+    {
+        return noticesService.lambdaUpdate().set(Notices::getEndTime,new Date()).eq(Notices::getId,id).update();
+    }
+
+
 
 }

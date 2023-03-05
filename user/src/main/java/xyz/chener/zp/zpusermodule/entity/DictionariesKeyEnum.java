@@ -9,5 +9,6 @@ public class DictionariesKeyEnum {
 
     public static final Integer ORG_TYPE = 3;
     public static final Integer NOTICES_TYPE = 4;
+    public static final Integer NOTICES_DITCH = 5;
 
 }
