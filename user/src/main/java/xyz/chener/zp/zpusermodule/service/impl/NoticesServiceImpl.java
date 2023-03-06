@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -83,6 +84,18 @@ public class NoticesServiceImpl extends ServiceImpl<NoticesDao, Notices> impleme
         return res;
     }
 
+    @Override
+    public List<NoticesDto> getHomeAnnouncement() {
+        return this.lambdaQuery().ge(Notices::getEndTime, new Date())
+                .eq(Notices::getType, NoticeTypeEnum.INDEX_PAGE)
+                .orderByDesc(Notices::getId)
+                .list().stream().map(e -> {
+                    NoticesDto dto = new NoticesDto();
+                    ObjectUtils.copyFields(e, dto);
+                    return dto;
+                }).toList();
+    }
+
 
     private void publishAllUser( NoticesDto dto,List<String> ditchs,Long publishUserId ){
         List<UserBase> list = userBaseService.lambdaQuery().select(UserBase::getId, UserBase::getUsername).list();
@@ -101,6 +114,7 @@ public class NoticesServiceImpl extends ServiceImpl<NoticesDao, Notices> impleme
                 msg.setCreateTime(new Date());
                 msg.setIsread(false);
                 msg.setSendUserId(publishUserId);
+                msg.setTitle("公告");
                 messages.add(msg);
             }
             // todo: add email phone
@@ -136,6 +150,7 @@ public class NoticesServiceImpl extends ServiceImpl<NoticesDao, Notices> impleme
                     msg.setCreateTime(new Date());
                     msg.setIsread(false);
                     msg.setSendUserId(publishUserId);
+                    msg.setTitle("公告");
                     messages.add(msg);
                 }
                 // todo: add email phone
@@ -171,6 +186,7 @@ public class NoticesServiceImpl extends ServiceImpl<NoticesDao, Notices> impleme
                     msg.setCreateTime(new Date());
                     msg.setIsread(false);
                     msg.setSendUserId(publishUserId);
+                    msg.setTitle("公告");
                     messages.add(msg);
                 }
                 // todo: add email phone

@@ -18,5 +18,8 @@ public interface NoticesService extends IService<Notices> {
 
     Boolean publish( NoticesDto dto,List<String> userNames,List<String> ditchs);
 
+
+    List<NoticesDto> getHomeAnnouncement();
+
 }
 

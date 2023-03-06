@@ -27,7 +27,8 @@ public class Messages extends Model<Messages> {
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
-    
+
+    private String title;
     private String content;
     //文本类型: text or other
     private String type;
@@ -50,10 +51,11 @@ public class Messages extends Model<Messages> {
     @TableLogic(value = "0",delval = "1")
     private Integer isdelete;
 
-    @TableField()
+
     private Boolean senderDelete;
     private Boolean receiveDelete;
 
+    private String refMessageId;
 
     public static class Type{
         public static final String TEXT = "text";
@@ -64,6 +66,22 @@ public class Messages extends Model<Messages> {
         public static final String NORMAL = "0";
         public static final String IMPORTANT = "1";
         public static final String VERY_IMPORTANT = "2";
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getRefMessageId() {
+        return refMessageId;
+    }
+
+    public void setRefMessageId(String refMessageId) {
+        this.refMessageId = refMessageId;
     }
 
     public Boolean getSenderDelete() {
