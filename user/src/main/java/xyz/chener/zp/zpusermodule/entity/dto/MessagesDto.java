@@ -21,6 +21,8 @@ public class MessagesDto {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
+    private String username;
+
     private String title;
     private String content;
     //文本类型: text or other
@@ -57,6 +59,13 @@ public class MessagesDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date refMessageDate;
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Integer getId() {
         return id;

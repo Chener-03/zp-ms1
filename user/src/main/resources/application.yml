@@ -56,3 +56,5 @@ zp:
   security:
     write-list:
       - /ws/web/connect
+
+

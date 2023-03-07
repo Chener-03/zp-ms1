@@ -33,9 +33,12 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
 
     @Override
     public MessagesDto getUserMessageById(String username, Integer messageId) {
-        UserBase user = userBaseService.lambdaQuery().select(UserBase::getId)
+        UserBase user = userBaseService.lambdaQuery().select(UserBase::getId,UserBase::getUsername)
                 .eq(UserBase::getUsername, username).one();
-        Messages messages = this.lambdaQuery().eq(Messages::getId, messageId).eq(Messages::getUserId, user.getId()).one();
+        Messages messages = this.lambdaQuery()
+                .eq(Messages::getId, messageId)
+                .and(e -> e.eq(Messages::getSendUserId, user.getId())
+                        .or().eq(Messages::getUserId, user.getId())).one();
         AssertUrils.state(messages != null, OnlyGetSelfMessage.class);
         AssertUrils.state(!messages.getReceiveDelete() && messages.getIsdelete()==0, ThisMessageAlreadyDelete.class);
         MessagesDto messagesDto = new MessagesDto();
@@ -45,10 +48,19 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
                     .set(Messages::getReadTime, new Date())
                     .eq(Messages::getId, messageId).update();
         }
-        userBaseService.lambdaQuery().select(UserBase::getUsername)
-                .eq(UserBase::getId, messages.getSendUserId()).oneOpt().ifPresent(userBase -> {
-            messagesDto.setSendUserName(userBase.getUsername());
-        });
+        if (user.getId().equals(messages.getSendUserId())) {
+            messagesDto.setSendUserName(user.getUsername());
+            userBaseService.lambdaQuery().select(UserBase::getUsername)
+                    .eq(UserBase::getId, messages.getUserId()).oneOpt().ifPresent(userBase -> {
+                        messagesDto.setUsername(userBase.getUsername());
+                    });
+        }else {
+            messagesDto.setUsername(user.getUsername());
+            userBaseService.lambdaQuery().select(UserBase::getUsername)
+                    .eq(UserBase::getId, messages.getSendUserId()).oneOpt().ifPresent(userBase -> {
+                        messagesDto.setSendUserName(userBase.getUsername());
+                    });
+        }
         if (messages.getRefMessageId() != null) {
             this.lambdaQuery().select(Messages::getTitle, Messages::getCreateTime)
                     .eq(Messages::getId, messages.getRefMessageId()).oneOpt().ifPresent(e->{
