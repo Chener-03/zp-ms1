@@ -1,28 +1,21 @@
-package xyz.chener.zp.zpusermodule.entity;
-
-import java.util.Date;
+package xyz.chener.zp.zpusermodule.entity.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
- * (Messages)表实体类
- *
- * @author makejava
- * @since 2023-03-05 12:31:57
+ * @Author: chenzp
+ * @Date: 2023/03/07/16:26
+ * @Email: chen@chener.xyz
  */
-@SuppressWarnings("serial")
-public class Messages extends Model<Messages> {
+public class MessagesDto {
 
-    @TableId(type = IdType.AUTO)
     private Integer id;
 
     @JsonSerialize(using = ToStringSerializer.class)
@@ -39,13 +32,15 @@ public class Messages extends Model<Messages> {
     private Date createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date readTime;
-    //false:0  
+    //false:0
     private Boolean isread;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long sendUserId;
-    
+
+    private String sendUserName;
+
     private String jmpLink;
-    
+
     private String jmpLinkText;
 
     @TableLogic(value = "0",delval = "1")
@@ -57,48 +52,11 @@ public class Messages extends Model<Messages> {
 
     private Integer refMessageId;
 
-    public static class Type{
-        public static final String TEXT = "text";
-        public static final String OTHER = "other";
-    }
+    private String refMessageTitle;
 
-    public static class Imp{
-        public static final String NORMAL = "0";
-        public static final String IMPORTANT = "1";
-        public static final String VERY_IMPORTANT = "2";
-    }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date refMessageDate;
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getRefMessageId() {
-        return refMessageId;
-    }
-
-    public void setRefMessageId(Integer refMessageId) {
-        this.refMessageId = refMessageId;
-    }
-
-    public Boolean getSenderDelete() {
-        return senderDelete;
-    }
-
-    public void setSenderDelete(Boolean senderDelete) {
-        this.senderDelete = senderDelete;
-    }
-
-    public Boolean getReceiveDelete() {
-        return receiveDelete;
-    }
-
-    public void setReceiveDelete(Boolean receiveDelete) {
-        this.receiveDelete = receiveDelete;
-    }
 
     public Integer getId() {
         return id;
@@ -114,6 +72,14 @@ public class Messages extends Model<Messages> {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {
@@ -172,6 +138,14 @@ public class Messages extends Model<Messages> {
         this.sendUserId = sendUserId;
     }
 
+    public String getSendUserName() {
+        return sendUserName;
+    }
+
+    public void setSendUserName(String sendUserName) {
+        this.sendUserName = sendUserName;
+    }
+
     public String getJmpLink() {
         return jmpLink;
     }
@@ -196,6 +170,43 @@ public class Messages extends Model<Messages> {
         this.isdelete = isdelete;
     }
 
-
+    public Boolean getSenderDelete() {
+        return senderDelete;
     }
 
+    public void setSenderDelete(Boolean senderDelete) {
+        this.senderDelete = senderDelete;
+    }
+
+    public Boolean getReceiveDelete() {
+        return receiveDelete;
+    }
+
+    public void setReceiveDelete(Boolean receiveDelete) {
+        this.receiveDelete = receiveDelete;
+    }
+
+    public Integer getRefMessageId() {
+        return refMessageId;
+    }
+
+    public void setRefMessageId(Integer refMessageId) {
+        this.refMessageId = refMessageId;
+    }
+
+    public String getRefMessageTitle() {
+        return refMessageTitle;
+    }
+
+    public void setRefMessageTitle(String refMessageTitle) {
+        this.refMessageTitle = refMessageTitle;
+    }
+
+    public Date getRefMessageDate() {
+        return refMessageDate;
+    }
+
+    public void setRefMessageDate(Date refMessageDate) {
+        this.refMessageDate = refMessageDate;
+    }
+}
