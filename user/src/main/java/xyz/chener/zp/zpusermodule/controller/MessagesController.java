@@ -1,15 +1,17 @@
 package xyz.chener.zp.zpusermodule.controller;
 
+import com.github.pagehelper.PageInfo;
+import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.query.FieldQuery;
 import xyz.chener.zp.zpusermodule.entity.dto.MessagesDto;
 import xyz.chener.zp.zpusermodule.service.MessagesService;
+
+import java.util.List;
 
 /**
  * @Author: chenzp
@@ -34,6 +36,23 @@ public class MessagesController {
     public MessagesDto getUserMessageById(@RequestParam Integer messageId){
         return messagesService.getUserMessageById(SecurityContextHolder.getContext().getAuthentication().getName()
                 ,messageId);
+    }
+
+
+    @PostMapping("/sendUsersMessage")
+    public Boolean sendUsersMessage(@ModelAttribute @Validated MessagesDto messagesDto
+            , @RequestParam("users") @Size(min=1,message = "用户不能为空") List<Long> userIds)
+    {
+        return messagesService.sendUsersMessage(messagesDto,userIds,SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
+
+    @GetMapping("/getMessagesList")
+    public PageInfo<MessagesDto> getMessagesList(@ModelAttribute MessagesDto messagesDto
+            , @RequestParam(value = "isReceive") Boolean isReceive
+            , @RequestParam(value = "page",defaultValue = "1") Integer page, @RequestParam(value = "size",defaultValue = "10") Integer size){
+        return messagesService.getMessagesList(messagesDto,SecurityContextHolder.getContext().getAuthentication().getName()
+                ,isReceive,page,size);
     }
 
 }

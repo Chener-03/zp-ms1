@@ -57,4 +57,6 @@ zp:
     write-list:
       - /ws/web/connect
 
-
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

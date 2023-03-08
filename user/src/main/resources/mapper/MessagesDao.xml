@@ -1,0 +1,25 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.zpusermodule.dao.MessagesDao">
+
+
+    <select id="getMessagesList" resultType="xyz.chener.zp.zpusermodule.entity.dto.MessagesDto">
+        select a.id, a.user_id, a.title, a.type, a.imp, a.create_time, a.read_time, a.isread, a.send_user_id, a.jmp_link, a.jmp_link_text,a.ref_message_id
+             ,b.username as username,c.username as send_user_name from messages a,user_base b,user_base c
+        WHERE a.user_id=b.id and a.send_user_id=c.id
+        and a.isdelete=0
+        <if test="isReceive==true">
+            and b.username=#{username} and a.receive_delete=0
+        </if>
+        <if test="isReceive==false">
+            and c.username=#{username} and a.sender_delete=0
+        </if>
+        <if test="dto.isread!=null">
+            and a.isread=#{dto.isread}
+        </if>
+        <if test="dto.imp!=null and dto.imp!=''">
+            and a.imp=#{dto.imp}
+        </if>
+        ORDER BY a.isread asc , a.id desc
+    </select>
+</mapper>
+
