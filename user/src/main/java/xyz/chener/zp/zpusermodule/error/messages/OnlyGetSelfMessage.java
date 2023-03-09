@@ -10,6 +10,6 @@ import xyz.chener.zp.common.error.HttpErrorException;
  */
 public class OnlyGetSelfMessage extends HttpErrorException {
     public OnlyGetSelfMessage() {
-        super(R.HttpCode.HTTP_NOT_ACCEPTABLE.get(), "只能获取自己的消息");
+        super(R.HttpCode.HTTP_NOT_ACCEPTABLE.get(), "不是您的消息或消息已被您删除");
     }
 }

@@ -1,9 +1,10 @@
-package xyz.chener.zp.common.config.query;
+package xyz.chener.zp.common.config.query.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import org.springframework.util.ReflectionUtils;
+import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.config.query.error.CostomFieldQueryError;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.chain.AbstractChainTreeExecute;

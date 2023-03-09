@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import xyz.chener.zp.common.config.query.annotation.QueryMustField;
 
 import java.io.Serializable;
 
@@ -23,9 +24,11 @@ import java.io.Serializable;
 public class Messages extends Model<Messages> {
 
     @TableId(type = IdType.AUTO)
+    @QueryMustField
     private Integer id;
 
     @JsonSerialize(using = ToStringSerializer.class)
+    @QueryMustField
     private Long userId;
 
     private String title;
@@ -39,9 +42,11 @@ public class Messages extends Model<Messages> {
     private Date createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date readTime;
-    //false:0  
+    //false:0
+    @QueryMustField
     private Boolean isread;
     @JsonSerialize(using = ToStringSerializer.class)
+    @QueryMustField
     private Long sendUserId;
     
     private String jmpLink;
@@ -49,11 +54,15 @@ public class Messages extends Model<Messages> {
     private String jmpLinkText;
 
     @TableLogic(value = "0",delval = "1")
+    @QueryMustField
     private Integer isdelete;
 
 
+    @QueryMustField
     private Boolean senderDelete;
+    @QueryMustField
     private Boolean receiveDelete;
+
 
     private Integer refMessageId;
 

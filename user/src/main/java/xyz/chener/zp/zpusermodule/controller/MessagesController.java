@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.config.query.FieldQuery;
+import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.zpusermodule.entity.dto.MessagesDto;
 import xyz.chener.zp.zpusermodule.service.MessagesService;
 
@@ -33,15 +33,16 @@ public class MessagesController {
     }
 
     @GetMapping("/getUserMessageById")
-    public MessagesDto getUserMessageById(@RequestParam Integer messageId){
+    public MessagesDto getUserMessageById(@RequestParam(value = "messageId") Integer messageId
+            , @RequestParam(value = "isReceive") Boolean isReceive){
         return messagesService.getUserMessageById(SecurityContextHolder.getContext().getAuthentication().getName()
-                ,messageId);
+                ,messageId,isReceive);
     }
 
 
     @PostMapping("/sendUsersMessage")
     public Boolean sendUsersMessage(@ModelAttribute @Validated MessagesDto messagesDto
-            , @RequestParam("users") @Size(min=1,message = "用户不能为空") List<Long> userIds)
+            , @RequestParam("userIds") @Size(min=1,message = "用户不能为空") List<Long> userIds)
     {
         return messagesService.sendUsersMessage(messagesDto,userIds,SecurityContextHolder.getContext().getAuthentication().getName());
     }
@@ -53,6 +54,11 @@ public class MessagesController {
             , @RequestParam(value = "page",defaultValue = "1") Integer page, @RequestParam(value = "size",defaultValue = "10") Integer size){
         return messagesService.getMessagesList(messagesDto,SecurityContextHolder.getContext().getAuthentication().getName()
                 ,isReceive,page,size);
+    }
+
+    @PostMapping("/removeMessage")
+    public Boolean removeMessage(@RequestParam("messageId") Integer messageId,@RequestParam(value = "isReceive") Boolean isReceive){
+        return messagesService.removeMessage(messageId,SecurityContextHolder.getContext().getAuthentication().getName(), isReceive);
     }
 
 }

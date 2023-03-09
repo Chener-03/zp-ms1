@@ -1,4 +1,4 @@
-package xyz.chener.zp.common.config.query;
+package xyz.chener.zp.common.config.query.annotation;
 
 import java.lang.annotation.*;
 
@@ -13,7 +13,7 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.FIELD})
 public @interface QueryTableName {
     String value();
 }

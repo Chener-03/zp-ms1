@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.config.query.FieldQuery;
+import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.utils.AssertUrils;

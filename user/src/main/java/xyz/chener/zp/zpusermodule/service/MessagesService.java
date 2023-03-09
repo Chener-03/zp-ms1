@@ -19,12 +19,13 @@ import java.util.List;
  */
 public interface MessagesService extends IService<Messages> {
 
-    MessagesDto getUserMessageById(String  username,Integer messageId);
+    MessagesDto getUserMessageById(String  username,Integer messageId,Boolean isReceive);
 
     Boolean sendUsersMessage( MessagesDto messagesDto,List<Long> userIds,String sendUsername);
 
     PageInfo<MessagesDto> getMessagesList(MessagesDto messagesDto, String username
             , Boolean isReceive, Integer page, Integer size);
 
+    Boolean removeMessage(Integer messageId, String username,Boolean isReceive);
 }
 

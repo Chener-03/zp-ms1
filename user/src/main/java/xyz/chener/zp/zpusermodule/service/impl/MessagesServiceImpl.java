@@ -3,8 +3,15 @@ package xyz.chener.zp.zpusermodule.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.web.bind.annotation.RequestParam;
+import xyz.chener.zp.common.config.query.QueryHelper;
+import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.common.utils.TransactionUtils;
 import xyz.chener.zp.zpusermodule.dao.MessagesDao;
 import xyz.chener.zp.zpusermodule.entity.Messages;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
@@ -33,17 +40,35 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
         this.userBaseService = userBaseService;
     }
 
+    private DataSourceTransactionManager transactionManager;
+
+    @Autowired
+    public void setTransactionManager(DataSourceTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
 
     @Override
-    public MessagesDto getUserMessageById(String username, Integer messageId) {
+    public MessagesDto getUserMessageById(String username, Integer messageId, Boolean isReceive) {
         UserBase user = userBaseService.lambdaQuery().select(UserBase::getId,UserBase::getUsername)
                 .eq(UserBase::getUsername, username).one();
-        Messages messages = this.lambdaQuery()
-                .eq(Messages::getId, messageId)
-                .and(e -> e.eq(Messages::getSendUserId, user.getId())
-                        .or().eq(Messages::getUserId, user.getId())).one();
+        Messages messages = null;
+
+        if (isReceive){
+            messages = this.lambdaQuery().eq(Messages::getId, messageId)
+                    .eq(Messages::getUserId, user.getId())
+                    .one();
+        }else {
+            messages = this.lambdaQuery().eq(Messages::getId, messageId)
+                    .eq(Messages::getSendUserId, user.getId())
+                    .one();
+        }
+
         AssertUrils.state(messages != null, OnlyGetSelfMessage.class);
-        AssertUrils.state(!messages.getReceiveDelete() && messages.getIsdelete()==0, ThisMessageAlreadyDelete.class);
+        if (isReceive) {
+            AssertUrils.state(messages.getIsdelete() == 0 && !messages.getReceiveDelete(), ThisMessageAlreadyDelete.class);
+        }else {
+            AssertUrils.state(messages.getIsdelete() == 0 && !messages.getSenderDelete(), ThisMessageAlreadyDelete.class);
+        }
         MessagesDto messagesDto = new MessagesDto();
         ObjectUtils.copyFields(messages, messagesDto);
         if (!messages.getIsread() && user.getId().equals(messages.getUserId())) {
@@ -51,19 +76,24 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
                     .set(Messages::getReadTime, new Date())
                     .eq(Messages::getId, messageId).update();
         }
-        if (user.getId().equals(messages.getSendUserId())) {
-            messagesDto.setSendUserName(user.getUsername());
-            userBaseService.lambdaQuery().select(UserBase::getUsername)
-                    .eq(UserBase::getId, messages.getUserId()).oneOpt().ifPresent(userBase -> {
-                        messagesDto.setUsername(userBase.getUsername());
-                    });
-        }else {
+
+        if (isReceive){
             messagesDto.setUsername(user.getUsername());
             userBaseService.lambdaQuery().select(UserBase::getUsername)
                     .eq(UserBase::getId, messages.getSendUserId()).oneOpt().ifPresent(userBase -> {
                         messagesDto.setSendUserName(userBase.getUsername());
                     });
+            this.lambdaUpdate().set(Messages::getIsread, true)
+                    .set(Messages::getReadTime, new Date())
+                    .eq(Messages::getId, messageId).update();
+        }else {
+            messagesDto.setSendUserName(user.getUsername());
+            userBaseService.lambdaQuery().select(UserBase::getUsername)
+                    .eq(UserBase::getId, messages.getUserId()).oneOpt().ifPresent(userBase -> {
+                        messagesDto.setUsername(userBase.getUsername());
+                    });
         }
+
         if (messages.getRefMessageId() != null) {
             this.lambdaQuery().select(Messages::getTitle, Messages::getCreateTime)
                     .eq(Messages::getId, messages.getRefMessageId()).oneOpt().ifPresent(e->{
@@ -98,6 +128,38 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
             , Boolean isReceive,Integer page,Integer size) {
         PageHelper.startPage(page,size);
         return new PageInfo<>(getBaseMapper().getMessagesList(messagesDto,username,isReceive));
+    }
+
+    @Override
+    public Boolean removeMessage(Integer messageId, String username,Boolean isReceive) {
+        TransactionStatus transaction = transactionManager.getTransaction(TransactionUtils.getTransactionDefinition());
+        try {
+            UserBase user = userBaseService.lambdaQuery().select(UserBase::getId,UserBase::getUsername)
+                    .eq(UserBase::getUsername, username).one();
+            if (isReceive){
+                lambdaUpdate().set(Messages::getReceiveDelete, true)
+                        .eq(Messages::getId, messageId)
+                        .eq(Messages::getUserId, user.getId())
+                        .update();
+            }else {
+                lambdaUpdate().set(Messages::getSenderDelete, true)
+                        .eq(Messages::getSendUserId, user.getId())
+                        .eq(Messages::getId, messageId)
+                        .update();
+            }
+            lambdaQuery().select(Messages::getSenderDelete,Messages::getReceiveDelete)
+                    .eq(Messages::getId, messageId).oneOpt().ifPresent(e1->{
+                        if (e1.getSenderDelete() && e1.getReceiveDelete())
+                        {
+                            removeById(messageId);
+                        }
+                    });
+            transactionManager.commit(transaction);
+        }catch (Exception ex){
+            transactionManager.rollback(transaction);
+            return false;
+        }
+        return true;
     }
 }
 
