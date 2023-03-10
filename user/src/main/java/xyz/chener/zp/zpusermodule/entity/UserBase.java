@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
+import xyz.chener.zp.common.config.paramDecryption.annotation.DecryField;
 
 import java.util.Date;
 
@@ -27,7 +28,7 @@ public class UserBase extends Model<UserBase> {
 
     @Length(min = 3,max = 20,message = "用户名长度3-20")
     private String username;
-    
+
     private String password;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

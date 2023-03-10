@@ -13,6 +13,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import xyz.chener.zp.common.config.paramDecryption.annotation.DecryField;
 import xyz.chener.zp.common.config.paramDecryption.annotation.ModelAttributeDecry;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestBodyDecry;
 import xyz.chener.zp.common.utils.ObjectUtils;
@@ -53,13 +54,14 @@ public class RequestBodyDecryResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         AtomicReference<Object> res = new AtomicReference<>(null);
+        RequestBodyDecry parameterAnnotation = parameter.getParameterAnnotation(RequestBodyDecry.class);
         if (webRequest.getNativeRequest() instanceof HttpServletRequest request) {
             ByteArrayOutputStream bios = new ByteArrayOutputStream();
             request.getInputStream().transferTo(bios);
             bios.close();
             final String sourceData = bios.toString(StandardCharsets.UTF_8);
             request.setAttribute(REQUEST_BODY_SOURCE_DATA, sourceData);
-            return buildObjectMapper().readValue(sourceData, parameter.getParameterType());
+            return buildObjectMapper(parameterAnnotation).readValue(sourceData, parameter.getParameterType());
         }else {
             log.warn("webRequest 不是 HttpServletRequest???");
         }
@@ -67,32 +69,59 @@ public class RequestBodyDecryResolver implements HandlerMethodArgumentResolver {
     }
 
 
-    private ObjectMapper buildObjectMapper() {
+    private ObjectMapper buildObjectMapper(RequestBodyDecry parameterAnnotation) {
         ObjectMapper om = new ObjectMapper();
         SimpleModule sm = new SimpleModule();
-        sm.addDeserializer(String.class, new DecryJacksonDeserializer());
+        sm.addDeserializer(String.class, new DecryJacksonDeserializerDipatcher(parameterAnnotation));
         om.registerModule(sm);
-
-
+        om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         return om;
     }
 
 
-    private class DecryJacksonDeserializer extends JsonDeserializer<String > implements ContextualDeserializer {
+    private static class DecryJacksonDeserializerDipatcher extends JsonDeserializer<String> implements ContextualDeserializer {
+
+        private final RequestBodyDecry requestBodyDecry;
+
+
+        public DecryJacksonDeserializerDipatcher(RequestBodyDecry requestBodyDecry) {
+            this.requestBodyDecry = requestBodyDecry;
+        }
+
         @Override
         public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-
-
             return null;
         }
 
         @Override
         public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
-
-            return this;
+            if (ObjectUtils.nullSafeEquals(property.getType().getRawClass(),String.class)) {
+                return new DecryJacksonDeserializer(requestBodyDecry
+                        ,property.getAnnotation(DecryField.class)
+                        ,property.getType().getRawClass());
+            }
+            return ctxt.findContextualValueDeserializer(property.getType(), property);
         }
     }
 
 
+    private static class DecryJacksonDeserializer extends JsonDeserializer<Object> {
+
+        private final DecryField decryField;
+        private final RequestBodyDecry requestBodyDecry;
+
+        private final Class targetClass;
+
+        public DecryJacksonDeserializer(RequestBodyDecry requestBodyDecry,DecryField decryField,Class targetClass) {
+            this.requestBodyDecry = requestBodyDecry;
+            this.decryField = decryField;
+            this.targetClass = targetClass;
+        }
+
+        @Override
+        public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+            return p.getText();
+        }
+    }
 
 }
