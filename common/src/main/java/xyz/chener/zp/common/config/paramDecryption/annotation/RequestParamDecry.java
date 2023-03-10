@@ -1,7 +1,8 @@
-package xyz.chener.zp.common.config.encryptionDecryption.annotation;
+package xyz.chener.zp.common.config.paramDecryption.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.bind.annotation.ValueConstants;
+import xyz.chener.zp.common.config.paramDecryption.decryProcess.impl.DefaultParamBase64Decry;
 
 import java.lang.annotation.*;
 
@@ -26,6 +27,6 @@ public @interface RequestParamDecry {
 
     String defaultValue() default ValueConstants.DEFAULT_NONE;
 
-    Class<?> decryClass() default Void.class;
+    Class<?> decryClass() default DefaultParamBase64Decry.class;
 
 }

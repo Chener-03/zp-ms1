@@ -15,15 +15,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.paramDecryption.annotation.ModelAttributeDecry;
+import xyz.chener.zp.common.config.paramDecryption.annotation.RequestBodyDecry;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
-import xyz.chener.zp.zpusermodule.entity.Dictionaries;
-import xyz.chener.zp.zpusermodule.entity.UserBase;
-import xyz.chener.zp.zpusermodule.entity.UserExtend;
-import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;
+import xyz.chener.zp.zpusermodule.entity.*;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
@@ -90,8 +89,8 @@ public class UserController {
     @PreAuthorize("hasAnyRole('microservice_call','user_user_list')")
     public PageInfo<UserAllInfoDto> getUserAllInfo(@ModelAttribute UserAllInfoDto userAllInfo
             , @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size
-            ,@RequestParam(defaultValue = "false") Boolean isLike
-            ,@RequestParam(defaultValue = "false") Boolean roleNotNull )
+            , @RequestParam(defaultValue = "false") Boolean isLike
+            , @RequestParam(defaultValue = "false") Boolean roleNotNull )
     {
         try {
             if (isLike)
@@ -264,19 +263,40 @@ public class UserController {
 
     @WriteList
     @RequestMapping("/testsend")
-    public void test(String user)
+    public void test(@RequestBodyDecry UserBase user)
     {
         List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
         NotifyMessage msg = new NotifyMessage();
         if (user!=null)
         {
             msg.setType(NotifyMessage.TYPE.ONE_USER);
-            msg.setUser(user);
+            //msg.setUser(user.getDs());
         }else {
             msg.setType(NotifyMessage.TYPE.ALL_USER);
         }
         msg.setContent("测试消息");
         wsMessagePublisher.publishWsUserMessage(msg);
+    }
+
+    public class U{
+        public UserBase userBase;
+        public UserExtend userExtend;
+
+        public UserBase getUserBase() {
+            return userBase;
+        }
+
+        public void setUserBase(UserBase userBase) {
+            this.userBase = userBase;
+        }
+
+        public UserExtend getUserExtend() {
+            return userExtend;
+        }
+
+        public void setUserExtend(UserExtend userExtend) {
+            this.userExtend = userExtend;
+        }
     }
 
 }

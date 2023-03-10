@@ -11,6 +11,7 @@ import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpRequestInterfaceInject;
+import xyz.chener.zp.common.config.paramDecryption.ParamDecryAutoConfig;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.config.security.AuthFilter;
 import xyz.chener.zp.common.config.security.EntryPointProcess;
@@ -29,6 +30,7 @@ import xyz.chener.zp.common.utils.NacosUtils;
         , UnifiedErrorReturn.class
         , WriteListAutoConfig.class, WriteListRegister.class
         , UnifiedReturnConfig.class
+        , ParamDecryAutoConfig.class
         , HttpRequestInterfaceInject.class
         , HttpClientConfig.class})
 public class CommonAutoConfig {
