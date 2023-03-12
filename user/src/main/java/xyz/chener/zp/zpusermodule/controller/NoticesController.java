@@ -6,14 +6,11 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
 import xyz.chener.zp.zpusermodule.entity.Notices;
 import xyz.chener.zp.zpusermodule.entity.dto.NoticesDto;
-import xyz.chener.zp.zpusermodule.service.DictionariesService;
-import xyz.chener.zp.zpusermodule.service.NoticesService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.NoticesServiceImpl;
 

@@ -48,11 +48,11 @@ public class MessagesServiceImpl extends ServiceImpl<MessagesDao, Messages> impl
     }
 
     @Override
-    public MessagesDto getUserMessageById(String username, Integer messageId, Boolean isReceive) {
+    public MessagesDto getUserMessageById(String username, Integer messageId, Boolean isReceive,FieldQuery fieldQuery) {
         UserBase user = userBaseService.lambdaQuery().select(UserBase::getId,UserBase::getUsername)
                 .eq(UserBase::getUsername, username).one();
         Messages messages = null;
-
+        QueryHelper.StartQuery(fieldQuery, Messages.class);
         if (isReceive){
             messages = this.lambdaQuery().eq(Messages::getId, messageId)
                     .eq(Messages::getUserId, user.getId())

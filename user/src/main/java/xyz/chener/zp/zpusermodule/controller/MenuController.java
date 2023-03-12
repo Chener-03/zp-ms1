@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.chener.zp.common.config.UnifiedReturn;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
 import xyz.chener.zp.zpusermodule.entity.dto.MenuNameDto;
 import xyz.chener.zp.zpusermodule.service.MenuService;

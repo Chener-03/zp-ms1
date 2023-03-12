@@ -26,6 +26,7 @@ import xyz.chener.zp.zpgateway.common.utils.AssertUrils;
 import xyz.chener.zp.zpgateway.common.utils.Jwt;
 import xyz.chener.zp.zpgateway.entity.vo.Role;
 import xyz.chener.zp.zpgateway.entity.vo.UserBase;
+import xyz.chener.zp.zpgateway.error.SystemCheckError;
 import xyz.chener.zp.zpgateway.error.TokenOverdueException;
 import xyz.chener.zp.zpgateway.error.UserAuthNotFoundError;
 import xyz.chener.zp.zpgateway.error.UserNotFoundError;
@@ -52,11 +53,6 @@ public class SecurityRepository implements WebFilter {
     private final Jwt jwt;
     private final CommonConfig commonConfig;
 
-     public SecurityRepository(){
-        userModuleService=null;
-        jwt=null;
-        commonConfig=null;
-    }
 
     public SecurityRepository(@Qualifier("xyz.chener.zp.zpgateway.service.UserModuleService") UserModuleService userModuleService, Jwt jwt, @Qualifier("commonConfig") CommonConfig commonConfig)
     {
@@ -80,6 +76,10 @@ public class SecurityRepository implements WebFilter {
 
         if (Objects.nonNull(userDetails))
         {
+            if (!checkJwtBindSystem(userDetails,exchange.getRequest().getPath().toString())) {
+                return getResponseMono(exchange,new SystemCheckError());
+            }
+
             return Mono.fromFuture(CompletableFuture.supplyAsync(() -> userModuleService.getUserBaseInfoByName(userDetails.getUsername())))
                     .flatMap(userBaseInfo -> {
                         if (userBaseInfo.getList().size() == 0)
@@ -161,6 +161,18 @@ public class SecurityRepository implements WebFilter {
             if (matchUrl(uri, s)) return true;
         }
         return false;
+    }
+
+    private boolean checkJwtBindSystem(LoginUserDetails details,String urlPath){
+        switch (details.getSystem()) {
+            case LoginUserDetails.SystemEnum.WEB -> {
+                return urlPath.contains("/web/");
+            }
+            case LoginUserDetails.SystemEnum.MOBILE -> {
+                return urlPath.contains("/mobile/");
+            }
+        }
+        return true;
     }
 
     private boolean matchUrl(String uri, String s) {

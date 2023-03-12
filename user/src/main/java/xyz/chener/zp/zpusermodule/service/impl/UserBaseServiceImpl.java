@@ -86,13 +86,6 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
         UserLoginEventRecord uler = new UserLoginEventRecord();
 
         try {
-            try {
-                username = new String(Base64.getDecoder().decode(username));
-                password = new String(Base64.getDecoder().decode(password));
-            }catch (Exception innerException)
-            {
-                throw new UsernamePasswordErrorException();
-            }
             String ip = RequestUtils.getConcurrentIp();
             String os = RequestUtils.getConcurrentOs();
             uler.setIp(ip);
@@ -105,6 +98,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             AssertUrils.state(userBase.getDisable() == 0 , UserDisableException.class);
             AssertUrils.state(userBase.getExpireTime().getTime() > new Date().getTime(), UserExpireException.class);
             LoginUserDetails details = new LoginUserDetails();
+            details.setSystem(LoginUserDetails.SystemEnum.WEB);
             details.setUsername(userBase.getUsername());
             details.setDs(userBase.getDs());
             res.setLastLoginTime(userBase.getLastLoginTime());

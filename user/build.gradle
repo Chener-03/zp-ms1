@@ -42,6 +42,8 @@ dependencies {
     implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
 
     implementation 'org.lionsoul:ip2region:2.7.0'
+    implementation 'com.google.guava:guava:31.1-jre'
+
 }
 
 dependencyManagement {

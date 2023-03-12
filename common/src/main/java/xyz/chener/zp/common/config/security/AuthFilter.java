@@ -10,11 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.chener.zp.common.config.CommonConfig;
-import xyz.chener.zp.common.config.WriteListAutoConfig;
+import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
 import xyz.chener.zp.common.entity.CommonVar;
 
 import java.io.IOException;

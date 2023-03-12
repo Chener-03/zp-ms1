@@ -53,6 +53,26 @@ public class Jwt {
         return bearer + jwt;
     }
 
+    public String encode(LoginUserDetails j, long expires)
+    {
+        ObjectMapper om = new ObjectMapper();
+        Algorithm algorithm = Algorithm.HMAC256(commonConfig.getJwt().getSalt());
+        String jwt = null;
+        try {
+            jwt = com.auth0.jwt.JWT.create()
+                    .withIssuer("xyz.chener.zp")
+                    .withIssuedAt(new Date())
+                    .withExpiresAt(new Date(new Date().getTime()+expires))
+                    .withClaim("data", om.writeValueAsString(j))
+                    .sign(algorithm);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+        return bearer + jwt;
+    }
+
     public LoginUserDetails decode(String jwt)
     {
         try {

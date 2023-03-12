@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.chener.zp.common.config.UnifiedReturn;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.zpusermodule.entity.dto.MessagesDto;
 import xyz.chener.zp.zpusermodule.service.MessagesService;
 
@@ -34,9 +34,10 @@ public class MessagesController {
 
     @GetMapping("/getUserMessageById")
     public MessagesDto getUserMessageById(@RequestParam(value = "messageId") Integer messageId
+            , @ModelAttribute FieldQuery fieldQuery
             , @RequestParam(value = "isReceive") Boolean isReceive){
         return messagesService.getUserMessageById(SecurityContextHolder.getContext().getAuthentication().getName()
-                ,messageId,isReceive);
+                ,messageId,isReceive,fieldQuery);
     }
 
 

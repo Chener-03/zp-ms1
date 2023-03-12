@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -129,6 +130,8 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
             return true;
         } else if (obj instanceof BigDecimal) {
             return true;
+        }else if (obj instanceof BigInteger) {
+            return true;
         } else if (obj instanceof Boolean) {
             return true;
         } else if (obj instanceof Byte) {
@@ -154,6 +157,8 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
         } else if (clz == Float.class) {
             return true;
         } else if (clz == BigDecimal.class) {
+            return true;
+        }else if (clz == BigInteger.class) {
             return true;
         } else if (clz == Boolean.class) {
             return true;

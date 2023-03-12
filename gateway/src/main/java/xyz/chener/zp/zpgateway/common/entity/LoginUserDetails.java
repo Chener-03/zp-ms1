@@ -28,6 +28,21 @@ public class LoginUserDetails {
 
     private String ds;
 
+    private String system;
+
+    public static class SystemEnum{
+        public static final String WEB = "WEB";
+        public static final String MOBILE = "ZP_ADMIN";
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
     public String getDs() {
         return ds;
     }

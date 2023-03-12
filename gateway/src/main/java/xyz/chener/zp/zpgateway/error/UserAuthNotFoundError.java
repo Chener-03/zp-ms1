@@ -4,7 +4,7 @@ import xyz.chener.zp.zpgateway.common.error.HttpErrorException;
 
 public class UserAuthNotFoundError extends HttpErrorException {
     public UserAuthNotFoundError() {
-        super(401,"user role not found!");
+        super(401,"用户未包含权限");
     }
 
     public UserAuthNotFoundError(int httpCode, String httpErrorMessage) {

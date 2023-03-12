@@ -70,18 +70,18 @@ public class R<T> implements Serializable {
 
 
     public enum ErrorMessage{
-        HTTP_OK("success")
-        ,HTTP_ERR("unknown error")
-        ,HTTP_PAGE_NOT_FOND("page not found!")
+        HTTP_OK("成功")
+        ,HTTP_ERR("服务器错误")
+        ,HTTP_PAGE_NOT_FOND("页面未找到")
         ,SQL_RUN_ERROR("执行出错")
-        ,BAD_REQUEST("params error")
-        ,METHOD_ERROR("method not allow")
-        ,FEIGN_DECODER_ERROR("openfeign result decoder prase class error,type name is null")
-        ,HTTP_NO_LOGIN("no login")
-        ,HTTP_SERVER_MISS("Service downtime")
-        ,HTTP_LIMIT("too many request")
-        ,HTTP_IP_BAN("ip ban")
-        ,HTTP_NO_ACCESS("NO ACCESS")
+        ,BAD_REQUEST("参数错误")
+        ,METHOD_ERROR("请求方法不被允许")
+        ,FEIGN_DECODER_ERROR("OpenFeign结果转换出错")
+        ,HTTP_NO_LOGIN("登录已过期")
+        ,HTTP_SERVER_MISS("服务未上线")
+        ,HTTP_LIMIT("请求过多")
+        ,HTTP_IP_BAN("IP被禁止")
+        ,HTTP_NO_ACCESS("没有权限")
         ,HTTP_NOT_ACCEPTABLE("参数解析错误或者不被允许");
         private final String message;
         private ErrorMessage (String message)

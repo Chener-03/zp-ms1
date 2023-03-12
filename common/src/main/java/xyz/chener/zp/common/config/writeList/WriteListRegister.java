@@ -1,4 +1,4 @@
-package xyz.chener.zp.common.config;
+package xyz.chener.zp.common.config.writeList;
 
 import com.alibaba.cloud.nacos.NacosDiscoveryProperties;
 import com.alibaba.cloud.nacos.NacosServiceManager;

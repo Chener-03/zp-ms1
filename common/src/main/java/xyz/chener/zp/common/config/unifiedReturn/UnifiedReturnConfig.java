@@ -1,4 +1,4 @@
-package xyz.chener.zp.common.config;
+package xyz.chener.zp.common.config.unifiedReturn;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;

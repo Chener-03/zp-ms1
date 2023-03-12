@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.zpusermodule.entity.Messages;
 import xyz.chener.zp.zpusermodule.entity.dto.MessagesDto;
 
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface MessagesService extends IService<Messages> {
 
-    MessagesDto getUserMessageById(String  username,Integer messageId,Boolean isReceive);
+    MessagesDto getUserMessageById(String  username, Integer messageId, Boolean isReceive, FieldQuery fieldQuery);
 
     Boolean sendUsersMessage( MessagesDto messagesDto,List<Long> userIds,String sendUsername);
 

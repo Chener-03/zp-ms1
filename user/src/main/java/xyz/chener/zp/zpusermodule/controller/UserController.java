@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -13,10 +12,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.client.WebSocketConnectionManager;
-import xyz.chener.zp.common.config.UnifiedReturn;
-import xyz.chener.zp.common.config.paramDecryption.annotation.ModelAttributeDecry;
-import xyz.chener.zp.common.config.paramDecryption.annotation.RequestBodyDecry;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryResult;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
@@ -85,6 +83,7 @@ public class UserController {
     }
 
 
+    @EncryResult
     @GetMapping("/getUserAllInfo")
     @PreAuthorize("hasAnyRole('microservice_call','user_user_list')")
     public PageInfo<UserAllInfoDto> getUserAllInfo(@ModelAttribute UserAllInfoDto userAllInfo
@@ -117,8 +116,10 @@ public class UserController {
 
     @PostMapping("/userDoLogin")
     @WriteList
-    public LoginResult userDoLogin(String username, String phone, String email
-            , @RequestParam String password, @RequestParam String verification)
+    public LoginResult userDoLogin(@RequestParamDecry(value = "username") String username
+            ,@RequestParamDecry(value = "phone") String phone
+            ,@RequestParamDecry(value = "email") String email
+            , @RequestParamDecry(value = "password") String password, @RequestParam String verification)
     {
         if (!StringUtils.hasText(username) &&
                 !StringUtils.hasText(phone) &&
@@ -263,11 +264,11 @@ public class UserController {
 
     @WriteList
     @RequestMapping("/testsend")
-    public void test(@RequestBodyDecry UserBase user)
+    public void test(@RequestParamDecry(value = "a") String  username)
     {
         List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
         NotifyMessage msg = new NotifyMessage();
-        if (user!=null)
+        if (username!=null)
         {
             msg.setType(NotifyMessage.TYPE.ONE_USER);
             //msg.setUser(user.getDs());

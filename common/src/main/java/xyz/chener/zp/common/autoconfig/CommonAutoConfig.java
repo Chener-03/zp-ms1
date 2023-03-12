@@ -11,10 +11,15 @@ import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpRequestInterfaceInject;
+import xyz.chener.zp.common.config.opLog.aop.OpRecordAop;
 import xyz.chener.zp.common.config.paramDecryption.ParamDecryAutoConfig;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
 import xyz.chener.zp.common.config.security.AuthFilter;
 import xyz.chener.zp.common.config.security.EntryPointProcess;
+import xyz.chener.zp.common.config.unifiedReturn.UnifiedErrorReturn;
+import xyz.chener.zp.common.config.unifiedReturn.UnifiedReturnConfig;
+import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
+import xyz.chener.zp.common.config.writeList.WriteListRegister;
 import xyz.chener.zp.common.utils.Jwt;
 import xyz.chener.zp.common.utils.NacosUtils;
 
@@ -80,5 +85,10 @@ public class CommonAutoConfig {
         return new NacosUtils();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public OpRecordAop opRecordAop() {
+        return new OpRecordAop();
+    }
 
 }

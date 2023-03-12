@@ -1,4 +1,4 @@
-package xyz.chener.zp.common.config;
+package xyz.chener.zp.common.config.writeList;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -30,7 +30,7 @@ public class WriteListAutoConfig implements EnvironmentAware, BeanDefinitionRegi
 
 
 
-    public void setWriteList(List<Class<?>> classes)   {
+    public void setWriteList(List<Class<?>> classes) {
         ArrayList<String> write = new ArrayList<>();
         classes.forEach(e->{
             WriteList ann = e.getAnnotation(WriteList.class);

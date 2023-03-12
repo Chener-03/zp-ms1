@@ -36,7 +36,9 @@ public class MustFieldProcess extends AbstractChainTreeExecute {
                         QueryHelper.TableField tf = new QueryHelper.TableField();
                         tf.fieldName = fieldName;
                         tf.tableName = tableName;
-                        tableFields.add(tf);
+                        if (tableFields.stream().noneMatch(f->f.fieldName.equals(fieldName) && f.tableName.equals(tableName))) {
+                            tableFields.add(tf);
+                        }
                     });
             return new ResultWrapper(cp,tableFields);
         }

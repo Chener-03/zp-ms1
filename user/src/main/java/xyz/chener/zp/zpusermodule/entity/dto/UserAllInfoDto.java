@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.query.annotation.QueryTableName;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryField;
+import xyz.chener.zp.common.config.unifiedReturn.encry.encryProcess.impl.DefaultDesensitizationEncry;
 import xyz.chener.zp.common.error.HttpErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.zpusermodule.entity.Role;
@@ -35,7 +37,6 @@ public class UserAllInfoDto extends FieldQuery {
     private Date createTime;
 
     @QueryTableName("user_base")
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTimeEnd;
 
@@ -54,6 +55,7 @@ public class UserAllInfoDto extends FieldQuery {
     private Date lastLoginTime;
 
     @QueryTableName("user_base")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long roleId;
 
 
@@ -64,6 +66,7 @@ public class UserAllInfoDto extends FieldQuery {
     private String phone;
     //上级userid
     @QueryTableName("user_extend")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long superUserId;
     //职务
     @QueryTableName("user_extend")

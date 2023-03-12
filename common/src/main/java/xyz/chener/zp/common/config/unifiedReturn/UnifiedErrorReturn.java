@@ -1,4 +1,4 @@
-package xyz.chener.zp.common.config;
+package xyz.chener.zp.common.config.unifiedReturn;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletOutputStream;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.DispatchException;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.error.HttpErrorException;
 import xyz.chener.zp.common.utils.LoggerUtils;
@@ -38,7 +39,7 @@ public class UnifiedErrorReturn {
     @DispatchException(HttpErrorException.class)
     public R<String> httpErrorProcess(HttpErrorException exception)
     {
-        LoggerUtils.logErrorStackTrace(exception,log);
+        log.error(exception.getHttpErrorMessage());
         return R.Builder.<String>getInstance()
                 .setCode(exception.getHttpCode())
                 .setMessage(exception.getHttpErrorMessage())
