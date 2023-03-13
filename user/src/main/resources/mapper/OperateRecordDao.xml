@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.zpusermodule.config.oplog.dao.OperateRecordDao">
+
+
+    <insert id="insertRecord">
+        INSERT INTO `operate_record` ( `op_name`, `issuccess`, `params_data`, `return_data`
+        , `fail_reason`, `op_time`, `trace_id`, `op_user_id`)
+        SELECT #{op.opName} as op_name,#{op.issuccess} as issuccess,#{op.paramsData} as params_data
+               ,#{op.returnData} as return_data,#{op.failReason} as fail_reason,#{op.opTime} as op_time
+               ,#{op.traceId} as trace_id
+                <if test="op.username != null and op.username != ''">
+                    ,b.id as op_user_id from user_base b where username='admin'
+                </if>
+    </insert>
+</mapper>
+

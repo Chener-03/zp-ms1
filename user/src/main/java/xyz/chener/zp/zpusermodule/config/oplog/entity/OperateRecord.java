@@ -2,6 +2,8 @@ package xyz.chener.zp.zpusermodule.config.oplog.entity;
 
 import java.util.Date;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 
 /**
@@ -17,7 +19,7 @@ public class OperateRecord extends Model<OperateRecord> {
     
     private String opName;
     
-    private Integer issuccess;
+    private Boolean issuccess;
     //入参json数组
     private String paramsData;
     //出参json数组
@@ -26,9 +28,29 @@ public class OperateRecord extends Model<OperateRecord> {
     private String failReason;
     
     private Long opUserId;
-    
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date opTime;
 
+    private String traceId;
+
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
 
     public Long getId() {
         return id;
@@ -46,11 +68,11 @@ public class OperateRecord extends Model<OperateRecord> {
         this.opName = opName;
     }
 
-    public Integer getIssuccess() {
+    public Boolean getIssuccess() {
         return issuccess;
     }
 
-    public void setIssuccess(Integer issuccess) {
+    public void setIssuccess(Boolean issuccess) {
         this.issuccess = issuccess;
     }
 
@@ -94,14 +116,6 @@ public class OperateRecord extends Model<OperateRecord> {
         this.opTime = opTime;
     }
 
-    /**
-     * 获取主键值
-     *
-     * @return 主键值
-     */
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
-    }
+
+}
 
