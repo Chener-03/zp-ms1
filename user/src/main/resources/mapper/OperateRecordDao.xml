@@ -12,5 +12,21 @@
                     ,b.id as op_user_id from user_base b where username='admin'
                 </if>
     </insert>
+    <select id="getList" resultType="xyz.chener.zp.zpusermodule.entity.dto.OperateRecordDto">
+        SELECT a.*,b.username as username FROM operate_record a LEFT JOIN user_base b
+        ON a.op_user_id=b.id
+        <where>
+            <if test="dto.username != null and dto.username != ''">
+                AND b.username like CONCAT('%',#{dto.username},'%')
+            </if>
+            <if test="dto.startTime != null and dto.startTime != ''">
+                AND a.op_time &gt;= #{dto.startTime}
+            </if>
+            <if test="dto.endTime != null and dto.endTime != ''">
+                AND a.op_time &lt;= #{dto.endTime}
+            </if>
+        </where>
+        ORDER BY a.id DESC
+    </select>
 </mapper>
 

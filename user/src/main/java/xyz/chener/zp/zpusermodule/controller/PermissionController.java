@@ -10,11 +10,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.Permission;
 import xyz.chener.zp.zpusermodule.entity.Role;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
@@ -102,6 +105,7 @@ public class PermissionController {
 
     @PostMapping("/saveRole")
     @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    @OpLog(operateName = OpEnum.UPDATEUSERROLE,recordClass = OpRecordMybatisWrapper.class )
     public Role saveRole(@RequestParam(required = false) Long id
             , @Length(max = 20,min = 3,message = "角色名长度3-20") @RequestParam String roleName
             , @RequestParam(required = false) List<String> roleList)
@@ -126,6 +130,7 @@ public class PermissionController {
 
     @PostMapping("/deleteRole")
     @PreAuthorize("hasAnyRole('microservice_call','user_permission_query')")
+    @OpLog(operateName = OpEnum.DALETEUSERROLE,recordClass = OpRecordMybatisWrapper.class )
     public void deleteRole(@RequestParam(required = true) Long id)
     {
         AssertUrils.state(id > 1000, DefaultRoleDeleteError.class);

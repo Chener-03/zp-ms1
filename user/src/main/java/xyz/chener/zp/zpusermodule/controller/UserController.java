@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryResult;
@@ -20,6 +21,8 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.*;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
@@ -146,6 +149,7 @@ public class UserController {
 
     @PostMapping("/saveUserBaseInfo")
     @PreAuthorize("hasAnyRole('user_user_query')")
+    @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public UserBase saveUserBaseInfo(@ModelAttribute @Validated UserBase userBase)
     {
         try {
@@ -159,6 +163,7 @@ public class UserController {
 
     @PostMapping("/saveUserExtendInfo")
     @PreAuthorize("hasAnyRole('user_user_query')")
+    @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public UserExtend saveUserExtendInfo(@ModelAttribute UserExtend userExtend)
     {
         return userExtendService.addOrUpdateUserExtend(userExtend);
@@ -167,6 +172,7 @@ public class UserController {
 
     @PostMapping("/setUserDisable")
     @PreAuthorize("hasAnyRole('user_user_query')")
+    @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean setUserDisable(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             ,@RequestParam Integer disable)
     {
@@ -187,6 +193,7 @@ public class UserController {
 
     @PostMapping("/resetPassword")
     @PreAuthorize("hasAnyRole('user_user_query')")
+    @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean resetPassword(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             , @RequestParam Boolean isPwd)
     {
@@ -210,6 +217,7 @@ public class UserController {
 
     @PostMapping("/deleteUser")
     @PreAuthorize("hasAnyRole('user_user_query')")
+    @OpLog(operateName = OpEnum.DELETEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteUser(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username)
     {
         try {

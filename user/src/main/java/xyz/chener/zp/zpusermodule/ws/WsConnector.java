@@ -2,6 +2,10 @@ package xyz.chener.zp.zpusermodule.ws;
 
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
+import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.websocket.WsRemoteEndpointBasic;
+import org.apache.tomcat.websocket.WsSession;
+import org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer;
 import org.springframework.stereotype.Component;
 import xyz.chener.zp.zpusermodule.ws.coded.WsDecoder;
 import xyz.chener.zp.zpusermodule.ws.coded.WsEncoder;
@@ -27,6 +31,7 @@ public class WsConnector {
 
     @OnOpen
     public void onOpen(Session session) {
+        //((SocketChannelImpl) ((NioChannel) ((WsRemoteEndpointImplServer) ((WsRemoteEndpointBasic) ((WsSession) session).remoteEndpointBasic).base).socketWrapper.socket).sc).remoteAddress
         cache.put(session.getId(),session);
         ConnectQueueManager.getInstance().addConnect(new WsConnect(session.getId(),"",System.currentTimeMillis()+5000));
     }

@@ -40,7 +40,13 @@ spring:
     username: admin
     password: Czp123456789
     virtual-host: /zpusermodule
-
+  data:
+    redis:
+      database: 3
+      host: 82.156.191.218
+      port: 6379
+      password: admin123654
+      connect-timeout: 10000
 
 server:
   port: 6050

@@ -7,10 +7,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
@@ -99,6 +102,7 @@ public class OrgController {
 
     @PostMapping("/saveOrgInfo")
     @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    @OpLog(operateName = OpEnum.UPDATEORGINFO,recordClass = OpRecordMybatisWrapper.class )
     public OrgInfoDto saveOrgInfo(@ModelAttribute @Validated OrgInfoDto orgInfoDto) {
         if (orgBaseService.saveOrUpdateOrg(orgInfoDto)) {
             return orgInfoDto;
@@ -109,12 +113,14 @@ public class OrgController {
 
     @PostMapping("/deleteOrg")
     @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    @OpLog(operateName = OpEnum.DELETEORGINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteOrg(@RequestParam Long id) {
         return orgBaseService.deleteOrg(id);
     }
 
     @PostMapping("/disableOrg")
     @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    @OpLog(operateName = OpEnum.UPDATEORGINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean disableOrg(@RequestParam Long id,@RequestParam Boolean disable) {
         return orgBaseService.lambdaUpdate().set(OrgBase::getDisable,disable).eq(OrgBase::getId,id).update();
     }
@@ -122,12 +128,14 @@ public class OrgController {
 
     @PostMapping("/addOrgUser")
     @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    @OpLog(operateName = OpEnum.UPDATEORGUSER,recordClass = OpRecordMybatisWrapper.class )
     public Boolean addOrgUser(@RequestParam Long orgId,@RequestParam List<Long> userIds) {
         return orgUserMapService.addOrgUser(orgId,userIds);
     }
 
     @PostMapping("/deleteOrgUser")
     @PreAuthorize("hasAnyRole('org_list_update','org_list_update_only_sub')")
+    @OpLog(operateName = OpEnum.UPDATEORGUSER,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteOrgUser(@RequestParam Long orgId,@RequestParam List<Long> userIds) {
         return orgUserMapService.deleteOrgUser(orgId,userIds);
     }

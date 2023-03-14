@@ -43,7 +43,7 @@ dependencies {
 
     implementation 'org.lionsoul:ip2region:2.7.0'
     implementation 'com.google.guava:guava:31.1-jre'
-
+    implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'
 }
 
 dependencyManagement {

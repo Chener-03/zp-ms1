@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import xyz.chener.zp.common.config.*;
+import xyz.chener.zp.common.config.antiShaking.aop.AntiShakingAop;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
@@ -89,6 +90,12 @@ public class CommonAutoConfig {
     @ConditionalOnMissingBean
     public OpRecordAop opRecordAop() {
         return new OpRecordAop();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AntiShakingAop antiShakingAop() {
+        return new AntiShakingAop();
     }
 
 }

@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
 import xyz.chener.zp.zpusermodule.entity.dto.MenuNameDto;
 import xyz.chener.zp.zpusermodule.service.MenuService;
@@ -52,6 +55,7 @@ public class MenuController {
 
     @PostMapping("/saveMenuInfo")
     @PreAuthorize("hasAnyRole('menu_list_query')")
+    @OpLog(operateName = OpEnum.UPDATEMENU,recordClass = OpRecordMybatisWrapper.class )
     public UiRouting saveMenuInfo(@ModelAttribute UiRouting uiRouting) {
         UiRouting res = uiRoutingService.saveOrUpdate(uiRouting) ? uiRouting : null;
         if (res != null){
@@ -62,6 +66,7 @@ public class MenuController {
 
     @PostMapping("/deleteMenuInfo")
     @PreAuthorize("hasAnyRole('menu_list_query')")
+    @OpLog(operateName = OpEnum.DELETEMENU,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteMenuInfo(@RequestParam Integer id) {
         boolean res = uiRoutingService.removeById(id);
         if (res){

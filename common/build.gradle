@@ -34,6 +34,8 @@ dependencies {
     implementation 'com.github.jsqlparser:jsqlparser:4.5'
 
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'
 }
 
 dependencyManagement {

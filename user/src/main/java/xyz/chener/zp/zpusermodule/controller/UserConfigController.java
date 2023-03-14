@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.UserConfig;
 import xyz.chener.zp.zpusermodule.service.UserConfigService;
 
@@ -32,7 +34,7 @@ public class UserConfigController {
     }
 
     @PostMapping("/updateConcurrentUserLayoutConfig")
-    @OpLog(operateName = "更新用户布局配置")
+    @OpLog(operateName = OpEnum.USERUICONFIG,recordClass = OpRecordMybatisWrapper.class )
     public Boolean updateConcurrentUserLayoutConfig(@RequestParam("layoutConfig") String layoutConfig){
         return userConfigService.updateConcurrentUserLayoutConfig(SecurityContextHolder.getContext().getAuthentication().getName()
                 ,layoutConfig);
