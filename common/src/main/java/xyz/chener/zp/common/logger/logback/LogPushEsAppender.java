@@ -10,6 +10,12 @@ import ch.qos.logback.core.*;
  * @Email: chen@chener.xyz
  */
 public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
+
+    @Override
+    public void start() {
+        super.start();
+    }
+
     @Override
     protected void append(ILoggingEvent eventObject) {
         if (eventObject != null && isStarted()){
@@ -18,4 +24,8 @@ public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
         }
     }
 
+    @Override
+    public void stop() {
+        super.stop();
+    }
 }
