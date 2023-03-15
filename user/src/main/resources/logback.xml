@@ -18,10 +18,10 @@
     <property name="JSON_LOG_PATTERN" value="
     {
     &quot;time&quot;:&quot;${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}&quot;
-    &quot;tid&quot;:&quot;[%tid]&quot;
-    &quot;sIn&quot;:&quot;[%sIn]&quot;
+    &quot;tid&quot;:&quot;%tid&quot;
+    &quot;sIn&quot;:&quot;%sIn&quot;
     &quot;level&quot;:&quot;${LOG_LEVEL_PATTERN:-%5p}&quot;
-    &quot;thread&quot;:&quot;[%t]&quot;
+    &quot;thread&quot;:&quot;%t&quot;
     %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
     }
     "/>
