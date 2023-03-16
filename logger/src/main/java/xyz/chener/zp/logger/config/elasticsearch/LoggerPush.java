@@ -65,6 +65,7 @@ public class LoggerPush {
                                 new HttpHost(loggerPush.getEsHost(), Integer.parseInt(loggerPush.getExPort())))
                         .build();
             }
+
             ElasticsearchTransport transport = new RestClientTransport(
                     restClient, new JacksonJsonpMapper());
             asyncClient = new ElasticsearchAsyncClient(transport);

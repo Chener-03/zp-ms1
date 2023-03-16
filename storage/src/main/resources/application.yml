@@ -66,6 +66,11 @@ zp:
   jwt:
     salt: sdadaddadada
     expires: 1000000000
+  logger-push:
+    es-host: 101.42.12.133
+    ex-port: 9200
+    es-username: elastic
+    es-password: Abcd1234....
 #  security:
 #    write-list:
 #      - /api/web/getFilePublic
@@ -73,3 +78,8 @@ zp:
   storage:
     location: ./filetemp/a/
 #    hardwareUid: qqaacc
+
+management:
+  health:
+    elasticsearch:
+      enabled: false

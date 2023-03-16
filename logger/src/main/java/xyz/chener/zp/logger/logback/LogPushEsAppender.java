@@ -60,13 +60,16 @@ public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
         om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         while (!Thread.interrupted()){
             try {
-                String s = queue.poll(1, TimeUnit.MINUTES);
-                logEntities.add(om.readValue(s, LogEntity.class));
                 if(logEntities.size() >= 100 || System.currentTimeMillis() - lastTime >= 60*1000) {
                     if (logEntities.size()>0) {
                         loggerPush.add(logEntities, logEntities::clear);
                     }
                     lastTime = System.currentTimeMillis();
+                }
+
+                String s = queue.poll(1, TimeUnit.MINUTES);
+                if (s != null){
+                    logEntities.add(om.readValue(s, LogEntity.class));
                 }
             } catch (Exception e) {}
         }

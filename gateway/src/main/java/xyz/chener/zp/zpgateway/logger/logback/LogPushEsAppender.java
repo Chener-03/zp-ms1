@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.StringUtils;
 import xyz.chener.zp.zpgateway.logger.config.elasticsearch.LoggerPush;
 import xyz.chener.zp.zpgateway.logger.logback.entity.LogEntity;
 
@@ -58,13 +59,15 @@ public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
         om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         while (!Thread.interrupted()){
             try {
-                String s = queue.poll(1, TimeUnit.MINUTES);
-                logEntities.add(om.readValue(s, LogEntity.class));
                 if(logEntities.size() >= 100 || System.currentTimeMillis() - lastTime >= 60*1000) {
                     if (logEntities.size()>0) {
                         loggerPush.add(logEntities, logEntities::clear);
                     }
                     lastTime = System.currentTimeMillis();
+                }
+                String s = queue.poll(1, TimeUnit.MINUTES);
+                if (StringUtils.hasText(s)){
+                    logEntities.add(om.readValue(s, LogEntity.class));
                 }
             } catch (Exception e) {}
         }
