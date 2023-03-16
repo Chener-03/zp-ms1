@@ -22,6 +22,12 @@ public class CommonConfig {
 
     private final Security security = new Security();
 
+    private final LoggerPush loggerPush = new LoggerPush();
+
+    public LoggerPush getLoggerPush() {
+        return loggerPush;
+    }
+
     public Jwt getJwt() {
         return jwt;
     }
@@ -80,6 +86,58 @@ public class CommonConfig {
 
         public void setWriteList(List<String> writeList) {
             this.writeList = writeList;
+        }
+    }
+
+    public static class LoggerPush{
+        private String esHost = "";
+
+        private String exPort = "";
+
+        private String esUsername = "";
+
+        private String esPassword = "";
+
+        private String esIndexName = "zplogger";
+
+        public String getEsIndexName() {
+            return esIndexName;
+        }
+
+        public void setEsIndexName(String esIndexName) {
+            this.esIndexName = esIndexName;
+        }
+
+        public String getEsHost() {
+            return esHost;
+        }
+
+        public void setEsHost(String esHost) {
+            this.esHost = esHost;
+        }
+
+        public String getExPort() {
+            return exPort;
+        }
+
+        public void setExPort(String exPort) {
+            this.exPort = exPort;
+        }
+
+        public String getEsUsername() {
+            return esUsername;
+        }
+
+        public void setEsUsername(String esUsername) {
+            this.esUsername = esUsername;
+        }
+
+        public String getEsPassword() {
+            return esPassword;
+        }
+
+        public void setEsPassword(String esPassword) {
+            this.esPassword = esPassword;
         }
     }
 

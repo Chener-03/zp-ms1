@@ -8,8 +8,6 @@ import xyz.chener.zp.zpusermodule.ws.WsMessageProcesser;
 import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
 import xyz.chener.zp.zpusermodule.ws.entity.WsMessageConstVar;
 import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
-import xyz.chener.zp.zpusermodule.ws.queue.ConnectQueueManager;
-import xyz.chener.zp.zpusermodule.ws.queue.entity.WsConnect;
 
 public class NotifyMessageListener implements MqListener<NotifyMessage>{
     @Override

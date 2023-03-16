@@ -7,12 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import xyz.chener.zp.zpusermodule.entity.Role;
-import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.service.impl.UserModuleServiceFallback;
-import xyz.chener.zp.zpusermodule.ws.queue.ConnectQueueManager;
-import xyz.chener.zp.zpusermodule.ws.queue.entity.WsConnect;
 
 import java.util.List;
 

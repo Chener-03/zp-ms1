@@ -3,6 +3,8 @@ package xyz.chener.zp.zpusermodule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +22,7 @@ import xyz.chener.zp.zpusermodule.utils.Ip2RegUtils;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 
 @SpringBootApplication
 @EnableFeignClients
@@ -34,23 +37,6 @@ public class UserApplication {
 
 
     public static void main(String[] args) throws Exception {
-        Cache<Object, Object> c = CacheBuilder.newBuilder()
-                .expireAfterWrite(Duration.ofSeconds(10000))
-                .removalListener(n->{
-                    System.out.println(n);
-                })
-                .build();
-
-        c.put("a", "a");
-
-//        c.invalidateAll();
-        //c.cleanUp();
-        Object a = c.get("a", () -> "b");
-        Object b = c.get("a", () -> "b");
-
-
-        String sFunctionName = ObjectUtils.getSFunctionName(UserBase::getUsername);
-
         System.setProperty("csp.sentinel.log.output.type","console");
         SpringApplication.run(UserApplication.class, args);
     }

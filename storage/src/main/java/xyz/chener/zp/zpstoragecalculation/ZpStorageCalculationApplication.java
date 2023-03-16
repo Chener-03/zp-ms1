@@ -9,6 +9,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import xyz.chener.zp.zpstoragecalculation.config.feign.loadbalance.LoadbalanceConfig;
 
+import java.util.UUID;
+
 @SpringBootApplication
 @EnableFeignClients
 @LoadBalancerClients({
@@ -16,6 +18,7 @@ import xyz.chener.zp.zpstoragecalculation.config.feign.loadbalance.LoadbalanceCo
 })
 @EnableTransactionManagement
 public class ZpStorageCalculationApplication {
+    public static final String APP_UID = UUID.randomUUID().toString().replace("-", "");
 
     public static void main(String[] args) {
         System.setProperty("csp.sentinel.log.output.type","console");

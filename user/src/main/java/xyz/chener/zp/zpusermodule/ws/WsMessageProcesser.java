@@ -5,8 +5,8 @@ import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.entity.LoginUserDetails;
 import xyz.chener.zp.common.utils.Jwt;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
-import xyz.chener.zp.zpusermodule.ws.queue.ConnectQueueManager;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,21 +28,29 @@ public class WsMessageProcesser {
 
     public static void heartBeat(WsMessage message, Session session) {
         System.out.println("heartBeat："+session.getId());
-        ConnectQueueManager.getInstance().renewal(session.getId(), message.getUsername());
+        WsClient unAuthConnect = WsCache.getUnAuthConnect(session.getId());
+        if (unAuthConnect != null) {
+            WsCache.unAuthConnect.invalidate(session.getId());
+            unAuthConnect.setUsername(message.getUsername());
+        }
+        WsCache.putAuthConnect(session.getId(), unAuthConnect);
         WsConnector.sendObject(message, session.getId());
     }
 
     public static void sendAll(WsMessage message) {
-        ConnectQueueManager.getInstance().getValidConnection().forEach(wsConnect -> {
-            WsConnector.sendObject(message, wsConnect.getConnect_uid());
+
+        WsCache.getAllAuthConnect().forEach((wsClient) -> {
+            WsConnector.sendObject(message, wsClient.getSessionId());
         });
+
     }
 
     public static boolean sendUser(WsMessage message, String username) {
         AtomicBoolean rt = new AtomicBoolean(false);
-        ConnectQueueManager.getInstance().getValidConnection().forEach(wsc -> {
-            if(ObjectUtils.nullSafeEquals(wsc.getConnect_user(),username)){
-                WsConnector.sendObject(message, wsc.getConnect_uid());
+
+        WsCache.getAllAuthConnect().forEach((wsClient) -> {
+            if (ObjectUtils.nullSafeEquals(wsClient.getUsername(), username)) {
+                WsConnector.sendObject(message, wsClient.getSessionId());
                 rt.set(true);
             }
         });

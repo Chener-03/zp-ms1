@@ -35,6 +35,12 @@ spring:
             - Path=/v1/file/**
           filters:
             - StripPrefix=2
+        - id: system-module
+          uri: lb://zp-system-module
+          predicates:
+            - Path=/v1/system/**
+          filters:
+            - StripPrefix=2
 
 
     sentinel:
@@ -80,3 +86,12 @@ gateway:
     is-white: false
     ip-list:
       - 127.0.0.2
+
+zplogger:
+  push:
+    es:
+      host: 101.42.12.133
+      port: 9200
+      username: elastic
+      password: Abcd1234....
+      indexName: zplogger

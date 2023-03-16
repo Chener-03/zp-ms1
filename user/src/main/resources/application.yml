@@ -62,7 +62,18 @@ zp:
   security:
     write-list:
       - /ws/web/connect
+  logger-push:
+    es-host: 101.42.12.133
+    ex-port: 9200
+    es-username: elastic
+    es-password: Abcd1234....
 
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+management:
+  health:
+    elasticsearch:
+      enabled: false

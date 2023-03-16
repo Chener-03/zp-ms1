@@ -34,10 +34,10 @@ import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
 import xyz.chener.zp.zpusermodule.service.impl.DictionariesServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserBaseServiceImpl;
 import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
+import xyz.chener.zp.zpusermodule.ws.WsCache;
+import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
-import xyz.chener.zp.zpusermodule.ws.queue.ConnectQueueManager;
-import xyz.chener.zp.zpusermodule.ws.queue.entity.WsConnect;
 
 import java.util.List;
 import java.util.Objects;
@@ -260,9 +260,7 @@ public class UserController {
     @GetMapping("/getWsOnlineUsersForMs")
     @PreAuthorize("hasAnyRole('microservice_call')")
     public List<String> getWsOnlineUsersName(){
-        return ConnectQueueManager.getInstance()
-                .getValidConnection().stream()
-                .map(WsConnect::getConnect_user).distinct().toList();
+        return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
     }
 
 
@@ -272,7 +270,7 @@ public class UserController {
 
     @WriteList
     @RequestMapping("/testsend")
-    public void test(@RequestParamDecry(value = "a") String  username)
+    public void test( String username)
     {
         List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
         NotifyMessage msg = new NotifyMessage();
