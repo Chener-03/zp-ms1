@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -92,7 +93,7 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                                     Instance instance = instances.get(i);
                                     String s = instance.getMetadata().get(WRITE_LIST_KEY);
                                     List<String> l = Arrays.stream(s.split(WRITE_LIST_DIVISION))
-                                            .filter(Objects::nonNull).toList();
+                                            .filter(StringUtils::hasText).toList();
                                     CopyOnWriteArrayList<String> urls = new CopyOnWriteArrayList<>();
 
                                     route.getPredicates().forEach(pd->{

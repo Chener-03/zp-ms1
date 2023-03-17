@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.*;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -254,8 +255,26 @@ public class OkHttpInterfaceBeanFactory implements FactoryBean {
 
 
         private String getUrl(Method method){
+            HttpRequestContextHolder.UrlInfo nextUrlInfo = HttpRequestContextHolder.getNextUrlInfo();
+            String nextFullUrl = nextUrlInfo.fullUrl;
+            if (StringUtils.hasText(nextFullUrl)) {
+                return nextFullUrl;
+            }
             HttpExchange ann = method.getDeclaringClass().getAnnotation(HttpExchange.class);
             String baseUrl = ann.value();
+
+            String nextBaseUrl = nextUrlInfo.baseUrl;
+            if (StringUtils.hasText(nextBaseUrl)) {
+                nextBaseUrl = nextBaseUrl.endsWith("/") ? nextBaseUrl.substring(0, nextBaseUrl.length() - 1) : nextBaseUrl;
+                baseUrl = nextBaseUrl;
+            }
+
+            String nextExtendUrl = nextUrlInfo.extendUrl;
+            if (StringUtils.hasText(nextExtendUrl)) {
+                nextExtendUrl = nextExtendUrl.startsWith("/") ? nextExtendUrl : "/" + nextExtendUrl;
+                return baseUrl + nextExtendUrl;
+            }
+
             for (Annotation an : method.getAnnotations()) {
                 if (an.annotationType().getName().equals(GetExchange.class.getName())){
                     return baseUrl + ((GetExchange) an).value();

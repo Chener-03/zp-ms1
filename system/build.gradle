@@ -15,6 +15,7 @@ configurations {
 
 dependencies {
     implementation project(':common')
+    implementation project(':logger')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -30,12 +31,16 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
     implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
-    implementation 'com.github.oshi:oshi-core:6.4.0'
+//    implementation 'com.github.oshi:oshi-core:6.4.0'
 
     implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'
 
     implementation 'org.apache.skywalking:apm-toolkit-trace:8.14.0'
     implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
+
+    implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 dependencyManagement {

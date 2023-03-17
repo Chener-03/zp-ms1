@@ -64,7 +64,7 @@ public class NormalLoadBalance implements ReactorServiceInstanceLoadBalancer {
     }
 
     private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances,ServerInstance nextInstance) {
-        if (instances.isEmpty()) {
+        if (instances.isEmpty() && nextInstance == null) {
             if (log.isWarnEnabled()) {
                 log.warn("No servers available for service: " + serviceId);
             }

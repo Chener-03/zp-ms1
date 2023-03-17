@@ -49,7 +49,7 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'
 
-    implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
+
 
 }
 

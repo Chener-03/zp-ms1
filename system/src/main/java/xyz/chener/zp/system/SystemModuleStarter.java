@@ -1,9 +1,14 @@
 package xyz.chener.zp.system;
 
+import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfiguration;
 
 import java.util.UUID;
 
@@ -13,7 +18,7 @@ import java.util.UUID;
  * @Email: chen@chener.xyz
  */
 
-@SpringBootApplication
+@SpringBootApplication//(exclude = RedissonAutoConfiguration.class)
 @EnableFeignClients
 @EnableTransactionManagement
 public class SystemModuleStarter {
@@ -21,6 +26,8 @@ public class SystemModuleStarter {
 
     public static void main(String[] args) {
         System.setProperty("csp.sentinel.log.output.type","console");
-        SpringApplication.run(SystemModuleStarter.class, args);
+        SpringApplication app = new SpringApplication(SystemModuleStarter.class);
+//        app.setApplicationStartup(new BufferingApplicationStartup(1024));
+        app.run(args);
     }
 }

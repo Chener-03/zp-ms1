@@ -1,5 +1,8 @@
 package xyz.chener.zp.system.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +20,9 @@ public class NacosServerInstance {
     private String clusters;
     private int cacheMillis;
     private List<Hosts> hosts;
-    private long lastRefTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date lastRefTime;
     private String checksum;
     private boolean allIPs;
     private boolean reachProtectionThreshold;
@@ -175,11 +180,11 @@ public class NacosServerInstance {
         this.hosts = hosts;
     }
 
-    public long getLastRefTime() {
+    public Date getLastRefTime() {
         return lastRefTime;
     }
 
-    public void setLastRefTime(long lastRefTime) {
+    public void setLastRefTime(Date lastRefTime) {
         this.lastRefTime = lastRefTime;
     }
 

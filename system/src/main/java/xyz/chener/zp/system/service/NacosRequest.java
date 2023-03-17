@@ -1,5 +1,6 @@
 package xyz.chener.zp.system.service;
 
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -13,8 +14,11 @@ import xyz.chener.zp.system.entity.ServerNames;
  * @Email: chen@chener.xyz
  */
 
-@HttpExchange("${spring.cloud.nacos.discovery.server-addr}")
+@HttpExchange(NacosRequest.NACOS_HOST)
 public interface NacosRequest {
+
+    String NACOS_HOST = "http://101.42.12.133:8848";
+
 
     /**
      * 获取服务名列表
@@ -25,7 +29,9 @@ public interface NacosRequest {
      * @return
      */
     @GetExchange("/nacos/v1/ns/service/list")
-    ServerNames getServiceNameList(@RequestParam("pageNo") int pageNo
+    ServerNames getServiceNameList(@RequestHeader("username") String username
+            , @RequestHeader("password") String password
+            ,@RequestParam("pageNo") int pageNo
             , @RequestParam("pageSize") int pageSize
             , @RequestParam("groupName") String groupName
             , @RequestParam("namespaceId") String namespaceId);
@@ -39,7 +45,9 @@ public interface NacosRequest {
      * @return
      */
     @GetExchange("/nacos/v1/ns/instance/list")
-    NacosServerInstance getInstanceList(@RequestParam("serviceName") String serviceName
+    NacosServerInstance getInstanceList(@RequestHeader("username") String username
+            , @RequestHeader("password") String password
+            ,@RequestParam("serviceName") String serviceName
             , @RequestParam("groupName") String groupName
             , @RequestParam("namespaceId") String namespaceId);
 
@@ -54,7 +62,9 @@ public interface NacosRequest {
      * @return
      */
     @GetExchange("/nacos/v1/ns/instance")
-    ServerInstanceInfo getInstance(@RequestParam("serviceName") String serviceName
+    ServerInstanceInfo getInstance(@RequestHeader("username") String username
+            , @RequestHeader("password") String password
+            , @RequestParam("serviceName") String serviceName
             , @RequestParam("groupName") String groupName
             , @RequestParam("namespaceId") String namespaceId
             , @RequestParam("ip") String ip
