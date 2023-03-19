@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
+import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.entity.WriteList;
+import xyz.chener.zp.system.entity.InstanceBaseHealth;
 import xyz.chener.zp.system.entity.dto.InstanceDto;
 import xyz.chener.zp.system.service.SystemInfoSerivce;
 import xyz.chener.zp.system.service.impl.SystemInfoSerivceImpl;
@@ -42,12 +44,18 @@ public class SystemInfoController {
         return systemInfoSerivce.getInstances(instanceDto);
     }
 
+    @GetMapping("/getInstanceInfo")
+    public List<InstanceBaseHealth> getInstanceInfo(@RequestParamDecry String url){
+        return systemInfoSerivce.getInstanceInfo(url);
+    }
+
     @WriteList
     @RequestMapping("/test")
     public void test()
     {
-        ApplicationContextHolder.getApplicationContext()
-                .getBean(SystemInfoSerivceImpl.class).getInstanceInfo("","");
+        systemInfoSerivce.getInstanceInfo("127.0.0.1:6050");
+//        ApplicationContextHolder.getApplicationContext()
+//                .getBean(SystemInfoSerivceImpl.class).getInstanceInfo("","");
     }
 
 

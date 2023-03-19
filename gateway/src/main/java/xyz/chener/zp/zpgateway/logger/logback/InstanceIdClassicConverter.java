@@ -29,25 +29,7 @@ public class InstanceIdClassicConverter extends ClassicConverter {
     private void getServerId() {
         if (instanceUid.get() == null) {
             synchronized (instanceUid) {
-                ApplicationContext applicationContext = ApplicationContextHolder.getApplicationContext();
-                if (applicationContext != null) {
-                    Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(SpringBootApplication.class);
-                    if (beansWithAnnotation.size() > 0) {
-                        for (Object o : beansWithAnnotation.values()) {
-                            String cglibName = o.getClass().getName();
-                            if (cglibName.contains("$$")) {
-                                cglibName = cglibName.substring(0, cglibName.indexOf("$$"));
-                            }
-                            try {
-                                Field appUid = Class.forName(cglibName).getDeclaredField("APP_UID");
-                                instanceUid.set(((String) appUid.get(o)).substring(0, 8));
-                            } catch (Exception e) {
-                                instanceUid.set(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
-                            }
-                            break;
-                        }
-                    }
-                }
+                instanceUid.set(System.getProperty("application.uid"));
             }
         }
     }

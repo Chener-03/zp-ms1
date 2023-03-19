@@ -18,8 +18,6 @@ import java.util.UUID;
 })
 @EnableTransactionManagement
 public class ZpStorageCalculationApplication {
-    public static final String APP_UID = UUID.randomUUID().toString().replace("-", "");
-
     public static void main(String[] args) {
         System.setProperty("csp.sentinel.log.output.type","console");
         SpringApplication.run(ZpStorageCalculationApplication.class, args);

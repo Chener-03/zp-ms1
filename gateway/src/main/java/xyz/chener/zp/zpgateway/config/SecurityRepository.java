@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -52,9 +53,11 @@ public class SecurityRepository implements WebFilter {
     private final UserModuleService userModuleService;
     private final Jwt jwt;
     private final CommonConfig commonConfig;
+    private String actuatorPath = "/actuator";
 
 
-    public SecurityRepository(@Qualifier("xyz.chener.zp.zpgateway.service.UserModuleService") UserModuleService userModuleService, Jwt jwt, @Qualifier("commonConfig") CommonConfig commonConfig)
+    public SecurityRepository(@Qualifier("xyz.chener.zp.zpgateway.service.UserModuleService") UserModuleService userModuleService, Jwt jwt
+            , @Qualifier("commonConfig") CommonConfig commonConfig)
     {
         this.userModuleService = userModuleService;
         this.jwt = jwt;
@@ -66,10 +69,32 @@ public class SecurityRepository implements WebFilter {
         return !(userBase.getDisable().equals(1) || userBase.getExpireTime().getTime() <= new Date().getTime());
     }
 
+    private boolean processActuator(ServerWebExchange webExchange)
+    {
+        try {
+            boolean b = webExchange.getRequest().getHeaders()
+                    .get(CommonVar.OPEN_FEIGN_HEADER).stream()
+                    .anyMatch(s -> s.equals(commonConfig.getSecurity().getFeignCallSlat()));
+            if (!b)
+                return false;
+        }catch (Exception e){
+            return false;
+        }
+        return webExchange.getRequest().getPath().toString().startsWith(actuatorPath);
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         if (processWriteList(exchange))
             return chain.filter(exchange);
+        if (processActuator(exchange)){
+            Context ctx = ReactiveSecurityContextHolder.withAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            "Actuator", null,
+                            AuthorityUtils.commaSeparatedStringToAuthorityList("Actuator"))
+            );
+            return chain.filter(exchange).contextWrite(ctx);
+        }
 
         String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         LoginUserDetails userDetails = jwt.decode(token);

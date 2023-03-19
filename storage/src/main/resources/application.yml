@@ -83,3 +83,12 @@ management:
   health:
     elasticsearch:
       enabled: false
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      exposure:
+        include: "*"

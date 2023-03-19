@@ -41,7 +41,12 @@ spring:
             - Path=/v1/system/**
           filters:
             - StripPrefix=2
-
+#        - id: nacos-page
+#          uri: http://101.42.12.133:8848/nacos
+#          predicates:
+#            - Path=/v1/nacos/**
+#          filters:
+#            - StripPrefix=2
 
     sentinel:
       datasource:
@@ -95,3 +100,19 @@ zplogger:
       username: elastic
       password: Abcd1234....
       indexName: zplogger
+
+management:
+  health:
+    elasticsearch:
+      enabled: false
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      show-details: when_authorized
+    refresh:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"

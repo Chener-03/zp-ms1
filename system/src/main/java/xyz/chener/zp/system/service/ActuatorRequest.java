@@ -1,6 +1,7 @@
 package xyz.chener.zp.system.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,5 +24,11 @@ public interface ActuatorRequest {
 
     @GetExchange(prefix+"/health")
     String getHealthBaseInfo(@RequestHeader(CommonVar.OPEN_FEIGN_HEADER) String headerKey);
+
+
+    @GetExchange(prefix+"/metrics/{path}")
+    String getMetrics(@RequestHeader(CommonVar.OPEN_FEIGN_HEADER) String headerKey
+            , @PathVariable("path") String path);
+
 
 }

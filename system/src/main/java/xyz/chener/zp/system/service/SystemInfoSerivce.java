@@ -1,5 +1,7 @@
 package xyz.chener.zp.system.service;
 
+import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
+import xyz.chener.zp.system.entity.InstanceBaseHealth;
 import xyz.chener.zp.system.entity.dto.InstanceDto;
 
 import java.util.List;
@@ -14,5 +16,7 @@ public interface SystemInfoSerivce {
 
 
     List<InstanceDto> getInstances(InstanceDto dto);
+
+    List<InstanceBaseHealth> getInstanceInfo(String url);
 
 }

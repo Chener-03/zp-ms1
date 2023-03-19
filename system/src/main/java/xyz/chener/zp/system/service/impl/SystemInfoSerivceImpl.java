@@ -15,6 +15,7 @@ import xyz.chener.zp.system.service.ActuatorRequest;
 import xyz.chener.zp.system.service.NacosRequest;
 import xyz.chener.zp.system.service.SystemInfoSerivce;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,77 +81,172 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
         }).toList();
     }
 
-    public static class Target{
-        public static final String SERVICE = "service";
-    }
-
-
-    public void getInstanceInfo(String addr,String target){
-        HttpRequestContextHolder.setNextBaseUrl("http://127.0.0.1:6168");
-        String healthBaseInfo = actuatorRequest.getHealthBaseInfo(commonConfig.getSecurity().getFeignCallSlat());
-        ObjectMapper om = new ObjectMapper();
+    @Override
+    public List<InstanceBaseHealth> getInstanceInfo(String url) {
+        List<InstanceBaseHealth> res = new ArrayList<>();
         try {
+            HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+            String healthBaseInfo = actuatorRequest.getHealthBaseInfo(commonConfig.getSecurity().getFeignCallSlat());
+            ObjectMapper om = new ObjectMapper();
             Map map = om.readValue(healthBaseInfo, Map.class);
-
-            List<InstanceBaseHealth> l = new ArrayList<>();
             Map components = (Map) map.get("components");
             if (components.containsKey("db")) {
-                Map db = (Map) components.get("db");
-                String dbName = ((Map) db.get("details")).get("database").toString();
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                instanceBaseHealth.setName("数据库:"+dbName);
-                instanceBaseHealth.setStatus(db.get("status").toString());
-                l.add(instanceBaseHealth);
+                instanceBaseHealth.setName("数据库:"+getMapValue(components,"db.details.database"));
+                instanceBaseHealth.setStatus(getMapValue(components,"db.status"));
+                res.add(instanceBaseHealth);
             }
             if (components.containsKey("diskSpace")) {
-                Map diskSpace = (Map) components.get("diskSpace");
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                Map details = (Map)diskSpace.get("details");
-                double total = Long.parseLong(details.get("total").toString())/1024/1024/1024L;
-                double free = Long.parseLong(details.get("free").toString())/1024/1024/1024L;
-                instanceBaseHealth.setName(String.format("磁盘空间:%sG/%sG",free,total));
-                instanceBaseHealth.setStatus(diskSpace.get("status").toString());
-                l.add(instanceBaseHealth);
+                double total = Long.parseLong(getMapValue(components,"diskSpace.details.total"))/1024/1024/1024L;
+                double free = Long.parseLong(getMapValue(components,"diskSpace.details.free"))/1024/1024/1024L;
+                instanceBaseHealth.setName("磁盘空间");
+                instanceBaseHealth.setStatus(String.format("%.3fG/%.3fG",free,total));
+                res.add(instanceBaseHealth);
             }
             if (components.containsKey("nacosDiscovery")) {
-                Map nacosDiscovery = (Map) components.get("nacosDiscovery");
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("注册中心");
-                instanceBaseHealth.setStatus(nacosDiscovery.get("status").toString());
-                l.add(instanceBaseHealth);
+                instanceBaseHealth.setStatus(getMapValue(components,"nacosDiscovery.status"));
+                res.add(instanceBaseHealth);
             }
             if (components.containsKey("redis")) {
-                Map redis = (Map) components.get("redis");
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                String version = ((Map) redis.get("details")).get("version").toString();
-                instanceBaseHealth.setName("Redis:"+version);
-                instanceBaseHealth.setStatus(redis.get("status").toString());
-                l.add(instanceBaseHealth);
+                instanceBaseHealth.setName("Redis:"+getMapValue(components,"redis.details.version"));
+                instanceBaseHealth.setStatus(getMapValue(components,"redis.status"));
+                res.add(instanceBaseHealth);
             }
             if (components.containsKey("ping")) {
-                Map ping = (Map) components.get("ping");
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("PING");
-                instanceBaseHealth.setStatus(ping.get("status").toString());
-                l.add(instanceBaseHealth);
+                instanceBaseHealth.setStatus(getMapValue(components,"ping.status"));
+                res.add(instanceBaseHealth);
             }
             if (components.containsKey("rabbit")) {
-                Map rabbit = (Map) components.get("rabbit");
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                String version = ((Map) rabbit.get("details")).get("version").toString();
-                instanceBaseHealth.setName("RabbitMQ:"+version);
-                instanceBaseHealth.setStatus(rabbit.get("status").toString());
-                l.add(instanceBaseHealth);
+                instanceBaseHealth.setName("RabbitMQ:"+getMapValue(components,"rabbit.details.version"));
+                instanceBaseHealth.setStatus(getMapValue(components,"rabbit.status"));
+                res.add(instanceBaseHealth);
+            }
+            if (components.containsKey("sentinel")) {
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("Sentinel");
+                instanceBaseHealth.setStatus(getMapValue(components,"sentinel.status"));
+                res.add(instanceBaseHealth);
+            }
+
+            {
+                // sys cpu占用
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "system.cpu.usage");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("系统cpu占用");
+                String val = getMapValue(map, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
+                res.add(instanceBaseHealth);
+            }
+            {
+                // jvm cpu占用
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "process.cpu.usage");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("jvm cpu占用");
+                String val = getMapValue(map, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
+                res.add(instanceBaseHealth);
+            }
+            {
+                // 进程运行时间
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "process.uptime");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("进程运行时间");
+                String val = getMapValue(map, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%s 秒", val));
+                res.add(instanceBaseHealth);
+            }
+            {
+                // jvm 最大内存占用
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "jvm.memory.max");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("jvm 内存占用");
+                String val = getMapValue(map, "measurements.0.value");
+                BigDecimal l = new BigDecimal(val).divide(new BigDecimal(1024 * 1024));
+
+                // jvm 内存占用
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "jvm.memory.used");
+                map = om.readValue(syscpu, Map.class);
+                val = getMapValue(map, "measurements.0.value");
+                BigDecimal l2 = new BigDecimal(val).divide(new BigDecimal(1024 * 1024));
+
+                instanceBaseHealth.setStatus(String.format("%.3fM / %.3fM ",l2, l));
+                res.add(instanceBaseHealth);
+            }
+            {
+                // jvm 线程数
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "jvm.threads.live");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("jvm 线程数(live / daemon)");
+                String val = getMapValue(map, "measurements.0.value");
+                BigDecimal i = new BigDecimal(val);
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "jvm.threads.daemon");
+                map = om.readValue(syscpu, Map.class);
+                val = getMapValue(map, "measurements.0.value");
+                BigDecimal i2 = new BigDecimal(val);
+                instanceBaseHealth.setStatus(String.format("%s / %s",i, i2));
+                res.add(instanceBaseHealth);
             }
 
 
-            System.out.println();
-        } catch (JsonProcessingException e) { }
-
-        System.out.println();
+        } catch (Exception e) { }
+        return res;
     }
 
 
+    private String getMapValue(Map map,String key){
+       try {
+           String[] split = key.split("\\.");
+           Object obj = map;
+           for (int i = 0; i < split.length; i++) {
+               if (i == split.length - 1) {
+                   return getMOL(obj, split[i]).toString();
+               }
+                obj = getMOL(obj, split[i]);
+           }
+       }catch (Exception e){}
+        return null;
+    }
 
-
+    private Integer isNumber(String str){
+        try {
+            return Integer.parseInt(str);
+        }catch (Exception e){}
+        return null;
+    }
+    private Object getMOL(Object o,String k){
+        try {
+            if (o instanceof Map){
+                return ((Map) o).get(k);
+            }else if (o instanceof List){
+                return ((List) o).get(isNumber(k));
+            }
+        }catch (Exception e){}
+        return "";
+    }
 }
