@@ -22,7 +22,8 @@ spring:
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
-
+    sentinel:
+      enabled: false
 
   mvc:
     throw-exception-if-no-handler-found: true

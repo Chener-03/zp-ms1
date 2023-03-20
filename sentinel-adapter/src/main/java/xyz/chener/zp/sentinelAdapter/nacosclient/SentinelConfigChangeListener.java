@@ -6,16 +6,14 @@ import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.security.DeclareRoles;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
-import xyz.chener.zp.sentinelAdapter.spho.SphoRuleManager;
-import xyz.chener.zp.sentinelAdapter.sphu.SphuRuleManager;
+import xyz.chener.zp.sentinelAdapter.currentlimit.CurrentLimitManager;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -39,7 +37,7 @@ public class SentinelConfigChangeListener implements ApplicationListener<Applica
     public static final List<Consumer<List<DegradeRule>>> degradeChangeListeners = new CopyOnWriteArrayList<>();
 
     private final ExecutorService pool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<Runnable>(1), new NamedThreadFactory("sentinel-nacos-ds-update", true),
+            new ArrayBlockingQueue<>(1), new NamedThreadFactory("sentinel-nacos-ds-update", true),
             new ThreadPoolExecutor.DiscardOldestPolicy());
 
     public SentinelConfigChangeListener(SentinelCustomConfig sentinelCustomConfig) {
@@ -106,8 +104,8 @@ public class SentinelConfigChangeListener implements ApplicationListener<Applica
                 }
             }
             flowRules.forEach(fl->{
-                SphoRuleManager.removeRules(fl.getResource());
-                SphoRuleManager.addRules(fl.getResource(),fl);
+                CurrentLimitManager.removeRules(fl.getResource());
+                CurrentLimitManager.addRules(fl.getResource(),fl);
             });
             flowChangeListeners.forEach(consumer -> consumer.accept(flowRules));
         } catch (Exception ex) {}
@@ -124,8 +122,8 @@ public class SentinelConfigChangeListener implements ApplicationListener<Applica
                 }
             }
             degradeRules.forEach(fl->{
-                SphuRuleManager.removeRules(fl.getResource());
-                SphuRuleManager.addRules(fl.getResource(),fl);
+                CircuitBreakRuleManager.removeRules(fl.getResource());
+                CircuitBreakRuleManager.addRules(fl.getResource(),fl);
             });
             degradeChangeListeners.forEach(consumer -> consumer.accept(degradeRules));
         } catch (Exception ex) {}

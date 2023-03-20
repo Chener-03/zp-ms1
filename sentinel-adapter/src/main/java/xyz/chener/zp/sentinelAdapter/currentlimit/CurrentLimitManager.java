@@ -1,10 +1,9 @@
-package xyz.chener.zp.sentinelAdapter.spho;
+package xyz.chener.zp.sentinelAdapter.currentlimit;
 
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import xyz.chener.zp.sentinelAdapter.sphu.entity.SphuRuleInfo;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.entity.CircuitBreakRuleInfo;
+import xyz.chener.zp.sentinelAdapter.currentlimit.entity.CurrentLimitRuleInfo;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -15,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2023/03/20/14:18
  * @Email: chen@chener.xyz
  */
-public class SphoRuleManager {
+public class CurrentLimitManager {
     //  key:resource+uuid
-    public static final ConcurrentHashMap<String, SphuRuleInfo> cache = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, CurrentLimitRuleInfo> cache = new ConcurrentHashMap<>();
     //  key:resource
     public static final ConcurrentHashMap<String, FlowRule> rules = new ConcurrentHashMap<>();
 
@@ -63,10 +62,10 @@ public class SphoRuleManager {
             FlowRule flowRule = rules.get(resource);
             flowRule.setResource(resource + uuid);
             loadRule(flowRule);
-            SphuRuleInfo sphuRuleInfo = new SphuRuleInfo();
-            sphuRuleInfo.setKey(resource + uuid);
-            sphuRuleInfo.setResource(resource);
-            cache.put(resource + uuid, sphuRuleInfo);
+            CurrentLimitRuleInfo currentLimitRuleInfo = new CurrentLimitRuleInfo();
+            currentLimitRuleInfo.setKey(resource + uuid);
+            currentLimitRuleInfo.setResource(resource);
+            cache.put(resource + uuid, currentLimitRuleInfo);
             return resource + uuid;
         }
         return null;

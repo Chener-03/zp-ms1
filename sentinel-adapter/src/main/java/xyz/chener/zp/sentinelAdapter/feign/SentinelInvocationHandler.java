@@ -14,8 +14,8 @@ import feign.MethodMetadata;
 import feign.Target;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.util.StringUtils;
-import xyz.chener.zp.sentinelAdapter.sphu.SphuRuleManager;
-import xyz.chener.zp.sentinelAdapter.sphu.annotation.CircuitBreakResourceFeign;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResourceFeign;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -103,7 +103,7 @@ public class SentinelInvocationHandler implements InvocationHandler {
 					throw getNameException;
 				}
 				if (StringUtils.hasText(prefix)) {
-					resourceName = SphuRuleManager.getRulesName(prefix, resourceName);
+					resourceName = CircuitBreakRuleManager.getRulesName(prefix, resourceName);
 				}
 
 				try {

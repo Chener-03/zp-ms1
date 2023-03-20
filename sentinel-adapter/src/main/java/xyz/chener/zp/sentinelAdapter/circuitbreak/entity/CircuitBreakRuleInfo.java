@@ -1,13 +1,11 @@
-package xyz.chener.zp.sentinelAdapter.sphu.entity;
-
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
+package xyz.chener.zp.sentinelAdapter.circuitbreak.entity;
 
 /**
  * @Author: chenzp
  * @Date: 2023/03/20/13:00
  * @Email: chen@chener.xyz
  */
-public class SphuRuleInfo {
+public class CircuitBreakRuleInfo {
 
     // resource+uuid
     private String key;

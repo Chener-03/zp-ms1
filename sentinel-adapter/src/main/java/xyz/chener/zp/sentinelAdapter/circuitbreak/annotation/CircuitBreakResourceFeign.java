@@ -1,6 +1,6 @@
-package xyz.chener.zp.sentinelAdapter.sphu.annotation;
+package xyz.chener.zp.sentinelAdapter.circuitbreak.annotation;
 
-import xyz.chener.zp.sentinelAdapter.sphu.SphUDefault;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakDefault;
 
 import java.lang.annotation.*;
 
@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CircuitBreakResourceFeign {
-    String value() default SphUDefault.DEFAULT_CITCUIR_BREAK_RESOURCE;
+    String value() default CircuitBreakDefault.DEFAULT_CITCUIR_BREAK_RESOURCE;
 }

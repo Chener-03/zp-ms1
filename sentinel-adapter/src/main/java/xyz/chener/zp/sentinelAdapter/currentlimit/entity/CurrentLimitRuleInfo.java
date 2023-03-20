@@ -1,11 +1,11 @@
-package xyz.chener.zp.sentinelAdapter.spho.entity;
+package xyz.chener.zp.sentinelAdapter.currentlimit.entity;
 
 /**
  * @Author: chenzp
  * @Date: 2023/03/20/13:00
  * @Email: chen@chener.xyz
  */
-public class SphoRuleInfo {
+public class CurrentLimitRuleInfo {
 
     // resource+uuid
     private String key;

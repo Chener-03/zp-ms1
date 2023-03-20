@@ -1,7 +1,10 @@
 package xyz.chener.zp.zpusermodule.controller;
 
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
+import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreakerStrategy;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResource;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.*;
@@ -37,7 +42,6 @@ import xyz.chener.zp.zpusermodule.service.impl.UserExtendServiceImpl;
 import xyz.chener.zp.zpusermodule.ws.WsCache;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
-import xyz.chener.zp.zpusermodule.ws.mq.entity.NotifyMessage;
 
 import java.util.List;
 import java.util.Objects;
@@ -270,9 +274,9 @@ public class UserController {
 
     @WriteList
     @RequestMapping("/testsend")
-    public void test( String username)
+    public String  test( String username)
     {
-        List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
+/*        List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
         NotifyMessage msg = new NotifyMessage();
         if (username!=null)
         {
@@ -282,28 +286,11 @@ public class UserController {
             msg.setType(NotifyMessage.TYPE.ALL_USER);
         }
         msg.setContent("测试消息");
-        wsMessagePublisher.publishWsUserMessage(msg);
+        wsMessagePublisher.publishWsUserMessage(msg);*/
+        return "";
+
     }
 
-    public class U{
-        public UserBase userBase;
-        public UserExtend userExtend;
 
-        public UserBase getUserBase() {
-            return userBase;
-        }
-
-        public void setUserBase(UserBase userBase) {
-            this.userBase = userBase;
-        }
-
-        public UserExtend getUserExtend() {
-            return userExtend;
-        }
-
-        public void setUserExtend(UserExtend userExtend) {
-            this.userExtend = userExtend;
-        }
-    }
 
 }

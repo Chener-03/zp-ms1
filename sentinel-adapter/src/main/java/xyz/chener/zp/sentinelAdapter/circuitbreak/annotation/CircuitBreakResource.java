@@ -1,4 +1,4 @@
-package xyz.chener.zp.sentinelAdapter.spho.annotation;
+package xyz.chener.zp.sentinelAdapter.circuitbreak.annotation;
 
 import java.lang.annotation.*;
 
@@ -11,6 +11,9 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface LimitResource {
+public @interface CircuitBreakResource {
     String value();
+
+    String failCallBackMethodName() default "";
+
 }

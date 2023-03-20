@@ -135,18 +135,7 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
                 res.add(instanceBaseHealth);
             }
 
-            {
-                // sys cpu占用
-                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
-                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
-                        , "system.cpu.usage");
-                map = om.readValue(syscpu, Map.class);
-                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                instanceBaseHealth.setName("系统cpu占用");
-                String val = getMapValue(map, "measurements.0.value");
-                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
-                res.add(instanceBaseHealth);
-            }
+
             {
                 // jvm cpu占用
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
@@ -154,7 +143,7 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
                         , "process.cpu.usage");
                 map = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
-                instanceBaseHealth.setName("jvm cpu占用");
+                instanceBaseHealth.setName("jvm最近cpu占用");
                 String val = getMapValue(map, "measurements.0.value");
                 instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
                 res.add(instanceBaseHealth);
@@ -212,7 +201,18 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
                 instanceBaseHealth.setStatus(String.format("%s / %s",i, i2));
                 res.add(instanceBaseHealth);
             }
-
+            {
+                // 文件句柄数量
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "process.files.open.files");
+                map = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("进程占用文件数");
+                String val = getMapValue(map, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
+                res.add(instanceBaseHealth);
+            }
 
         } catch (Exception e) { }
         return res;
@@ -249,4 +249,11 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
         }catch (Exception e){}
         return "";
     }
+
+    private void runIgnoredError(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception ignored) {  }
+    }
+
 }

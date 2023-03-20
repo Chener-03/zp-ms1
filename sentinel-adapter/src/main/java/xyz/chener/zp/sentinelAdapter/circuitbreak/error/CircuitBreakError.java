@@ -1,4 +1,4 @@
-package xyz.chener.zp.sentinelAdapter.sphu.error;
+package xyz.chener.zp.sentinelAdapter.circuitbreak.error;
 
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.error.HttpErrorException;

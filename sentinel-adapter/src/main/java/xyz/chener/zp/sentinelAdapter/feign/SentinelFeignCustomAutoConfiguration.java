@@ -21,18 +21,17 @@ import feign.Feign;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
-import xyz.chener.zp.sentinelAdapter.sphu.SphUDefault;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakDefault;
 
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ SphU.class, Feign.class })
 @AutoConfigureBefore(name = "com.alibaba.cloud.sentinel.feign.SentinelFeignAutoConfiguration")
-@Import(SphUDefault.class)
+@Import(CircuitBreakDefault.class)
 public class SentinelFeignCustomAutoConfiguration {
 
 	@Bean

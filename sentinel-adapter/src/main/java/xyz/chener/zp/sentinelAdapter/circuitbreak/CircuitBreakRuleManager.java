@@ -1,9 +1,8 @@
-package xyz.chener.zp.sentinelAdapter.sphu;
+package xyz.chener.zp.sentinelAdapter.circuitbreak;
 
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import xyz.chener.zp.sentinelAdapter.sphu.entity.SphuRuleInfo;
+import xyz.chener.zp.sentinelAdapter.circuitbreak.entity.CircuitBreakRuleInfo;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -14,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2023/03/20/12:42
  * @Email: chen@chener.xyz
  */
-public class SphuRuleManager {
+public class CircuitBreakRuleManager {
 
     //  key:resource+uuid
-    public static final ConcurrentHashMap<String, SphuRuleInfo> cache = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, CircuitBreakRuleInfo> cache = new ConcurrentHashMap<>();
     //  key:resource
     public static final ConcurrentHashMap<String, DegradeRule> rules = new ConcurrentHashMap<>();
 
@@ -63,10 +62,10 @@ public class SphuRuleManager {
             DegradeRule degradeRule = rules.get(resource);
             degradeRule.setResource(resource + uuid);
             loadRule(degradeRule);
-            SphuRuleInfo sphuRuleInfo = new SphuRuleInfo();
-            sphuRuleInfo.setKey(resource + uuid);
-            sphuRuleInfo.setResource(resource);
-            cache.put(resource + uuid, sphuRuleInfo);
+            CircuitBreakRuleInfo circuitBreakRuleInfo = new CircuitBreakRuleInfo();
+            circuitBreakRuleInfo.setKey(resource + uuid);
+            circuitBreakRuleInfo.setResource(resource);
+            cache.put(resource + uuid, circuitBreakRuleInfo);
             return resource + uuid;
         }
         return null;
