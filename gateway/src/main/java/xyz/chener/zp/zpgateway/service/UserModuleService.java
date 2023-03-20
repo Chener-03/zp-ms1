@@ -5,12 +5,15 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import xyz.chener.zp.sentinelAdapter.sphu.SphUDefault;
+import xyz.chener.zp.sentinelAdapter.sphu.annotation.CircuitBreakResourceFeign;
 import xyz.chener.zp.zpgateway.common.entity.vo.PageInfo;
 import xyz.chener.zp.zpgateway.entity.vo.Role;
 import xyz.chener.zp.zpgateway.entity.vo.UserBase;
 import xyz.chener.zp.zpgateway.service.impl.UserModuleServiceFallback;
 
 @FeignClient(name = "zp-user-module",fallback = UserModuleServiceFallback.class)
+@CircuitBreakResourceFeign
 public interface UserModuleService {
 
     @RequestMapping(value = "/api/web/getUserBaseInfo",method = RequestMethod.GET)

@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule;
 
+import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = SentinelEndpointAutoConfiguration.class)
 @EnableFeignClients
 @EnableDiscoveryClient
 @EnableTransactionManagement

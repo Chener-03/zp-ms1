@@ -14,6 +14,7 @@ configurations {
 
 
 dependencies {
+    implementation project(':sentinel-adapter')
     implementation project(':common')
     implementation project(':logger')
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -23,15 +24,17 @@ dependencies {
 
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-//    runtimeOnly 'com.mysql:mysql-connector-j'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
-//    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
-//    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
-//    implementation 'com.github.oshi:oshi-core:6.4.0'
+
+    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
+        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
+    }
+    implementation 'com.alibaba.csp:sentinel-datasource-nacos'
+    implementation 'com.alibaba.csp:sentinel-datasource-extension'
 
     implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'
 

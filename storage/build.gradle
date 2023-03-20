@@ -16,6 +16,7 @@ configurations {
 dependencies {
     implementation project(':common')
     implementation project(':logger')
+    implementation project(':sentinel-adapter')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -30,7 +31,13 @@ dependencies {
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
     implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
+
+    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
+        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
+    }
+    implementation 'com.alibaba.csp:sentinel-datasource-nacos'
+    implementation 'com.alibaba.csp:sentinel-datasource-extension'
+
     implementation 'com.github.oshi:oshi-core:6.4.0'
 
     implementation 'org.redisson:redisson-spring-boot-starter:3.19.1'

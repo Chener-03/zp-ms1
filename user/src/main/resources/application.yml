@@ -22,6 +22,9 @@ spring:
     openfeign:
       lazy-attributes-resolution: true
 
+    sentinel:
+      enabled: false
+
 
   config:
     import:

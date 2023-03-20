@@ -5,4 +5,5 @@ include 'storage'
 include 'gateway'
 include 'logger'
 include 'system'
+include 'sentinel-adapter'
 

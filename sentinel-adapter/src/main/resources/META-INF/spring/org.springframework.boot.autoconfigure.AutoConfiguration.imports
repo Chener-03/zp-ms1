@@ -1,0 +1,4 @@
+xyz.chener.zp.sentinelAdapter.feign.SentinelFeignCustomAutoConfiguration
+xyz.chener.zp.sentinelAdapter.nacosclient.SentinelConfigChangeListener
+xyz.chener.zp.sentinelAdapter.actuator.DefauultSentinelCustomActuator
+

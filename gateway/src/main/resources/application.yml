@@ -41,48 +41,15 @@ spring:
             - Path=/v1/system/**
           filters:
             - StripPrefix=2
-#        - id: nacos-page
-#          uri: http://101.42.12.133:8848/nacos
-#          predicates:
-#            - Path=/v1/nacos/**
-#          filters:
-#            - StripPrefix=2
 
     sentinel:
-      datasource:
-        ds1:
-          nacos:
-            server-addr: localhost:8848
-            username: nacos
-            password: 123456
-            namespace: 31566b11-faba-4430-ab6c-353aa99c9874
-            data-id: gateway-sentinel-flow.json
-            group-id: zp
-            data-type: json
-            rule-type: flow
-        ds2:
-          nacos:
-            server-addr: localhost:8848
-            username: nacos
-            password: 123456
-            namespace: 31566b11-faba-4430-ab6c-353aa99c9874
-            data-id: gateway-sentinel-degrade.json
-            group-id: zp
-            data-type: json
-            rule-type: degrade
       enabled: false
-      eager: true
-      transport:
-        port: 9900
-        dashboard: 127.0.0.1:8080
+
 
   config:
     import:
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=zp
 
-feign:
-  sentinel:
-    enabled: true
 
 
 gateway:
@@ -116,3 +83,19 @@ management:
     web:
       exposure:
         include: "*"
+zp:
+  sentinel:
+    server-addr: ${spring.cloud.nacos.config.server-addr}
+    username: ${spring.cloud.nacos.config.username}
+    password: ${spring.cloud.nacos.config.password}
+    namespace: ${spring.cloud.nacos.config.namespace}
+    group-id: ${spring.cloud.nacos.config.group}
+    nacos:
+      ds1:
+        data-id: gateway-sentinel-flow.json
+        data-type: json
+        rule-type: flow
+      ds2:
+        data-id: gateway-sentinel-degrade.json
+        data-type: json
+        rule-type: degrade

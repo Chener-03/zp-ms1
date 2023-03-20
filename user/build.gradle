@@ -16,6 +16,7 @@ configurations {
 dependencies {
     implementation project(':common')
     implementation project(':logger')
+    implementation project(':sentinel-adapter')
 
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -36,7 +37,16 @@ dependencies {
 
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
+
+
+    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
+        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
+    }
+    implementation 'com.alibaba.csp:sentinel-datasource-nacos'
+    implementation 'com.alibaba.csp:sentinel-datasource-extension'
+
+
+
     implementation 'com.auth0:java-jwt:4.0.0'
 
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'

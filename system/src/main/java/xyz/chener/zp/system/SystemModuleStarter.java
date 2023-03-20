@@ -1,5 +1,6 @@
 package xyz.chener.zp.system;
 
+import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +20,7 @@ import java.util.UUID;
  * @Email: chen@chener.xyz
  */
 
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, SentinelEndpointAutoConfiguration.class})
 @EnableFeignClients
 @EnableTransactionManagement
 public class SystemModuleStarter {

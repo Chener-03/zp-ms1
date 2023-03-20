@@ -1,8 +1,18 @@
 package xyz.chener.zp.zpgateway.config;
 
+import com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiDefinition;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
+import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreakerStrategy;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -17,10 +27,11 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import xyz.chener.zp.sentinelAdapter.nacosclient.SentinelConfigChangeListener;
+import xyz.chener.zp.sentinelAdapter.sphu.SphUDefault;
 import xyz.chener.zp.zpgateway.common.entity.R;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: chenzp
@@ -35,10 +46,12 @@ public class GatewaySentinelConfig implements ApplicationListener<ApplicationSta
     private final ServerCodecConfigurer serverCodecConfigurer;
     private final List<ViewResolver> viewResolvers;
 
+
     public GatewaySentinelConfig(ServerCodecConfigurer serverCodecConfigurer
             , ObjectProvider<List<ViewResolver>> viewResolversProvider) {
         this.serverCodecConfigurer = serverCodecConfigurer;
         viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
+        SentinelConfigChangeListener.flowChangeListeners.add(this::loadFlowRules);
     }
 
     @Bean
@@ -59,6 +72,13 @@ public class GatewaySentinelConfig implements ApplicationListener<ApplicationSta
         GatewayCallbackManager.setBlockHandler(blockRequestHandler);
     }
 
+    public synchronized void loadFlowRules(List<FlowRule> flowRules) {
+        List<FlowRule> rule = new ArrayList<>(FlowRuleManager.getRules()
+                .stream().filter(e-> flowRules.stream().noneMatch(f -> f.getResource().equals(e.getResource())))
+                .toList());
+        rule.addAll(flowRules);
+        FlowRuleManager.loadRules(rule);
+    }
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
