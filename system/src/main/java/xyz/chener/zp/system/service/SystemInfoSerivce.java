@@ -5,6 +5,7 @@ import xyz.chener.zp.system.entity.InstanceBaseHealth;
 import xyz.chener.zp.system.entity.dto.InstanceDto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: chenzp
@@ -18,5 +19,7 @@ public interface SystemInfoSerivce {
     List<InstanceDto> getInstances(InstanceDto dto);
 
     List<InstanceBaseHealth> getInstanceInfo(String url);
+
+    Map getSentinelInfo(String url, String resourceName);
 
 }

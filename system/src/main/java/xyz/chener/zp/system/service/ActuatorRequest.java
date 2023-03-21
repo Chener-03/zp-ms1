@@ -10,6 +10,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import xyz.chener.zp.common.entity.CommonVar;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: chenzp
@@ -29,6 +30,11 @@ public interface ActuatorRequest {
     @GetExchange(prefix+"/metrics/{path}")
     String getMetrics(@RequestHeader(CommonVar.OPEN_FEIGN_HEADER) String headerKey
             , @PathVariable("path") String path);
+
+
+    @GetExchange(prefix+"/sentinelCustom/{resourceName}")
+    Map getSentinelCustom(@RequestHeader(CommonVar.OPEN_FEIGN_HEADER) String headerKey
+            , @PathVariable("resourceName") String resourceName);
 
 
 }

@@ -2,10 +2,7 @@ package xyz.chener.zp.system.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
@@ -16,6 +13,7 @@ import xyz.chener.zp.system.service.SystemInfoSerivce;
 import xyz.chener.zp.system.service.impl.SystemInfoSerivceImpl;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: chenzp
@@ -48,6 +46,13 @@ public class SystemInfoController {
     public List<InstanceBaseHealth> getInstanceInfo(@RequestParamDecry String url){
         return systemInfoSerivce.getInstanceInfo(url);
     }
+
+
+    @GetMapping("/getSentinelInfo")
+    public Map getSentinelInfo(@RequestParamDecry String url,@RequestParam String resourceName) {
+        return systemInfoSerivce.getSentinelInfo(url, resourceName);
+    }
+
 
     @WriteList
     @RequestMapping("/test")

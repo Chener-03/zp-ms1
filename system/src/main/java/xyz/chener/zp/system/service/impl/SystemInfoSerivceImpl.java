@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @Author: chenzp
@@ -135,87 +136,111 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
                 res.add(instanceBaseHealth);
             }
 
+            runIgnoredError(()->{
+                // sys cpu占用
+                HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+                String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
+                        , "system.cpu.usage");
+                Map map0 = om.readValue(syscpu, Map.class);
+                InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
+                instanceBaseHealth.setName("系统cpu占用");
+                String val = getMapValue(map0, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
+                res.add(instanceBaseHealth);
+                return null;
+            });
 
-            {
+            runIgnoredError(()->{
                 // jvm cpu占用
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "process.cpu.usage");
-                map = om.readValue(syscpu, Map.class);
+                Map map0 = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("jvm最近cpu占用");
-                String val = getMapValue(map, "measurements.0.value");
+                String val = getMapValue(map0, "measurements.0.value");
                 instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
                 res.add(instanceBaseHealth);
-            }
-            {
+                return null;
+            });
+            runIgnoredError(()->{
                 // 进程运行时间
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "process.uptime");
-                map = om.readValue(syscpu, Map.class);
+                Map map0 = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("进程运行时间");
-                String val = getMapValue(map, "measurements.0.value");
+                String val = getMapValue(map0, "measurements.0.value");
                 instanceBaseHealth.setStatus(String.format("%s 秒", val));
                 res.add(instanceBaseHealth);
-            }
-            {
+                return null;
+            });
+            runIgnoredError(()->{
                 // jvm 最大内存占用
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "jvm.memory.max");
-                map = om.readValue(syscpu, Map.class);
+                Map map0 = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("jvm 内存占用");
-                String val = getMapValue(map, "measurements.0.value");
+                String val = getMapValue(map0, "measurements.0.value");
                 BigDecimal l = new BigDecimal(val).divide(new BigDecimal(1024 * 1024));
 
                 // jvm 内存占用
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "jvm.memory.used");
-                map = om.readValue(syscpu, Map.class);
-                val = getMapValue(map, "measurements.0.value");
+                map0 = om.readValue(syscpu, Map.class);
+                val = getMapValue(map0, "measurements.0.value");
                 BigDecimal l2 = new BigDecimal(val).divide(new BigDecimal(1024 * 1024));
 
                 instanceBaseHealth.setStatus(String.format("%.3fM / %.3fM ",l2, l));
                 res.add(instanceBaseHealth);
-            }
-            {
+                return null;
+            });
+            runIgnoredError(()->{
                 // jvm 线程数
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "jvm.threads.live");
-                map = om.readValue(syscpu, Map.class);
+                Map map0 = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("jvm 线程数(live / daemon)");
-                String val = getMapValue(map, "measurements.0.value");
+                String val = getMapValue(map0, "measurements.0.value");
                 BigDecimal i = new BigDecimal(val);
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
                         , "jvm.threads.daemon");
-                map = om.readValue(syscpu, Map.class);
-                val = getMapValue(map, "measurements.0.value");
+                map0 = om.readValue(syscpu, Map.class);
+                val = getMapValue(map0, "measurements.0.value");
                 BigDecimal i2 = new BigDecimal(val);
                 instanceBaseHealth.setStatus(String.format("%s / %s",i, i2));
                 res.add(instanceBaseHealth);
-            }
-            {
+                return null;
+            });
+            runIgnoredError(()-> {
                 // 文件句柄数量
                 HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
                 String syscpu = actuatorRequest.getMetrics(commonConfig.getSecurity().getFeignCallSlat()
-                        , "process.files.open.files");
-                map = om.readValue(syscpu, Map.class);
+                        , "process.files.open");
+                Map map0 = om.readValue(syscpu, Map.class);
                 InstanceBaseHealth instanceBaseHealth = new InstanceBaseHealth();
                 instanceBaseHealth.setName("进程占用文件数");
-                String val = getMapValue(map, "measurements.0.value");
-                instanceBaseHealth.setStatus(String.format("%.6f%%", Double.parseDouble(val) * 100));
+                String val = getMapValue(map0, "measurements.0.value");
+                instanceBaseHealth.setStatus(String.format("%s", Double.parseDouble(val)));
                 res.add(instanceBaseHealth);
-            }
+                return null;
+            });
 
         } catch (Exception e) { }
         return res;
+    }
+
+    @Override
+    public Map getSentinelInfo(String url, String resourceName) {
+        HttpRequestContextHolder.setNextBaseUrl(String.format("http://%s", url));
+        return actuatorRequest.getSentinelCustom(commonConfig.getSecurity().getFeignCallSlat(), resourceName);
     }
 
 
@@ -250,9 +275,9 @@ public class SystemInfoSerivceImpl implements SystemInfoSerivce {
         return "";
     }
 
-    private void runIgnoredError(Runnable runnable) {
+    private void runIgnoredError(Callable callable) {
         try {
-            runnable.run();
+            callable.call();
         } catch (Exception ignored) {  }
     }
 

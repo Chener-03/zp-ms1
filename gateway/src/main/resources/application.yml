@@ -21,26 +21,26 @@ spring:
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
-    gateway:
-      routes:
-        - id: user-module
-          uri: lb://zp-user-module
-          predicates:
-            - Path=/v1/user/**
-          filters:
-            - StripPrefix=2
-        - id: storagecalculation-module
-          uri: lb://zp-storagecalculation-module
-          predicates:
-            - Path=/v1/file/**
-          filters:
-            - StripPrefix=2
-        - id: system-module
-          uri: lb://zp-system-module
-          predicates:
-            - Path=/v1/system/**
-          filters:
-            - StripPrefix=2
+#    gateway:
+#      routes:
+#        - id: user-module
+#          uri: lb://zp-user-module
+#          predicates:
+#            - Path=/v1/user/**
+#          filters:
+#            - StripPrefix=2
+#        - id: storagecalculation-module
+#          uri: lb://zp-storagecalculation-module
+#          predicates:
+#            - Path=/v1/file/**
+#          filters:
+#            - StripPrefix=2
+#        - id: system-module
+#          uri: lb://zp-system-module
+#          predicates:
+#            - Path=/v1/system/**
+#          filters:
+#            - StripPrefix=2
 
     sentinel:
       enabled: false
@@ -48,41 +48,43 @@ spring:
 
   config:
     import:
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=zp
+      - optional:nacos:zp-gateway-config.yml?group=zp
+      - optional:nacos:zp-actuator-config.yml?group=zp
+#      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=zp
 
 
 
-gateway:
-  ip:
-    enable: true
-    is-white: false
-    ip-list:
-      - 127.0.0.2
+#gateway:
+#  ip:
+#    enable: true
+#    is-white: false
+#    ip-list:
+#      - 127.0.0.2
+#
+#zplogger:
+#  push:
+#    es:
+#      host: 101.42.12.133
+#      port: 9200
+#      username: elastic
+#      password: Abcd1234....
+#      indexName: zplogger
 
-zplogger:
-  push:
-    es:
-      host: 101.42.12.133
-      port: 9200
-      username: elastic
-      password: Abcd1234....
-      indexName: zplogger
-
-management:
-  health:
-    elasticsearch:
-      enabled: false
-  endpoint:
-    metrics:
-      enabled: true
-    health:
-      show-details: when_authorized
-    refresh:
-      enabled: false
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+#management:
+#  health:
+#    elasticsearch:
+#      enabled: false
+#  endpoint:
+#    metrics:
+#      enabled: true
+#    health:
+#      show-details: when_authorized
+#    refresh:
+#      enabled: false
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
 zp:
   sentinel:
     server-addr: ${spring.cloud.nacos.config.server-addr}
