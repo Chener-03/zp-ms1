@@ -47,3 +47,8 @@ dependencyManagement {
         mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2022.0.0.0-RC1'
     }
 }
+
+compileJava {
+    options.compilerArgs << "-parameters"
+}
+

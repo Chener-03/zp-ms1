@@ -24,63 +24,11 @@ spring:
       lazy-attributes-resolution: true
     sentinel:
       enabled: false
-
   config:
     import:
       - optional:nacos:zp-config?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
 
-
-#  mvc:
-#    throw-exception-if-no-handler-found: true
-#  web:
-#    resources:
-#      add-mappings: false
-
-
-#  data:
-#    redis:
-#      database: 3
-#      host: 82.156.191.218
-#      port: 6379
-#      password: admin123654
-#      connect-timeout: 10000
-
-
-
 server:
   port: 6168
-
-#feign:
-#  sentinel:
-#    enabled: true
-#
-#zp:
-#  jwt:
-#    salt: sdadaddadada
-#    expires: 1000000000
-#  security:
-#    write-list:
-#      - /api/web/getFilePublic
-#  logger-push:
-#    es-host: 101.42.12.133
-#    ex-port: 9200
-#    es-username: elastic
-#    es-password: Abcd1234....
-#
-#management:
-#  health:
-#    elasticsearch:
-#      enabled: false
-#  endpoint:
-#    metrics:
-#      enabled: true
-#    health:
-#      show-details: when_authorized
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#
-

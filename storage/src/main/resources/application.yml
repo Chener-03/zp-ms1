@@ -24,7 +24,6 @@ spring:
       lazy-attributes-resolution: true
     sentinel:
       enabled: false
-
   config:
     import:
       - optional:nacos:zp-mysql-config.yml?group=zp
@@ -32,74 +31,12 @@ spring:
       - optional:nacos:zp-config?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
-
-
-#  mvc:
-#    throw-exception-if-no-handler-found: true
-#  web:
-#    resources:
-#      add-mappings: false
-#  datasource:
-#    hikari:
-#      max-lifetime: 60000
-#    type: com.zaxxer.hikari.HikariDataSource
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://bj-cynosdbmysql-grp-a7tnayym.sql.tencentcdb.com:21449/zp?characterEncoding=utf8&useSSL=false&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
-#    username: admin01
-#    password: CZPczp666...
   servlet:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
-#  data:
-#    redis:
-#      database: 3
-#      host: 82.156.191.218
-#      port: 6379
-#      password: admin123654
-#      connect-timeout: 10000
-
-
-
-
-
-
-
 server:
   port: 6100
-
-#feign:
-#  sentinel:
-#    enabled: true
-
 zp:
   storage:
     location: ./filetemp/a/
-#  jwt:
-#    salt: sdadaddadada
-#    expires: 1000000000
-#  logger-push:
-#    es-host: 101.42.12.133
-#    ex-port: 9200
-#    es-username: elastic
-#    es-password: Abcd1234....
-#  security:
-#    write-list:
-#      - /api/web/getFilePublic
-
-
-#    hardwareUid: qqaacc
-#
-#management:
-#  health:
-#    elasticsearch:
-#      enabled: false
-#  endpoint:
-#    metrics:
-#      enabled: true
-#    health:
-#      show-details: when_authorized
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"

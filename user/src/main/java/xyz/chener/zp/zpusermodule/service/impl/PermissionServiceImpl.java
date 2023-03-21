@@ -2,6 +2,7 @@ package xyz.chener.zp.zpusermodule.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.chener.zp.zpusermodule.dao.PermissionDao;
 import xyz.chener.zp.zpusermodule.entity.Permission;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
@@ -26,6 +27,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void flushUiPermission() {
         this.lambdaUpdate().likeRight(Permission::getPermissionEnName, "UI_").remove();
         List<Permission> list = uiRoutingService.lambdaQuery().orderByAsc(UiRouting::getId)
