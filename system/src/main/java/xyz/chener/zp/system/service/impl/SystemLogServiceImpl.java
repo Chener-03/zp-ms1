@@ -49,67 +49,64 @@ public class SystemLogServiceImpl implements SystemLogService {
         ElasticsearchAsyncClient asyncClient = loggerPush.getAsyncClient();
         PageInfo<LogEntityDto> res = new PageInfo<>();
         try {
-            Function<Query.Builder, ObjectBuilder<Query>> queryBuilder = new Function<>() {
-                @Override
-                public ObjectBuilder<Query> apply(Query.Builder builder1) {
-                    return builder1.bool(b -> {
-                        if (StringUtils.hasText(dto.getLevel())) {
-                            b.must(m -> {
-                                m.term(t -> {
-                                    t.field("level.keyword");
-                                    t.value(FieldValue.of(dto.getLevel()));
-                                    return t;
-                                });
-                                return m;
-                            });
-                        }
-                        if (StringUtils.hasText(dto.getsId())) {
-                            b.must(m -> {
-                                m.term(t -> {
-                                    t.field("sId.keyword");
-                                    t.value(FieldValue.of(dto.getsId()));
-                                    return t;
-                                });
-                                return m;
-                            });
-                        }
-                        if (StringUtils.hasText(dto.getiId())) {
-                            b.must(m -> {
-                                m.term(t -> {
-                                    t.field("iId.keyword");
-                                    t.value(FieldValue.of(dto.getiId()));
-                                    return t;
-                                });
-                                return m;
-                            });
-                        }
-                        if (StringUtils.hasText(dto.getTid())) {
-                            b.must(m -> {
-                                m.term(t -> {
-                                    t.field("tId.keyword");
-                                    t.value(FieldValue.of(dto.getTid()));
-                                    return t;
-                                });
-                                return m;
-                            });
-                        }
-                        if (StringUtils.hasText(dto.getMessage())) {
-                            b.must(m -> {
-                                m.match(mch -> mch.field("message")
-                                        .query(que -> que.stringValue(dto.getMessage())));
-                                return m;
-                            });
-                        }
-                        return b;
+            Function<Query.Builder, ObjectBuilder<Query>> queryBuilder = builder1 -> builder1.bool(b -> {
+                if (StringUtils.hasText(dto.getLevel())) {
+                    b.must(m -> {
+                        m.term(t -> {
+                            t.field("level.keyword");
+                            t.value(FieldValue.of(dto.getLevel()));
+                            return t;
+                        });
+                        return m;
                     });
                 }
-            };
+                if (StringUtils.hasText(dto.getsId())) {
+                    b.must(m -> {
+                        m.term(t -> {
+                            t.field("sId.keyword");
+                            t.value(FieldValue.of(dto.getsId()));
+                            return t;
+                        });
+                        return m;
+                    });
+                }
+                if (StringUtils.hasText(dto.getiId())) {
+                    b.must(m -> {
+                        m.term(t -> {
+                            t.field("iId.keyword");
+                            t.value(FieldValue.of(dto.getiId()));
+                            return t;
+                        });
+                        return m;
+                    });
+                }
+                if (StringUtils.hasText(dto.getTid())) {
+                    b.must(m -> {
+                        m.term(t -> {
+                            t.field("tId.keyword");
+                            t.value(FieldValue.of(dto.getTid()));
+                            return t;
+                        });
+                        return m;
+                    });
+                }
+                if (StringUtils.hasText(dto.getMessage())) {
+                    b.must(m -> {
+                        m.match(mch -> mch.field("message")
+                                .query(que -> que.stringValue(dto.getMessage())));
+                        return m;
+                    });
+                }
+                return b;
+            });
 
-            CountResponse countResponse = asyncClient.count(cbd -> cbd.index(commonConfig.getLoggerPush().getEsIndexName())
+            String indexNamePrefix = commonConfig.getLoggerPush().getEsIndexName()+"-*";
+
+            CountResponse countResponse = asyncClient.count(cbd -> cbd.index(indexNamePrefix)
                     .query(queryBuilder)).get();
 
             SearchResponse<LogEntityDto> response = asyncClient.search(builder -> {
-                builder.index(commonConfig.getLoggerPush().getEsIndexName())
+                builder.index(indexNamePrefix)
                         .query(queryBuilder)
                         .sort(b -> b.field(sfd -> sfd.field("time.keyword").order(SortOrder.Desc)))
                         .from((page-1)*size).size(size);
