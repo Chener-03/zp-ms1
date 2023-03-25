@@ -51,9 +51,9 @@ jobs:
     - name: upload file to server
       uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:  
-        username: ${{USER}}   
-        server: ${{ HOST }} 
-        ssh_private_key: ${{ RSA_KEY }} 
+        username: ${{secrets.USER}}   
+        server: ${{ secrets.HOST }} 
+        ssh_private_key: ${{ secrets.RSA_KEY }} 
         local_path: ./gateway/build/libs/*
         remote_path: /opt/software/zp/gateway/jarfile
 
