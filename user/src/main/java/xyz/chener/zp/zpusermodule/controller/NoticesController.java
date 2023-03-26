@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.zpusermodule.entity.Dictionaries;
 import xyz.chener.zp.zpusermodule.entity.DictionariesKeyEnum;
 import xyz.chener.zp.zpusermodule.entity.Notices;
@@ -59,12 +60,14 @@ public class NoticesController {
             ,@RequestParam(value = "userNames",required = false) List<String> userNames
             ,@RequestParam(value = "ditchs",required = false) List<String> ditchs)
     {
+        DemonstrationSystemUtils.ban();
         return noticesService.publish(dto,userNames,ditchs);
     }
 
     @PostMapping("/notificationExpiration")
     public Boolean notificationExpiration(@RequestParam(value = "id") Integer id)
     {
+        DemonstrationSystemUtils.ban();
         return noticesService.lambdaUpdate().set(Notices::getEndTime,new Date()).eq(Notices::getId,id).update();
     }
 

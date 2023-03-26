@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.zpstoragecalculation.config.StorageProperties;
 import xyz.chener.zp.zpstoragecalculation.config.feign.loadbalance.Instance;
 import xyz.chener.zp.zpstoragecalculation.config.feign.loadbalance.LoadbalancerContextHolder;
@@ -67,6 +68,7 @@ public class FileController {
     public UploadResultDto uploadFilePrivate(@RequestParam String filename
             , @RequestParam MultipartFile file
             , @RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20")  String username) {
+        DemonstrationSystemUtils.ban();
         UploadResultDto res = new UploadResultDto(false);
         if (SecurityContextHolder.getContext().getAuthentication()!=null)
         {
@@ -92,6 +94,7 @@ public class FileController {
     @PreAuthorize("hasAnyRole('file_public')")
     public UploadResultDto uploadFilePublic(@RequestParam(required = false,defaultValue = "") String filename
             , @RequestParam MultipartFile file ) {
+//        DemonstrationSystemUtils.ban();
         try {
             if (!StringUtils.hasText(filename))
                 filename = file.getOriginalFilename();

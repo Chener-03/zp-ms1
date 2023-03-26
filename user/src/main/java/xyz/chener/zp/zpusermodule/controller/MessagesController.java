@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.zpusermodule.entity.dto.MessagesDto;
 import xyz.chener.zp.zpusermodule.service.MessagesService;
 
@@ -45,6 +46,7 @@ public class MessagesController {
     public Boolean sendUsersMessage(@ModelAttribute @Validated MessagesDto messagesDto
             , @RequestParam("userIds") @Size(min=1,message = "用户不能为空") List<Long> userIds)
     {
+        DemonstrationSystemUtils.ban();
         return messagesService.sendUsersMessage(messagesDto,userIds,SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
@@ -59,6 +61,7 @@ public class MessagesController {
 
     @PostMapping("/removeMessage")
     public Boolean removeMessage(@RequestParam("messageId") Integer messageId,@RequestParam(value = "isReceive") Boolean isReceive){
+        DemonstrationSystemUtils.ban();
         return messagesService.removeMessage(messageId,SecurityContextHolder.getContext().getAuthentication().getName(), isReceive);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.Ds;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.DsTargetField;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.UserExtend;
@@ -43,6 +44,7 @@ public class UserInfoController {
     @PreAuthorize("hasAnyRole('user_self_info_update')")
     public UserExtend saveUserExtendInfo(@ModelAttribute UserExtend userExtend)
     {
+        DemonstrationSystemUtils.ban();
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         UserBase user = userBaseService.lambdaQuery().select(UserBase::getId).eq(UserBase::getUsername, name).one();
         if (userExtend.getUserId() == null){
@@ -61,6 +63,7 @@ public class UserInfoController {
     public ResetPasswordDto resetPassword(@RequestParam @DsTargetField String oldPassword, String ds
             , @RequestParam @Length(min = 6,max = 20,message = "密码长度为6-20") @DsTargetField  String newPassword)
     {
+        DemonstrationSystemUtils.ban();
         return userBaseService.resetPassword(SecurityContextHolder.getContext().getAuthentication().getName()
         ,newPassword,oldPassword);
     }

@@ -53,15 +53,4 @@ public class SystemInfoController {
         return systemInfoSerivce.getSentinelInfo(url, resourceName);
     }
 
-
-    @WriteList
-    @RequestMapping("/test")
-    public void test()
-    {
-        systemInfoSerivce.getInstanceInfo("127.0.0.1:6050");
-//        ApplicationContextHolder.getApplicationContext()
-//                .getBean(SystemInfoSerivceImpl.class).getInstanceInfo("","");
-    }
-
-
 }

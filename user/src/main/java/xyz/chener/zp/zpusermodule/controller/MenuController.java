@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.UiRouting;
@@ -57,6 +58,7 @@ public class MenuController {
     @PreAuthorize("hasAnyRole('menu_list_query')")
     @OpLog(operateName = OpEnum.UPDATEMENU,recordClass = OpRecordMybatisWrapper.class )
     public UiRouting saveMenuInfo(@ModelAttribute UiRouting uiRouting) {
+        DemonstrationSystemUtils.ban();
         UiRouting res = uiRoutingService.saveOrUpdate(uiRouting) ? uiRouting : null;
         if (res != null){
             permissionService.flushUiPermission();
@@ -68,6 +70,7 @@ public class MenuController {
     @PreAuthorize("hasAnyRole('menu_list_query')")
     @OpLog(operateName = OpEnum.DELETEMENU,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteMenuInfo(@RequestParam Integer id) {
+        DemonstrationSystemUtils.ban();
         boolean res = uiRoutingService.removeById(id);
         if (res){
             permissionService.flushUiPermission();

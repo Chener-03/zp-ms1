@@ -24,6 +24,7 @@ import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResource;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
@@ -156,6 +157,7 @@ public class UserController {
     @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public UserBase saveUserBaseInfo(@ModelAttribute @Validated UserBase userBase)
     {
+        DemonstrationSystemUtils.ban();
         try {
             return userBaseService.addOrUpdateUser(userBase);
         }catch (DuplicateKeyException exception)
@@ -170,6 +172,7 @@ public class UserController {
     @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public UserExtend saveUserExtendInfo(@ModelAttribute UserExtend userExtend)
     {
+        DemonstrationSystemUtils.ban();
         return userExtendService.addOrUpdateUserExtend(userExtend);
     }
 
@@ -180,6 +183,7 @@ public class UserController {
     public Boolean setUserDisable(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             ,@RequestParam Integer disable)
     {
+        DemonstrationSystemUtils.ban();
         AssertUrils.state(username!=null && disable!=null,HttpParamErrorException.class);
         AssertUrils.state(!SecurityContextHolder.getContext()
                 .getAuthentication().getName().equals(username), DisableUserIsConcurrent.class);
@@ -201,6 +205,7 @@ public class UserController {
     public Boolean resetPassword(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             , @RequestParam Boolean isPwd)
     {
+        DemonstrationSystemUtils.ban();
         try {
             if (Boolean.TRUE.equals(isPwd))
             {
@@ -224,6 +229,7 @@ public class UserController {
     @OpLog(operateName = OpEnum.DELETEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
     public Boolean deleteUser(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username)
     {
+        DemonstrationSystemUtils.ban();
         try {
             UserBase user = userBaseService.lambdaQuery().eq(UserBase::getUsername, username).one();
             boolean res = false;
@@ -266,31 +272,5 @@ public class UserController {
     public List<String> getWsOnlineUsersName(){
         return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
     }
-
-
-
-    @Autowired
-    WsMessagePublisher wsMessagePublisher;
-
-    @WriteList
-    @RequestMapping("/testsend")
-    public String  test( String username)
-    {
-/*        List<String> allWsOnlineUsersName = userBaseService.getAllWsOnlineUsersName();
-        NotifyMessage msg = new NotifyMessage();
-        if (username!=null)
-        {
-            msg.setType(NotifyMessage.TYPE.ONE_USER);
-            //msg.setUser(user.getDs());
-        }else {
-            msg.setType(NotifyMessage.TYPE.ALL_USER);
-        }
-        msg.setContent("测试消息");
-        wsMessagePublisher.publishWsUserMessage(msg);*/
-        return "";
-
-    }
-
-
 
 }

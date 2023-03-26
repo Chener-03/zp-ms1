@@ -16,6 +16,7 @@ import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.config.query.QueryHelper;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.utils.AssertUrils;
+import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.Permission;
@@ -110,7 +111,8 @@ public class PermissionController {
             , @Length(max = 20,min = 3,message = "角色名长度3-20") @RequestParam String roleName
             , @RequestParam(required = false) List<String> roleList)
     {
-        //AssertUrils.state(id == null || id > 1000 , DefaultRoleDeleteError.class);
+        AssertUrils.state(id == null || id > 1000 , DefaultRoleDeleteError.class);
+        DemonstrationSystemUtils.ban();
         return roleService.saveOrUpdateRole(id,roleName,roleList);
     }
 
@@ -134,6 +136,7 @@ public class PermissionController {
     public void deleteRole(@RequestParam(required = true) Long id)
     {
         AssertUrils.state(id > 1000, DefaultRoleDeleteError.class);
+        DemonstrationSystemUtils.ban();
         roleService.lambdaUpdate().eq(Role::getId,id).remove();
     }
 
@@ -144,6 +147,7 @@ public class PermissionController {
             , @RequestParam(required = false) Long roleId)
     {
         AssertUrils.state(id > 1000, DefaultUserRoleDeleteError.class);
+        DemonstrationSystemUtils.ban();
         userBaseService.lambdaUpdate().eq(UserBase::getId,id).set(UserBase::getRoleId,roleId).update();
     }
 
@@ -152,6 +156,7 @@ public class PermissionController {
     @PreAuthorize("hasAnyRole('microservice_call','user_permission_list')")
     public void flushUiRouting()
     {
+        DemonstrationSystemUtils.ban();
         permissionService.flushUiPermission();
     }
 
