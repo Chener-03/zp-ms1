@@ -43,3 +43,6 @@ server:
   port: 6050
   compression:
     enabled: true
+
+
+

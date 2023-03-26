@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpusermodule.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
@@ -15,6 +16,7 @@ import java.util.List;
  * @since 2023-01-11 15:23:15
  */
 @Mapper
+@CacheNamespace(implementation = xyz.chener.zp.common.config.cache.impl.DefaultRedissonMybatisCache.class)
 public interface UserBaseDao extends BaseMapper<UserBase> {
 
     List<UserAllInfoDto> getAllUserInfo(@Param("userAllInfo") UserAllInfoDto userAllInfo

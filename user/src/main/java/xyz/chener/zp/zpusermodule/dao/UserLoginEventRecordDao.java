@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpusermodule.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.zpusermodule.entity.UserLoginEventRecord;

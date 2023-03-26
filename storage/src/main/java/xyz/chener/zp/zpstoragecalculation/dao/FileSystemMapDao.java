@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpstoragecalculation.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Mapper;
 import xyz.chener.zp.zpstoragecalculation.entity.FileSystemMap;
 
@@ -12,6 +13,7 @@ import xyz.chener.zp.zpstoragecalculation.entity.FileSystemMap;
  */
 
 @Mapper
+@CacheNamespace(implementation = xyz.chener.zp.common.config.cache.impl.DefaultRedissonMybatisCache.class)
 public interface FileSystemMapDao extends BaseMapper<FileSystemMap> {
 
 }

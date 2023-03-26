@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpusermodule.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Mapper;
 import xyz.chener.zp.zpusermodule.entity.OrgBase;
 
@@ -12,6 +13,7 @@ import xyz.chener.zp.zpusermodule.entity.OrgBase;
  */
 
 @Mapper
+@CacheNamespace(implementation = xyz.chener.zp.common.config.cache.impl.DefaultRedissonMybatisCache.class)
 public interface OrgBaseDao extends BaseMapper<OrgBase> {
 
 }

@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpusermodule.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.zpusermodule.entity.Notices;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 
 @Mapper
+@CacheNamespace(implementation = xyz.chener.zp.common.config.cache.impl.DefaultRedissonMybatisCache.class)
 public interface NoticesDao extends BaseMapper<Notices> {
 
     List<NoticesDto> getList(@Param("pm") NoticesDto noticesDto);

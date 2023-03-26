@@ -23,6 +23,11 @@ public class CommonConfig {
     private final Security security = new Security();
 
     private final LoggerPush loggerPush = new LoggerPush();
+    private final MybatisCache mybatisCache = new MybatisCache();
+
+    public MybatisCache getMybatisCache() {
+        return mybatisCache;
+    }
 
     public LoggerPush getLoggerPush() {
         return loggerPush;
@@ -158,6 +163,27 @@ public class CommonConfig {
 
         public void setEsPassword(String esPassword) {
             this.esPassword = esPassword;
+        }
+    }
+
+    public static class MybatisCache{
+        private String redisCachePrefix = "mybatis-cache:";
+        private Integer redisCacheExpireMs = 1000*60*60;
+
+        public String getRedisCachePrefix() {
+            return redisCachePrefix;
+        }
+
+        public void setRedisCachePrefix(String redisCachePrefix) {
+            this.redisCachePrefix = redisCachePrefix;
+        }
+
+        public Integer getRedisCacheExpireMs() {
+            return redisCacheExpireMs;
+        }
+
+        public void setRedisCacheExpireMs(Integer redisCacheExpireMs) {
+            this.redisCacheExpireMs = redisCacheExpireMs;
         }
     }
 
