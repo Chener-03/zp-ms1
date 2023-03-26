@@ -21,6 +21,12 @@ spring:
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
+      compression:
+        request:
+          enabled: true
+        response:
+          enabled:  true
+
     sentinel:
       enabled: false
 
@@ -29,6 +35,11 @@ spring:
     import:
       - optional:nacos:zp-gateway-config.yml?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
+
+server:
+  compression:
+    enabled: true
+
 
 zp:
   sentinel:

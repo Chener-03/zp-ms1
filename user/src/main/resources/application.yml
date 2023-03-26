@@ -21,6 +21,11 @@ spring:
         ip: 127.0.0.1
     openfeign:
       lazy-attributes-resolution: true
+      compression:
+        request:
+          enabled: true
+        response:
+          enabled:  true
 
     sentinel:
       enabled: false
@@ -36,3 +41,5 @@ spring:
 
 server:
   port: 6050
+  compression:
+    enabled: true

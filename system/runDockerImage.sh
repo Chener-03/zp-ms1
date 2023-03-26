@@ -1,0 +1,1 @@
+docker run -d -p 6168:6168 --name zpsystem -v /opt/software/zp/system/logs:/systemapps/logs zp-system:latest

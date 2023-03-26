@@ -1,0 +1,1 @@
+docker run -d -p 5001:5001 --name zpgateway -v /opt/software/zp/gateway/logs:/gatewayapps/logs zp-gateway:latest

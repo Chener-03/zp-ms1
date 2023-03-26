@@ -100,6 +100,26 @@ public class CommonConfig {
 
         private String esIndexName = "zplogger";
 
+        private Integer retryCount = 3;
+
+        private String failPath = "./logs/logger-push-fail.log";
+
+        public Integer getRetryCount() {
+            return retryCount;
+        }
+
+        public void setRetryCount(Integer retryCount) {
+            this.retryCount = retryCount;
+        }
+
+        public String getFailPath() {
+            return failPath;
+        }
+
+        public void setFailPath(String failPath) {
+            this.failPath = failPath;
+        }
+
         public String getEsIndexName() {
             return esIndexName;
         }

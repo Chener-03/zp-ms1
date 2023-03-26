@@ -1,0 +1,1 @@
+docker run -d -p 6100:6100 --name zpstorage -v /opt/software/zp/storage/logs:/storageapps/logs zp-storage:latest

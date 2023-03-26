@@ -2,6 +2,7 @@ package xyz.chener.zp.zpgateway.logger.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
@@ -67,10 +68,25 @@ public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
                 }
                 String s = queue.poll(1, TimeUnit.MINUTES);
                 if (StringUtils.hasText(s)){
-                    logEntities.add(om.readValue(s, LogEntity.class));
+                    logEntities.add(getLogEntity(s,om));
                 }
             } catch (Exception e) {}
         }
+    }
+
+    private static LogEntity getLogEntity(String s,ObjectMapper om){
+        try {
+            return om.readValue(s, LogEntity.class);
+        } catch (JsonProcessingException e) {
+            int i1 = s.indexOf("\"message\":");
+            int i2 = s.lastIndexOf("\"");
+            s = s.substring(0,i1) + "\"message\":\"" + s.substring(i1+11,i2).replace("\"","'") + s.substring(i2);
+            s = s.replace("\n","\\n");
+            try {
+                return om.readValue(s, LogEntity.class);
+            } catch (JsonProcessingException ignored) { }
+        }
+        throw new RuntimeException("LogEntity parse error");
     }
 
 

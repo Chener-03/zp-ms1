@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,6 +19,8 @@ import xyz.chener.zp.zpusermodule.service.OrgBaseService;
 import xyz.chener.zp.zpusermodule.service.RoleService;
 import xyz.chener.zp.zpusermodule.service.UserBaseService;
 import xyz.chener.zp.zpusermodule.service.UserExtendService;
+
+import java.util.List;
 
 /**
  * (UserExtend)表服务实现类
@@ -98,6 +101,12 @@ public class UserExtendServiceImpl extends ServiceImpl<UserExtendDao, UserExtend
     private String getOrgNameByUserId(Long userId)
     {
         OrgBase org = orgUserMapDao.getOrgBaseByUserId(userId);
+        if (org == null){
+            List<OrgBase> list = orgBaseService.lambdaQuery().eq(OrgBase::getMainUserId, userId).list();
+            if (list.size() > 0){
+                return String.join("、", list.stream().map(e-> e.getOrgChSimpleName()+"(负责人)").toList());
+            }
+        }
         if (org == null)
             return null;
         StringBuilder orgFullPathName = new StringBuilder(org.getOrgChName());

@@ -1,6 +1,7 @@
 package xyz.chener.zp.logger.config.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.GetScriptRequest;
 import co.elastic.clients.elasticsearch.core.GetScriptResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
@@ -20,19 +21,24 @@ import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.CommonConfig;
+import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.logger.logback.LogPushEsAppender;
 import xyz.chener.zp.logger.logback.entity.LogEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Author: chenzp
@@ -124,10 +130,45 @@ public class LoggerPush {
             asyncClient.bulk(bu-> bu.index(indexName)
                     .operations(bulk)).whenComplete((r,e)->{
                 if (e != null) {
-                    log.error("推送异常{},可能丢失{}条数据:", e, bulk.size());
+                    CompletableFuture.runAsync(()->{
+                        retry(bulk,indexName, loggerPush.getRetryCount());
+                    });
                 }
             });
         } catch (Exception ignored) { }
+    }
+
+
+    public void retry(List<BulkOperation> bulk,String indexName,Integer count)
+    {
+        try {
+            BulkResponse res = asyncClient.bulk(bu -> bu.index(indexName).operations(bulk)).get();
+            if (res.errors()) {
+                throw new Exception();
+            }
+        }catch (Exception exception){
+            if (count <= 0){
+                String failPath = loggerPush.getFailPath();
+                try {
+                    RandomAccessFile randomFile = new RandomAccessFile(failPath, "rw");
+                    long fileLength = randomFile.length();
+                    randomFile.seek(fileLength);
+                    ObjectMapper om = new ObjectMapper();
+                    bulk.forEach(e->{
+                        try {
+                            randomFile.writeBytes(om.writeValueAsString(e._get()));
+                        } catch (IOException ioException) {
+                            System.err.println(ioException.getMessage());
+                        }
+                    });
+                    randomFile.close();
+                }catch (Exception exc1){
+                    log.error("推送失败日志记录失败:{}", exc1.getMessage());
+                }
+                return;
+            }
+            retry(bulk, indexName,count - 1);
+        }
     }
 
 

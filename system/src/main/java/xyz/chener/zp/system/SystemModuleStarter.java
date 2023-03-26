@@ -12,7 +12,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Email: chen@chener.xyz
  */
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, SentinelEndpointAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class
+        , SentinelEndpointAutoConfiguration.class},
+        excludeName = {"org.redisson.spring.starter.RedissonAutoConfiguration"}
+)
 @EnableFeignClients
 public class SystemModuleStarter {
     public static void main(String[] args) {
