@@ -119,6 +119,12 @@ public class EncryCore {
                 gen.writeString("权限不足,无法显示");
                 return;
             }
+
+            if (!encryField.enableEncry()){
+                gen.writeString(covertToString(value));
+                return;
+            }
+
             EncryInterface instance = null;
             try {
                 instance = (EncryInterface) encryField.encryClass().getConstructor().newInstance();

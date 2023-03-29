@@ -16,6 +16,8 @@ public @interface EncryField {
 
     Class encryClass() default DefaultBase64Encry.class;
 
+    boolean enableEncry() default true;
+
 
     String[] hasAnyAuthority() default {};
 
