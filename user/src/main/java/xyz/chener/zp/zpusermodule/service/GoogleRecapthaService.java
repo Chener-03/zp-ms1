@@ -11,7 +11,7 @@ public interface GoogleRecapthaService {
 
     String secret = "6LfSuiUiAAAAAHfI_Dk5EDJ94INqPVnw-1AMbqJ9";
 
-    Float score = 0.7f;
+    Float score = 0.5f;
 
     boolean check(String response);
 
