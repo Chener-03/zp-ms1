@@ -3,8 +3,7 @@ package xyz.chener.zp.zpusermodule.config.oplog.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecord;
-import xyz.chener.zp.zpusermodule.entity.dto.OperateRecordDto;
-import xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto;
 
 /**
  * (OperateRecord)表服务接口

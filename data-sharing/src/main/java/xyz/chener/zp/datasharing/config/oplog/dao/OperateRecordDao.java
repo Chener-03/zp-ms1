@@ -1,10 +1,10 @@
-package xyz.chener.zp.zpusermodule.config.oplog.dao;
+package xyz.chener.zp.datasharing.config.oplog.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecord;
-import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto;
+import xyz.chener.zp.datasharing.config.oplog.entity.OperateRecord;
+import xyz.chener.zp.datasharing.config.oplog.entity.OperateRecordDto;
 
 import java.util.List;
 
@@ -18,8 +18,6 @@ import java.util.List;
 public interface OperateRecordDao extends BaseMapper<OperateRecord> {
 
     int insertRecord(@Param("op") OperateRecord operateRecord);
-
-    List<OperateRecordDto> getList(@Param("dto") OperateRecordDto dto);
 
 }
 

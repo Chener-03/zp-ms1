@@ -8,11 +8,17 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Conventions;
 import org.springframework.core.MethodParameter;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.paramDecryption.annotation.DecryField;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestBodyDecry;
 import xyz.chener.zp.common.config.paramDecryption.decryProcess.DecryInterface;
@@ -69,10 +75,24 @@ public class RequestBodyDecryResolver implements HandlerMethodArgumentResolver {
             bios.close();
             final String sourceData = bios.toString(StandardCharsets.UTF_8);
             request.setAttribute(REQUEST_BODY_SOURCE_DATA, sourceData);
-            return buildObjectMapper(parameterAnnotation).readValue(sourceData, parameter.getParameterType());
+            Object o = buildObjectMapper(parameterAnnotation).readValue(sourceData, parameter.getParameterType());
+            res.set(o);
         }else {
             log.warn("webRequest 不是 HttpServletRequest???");
         }
+
+
+        Validated validatedAnn = parameter.getParameterAnnotation(Validated.class);
+        if (validatedAnn != null) {
+            Validator validator = ApplicationContextHolder.getApplicationContext().getBean(Validator.class);
+            String name = Conventions.getVariableNameForParameter(parameter);
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(res.get(), name);
+            validator.validate(res.get(), bindingResult);
+            if (bindingResult.hasErrors()) {
+                throw new MethodArgumentNotValidException(parameter, bindingResult);
+            }
+        }
+
         return res.get();
     }
 

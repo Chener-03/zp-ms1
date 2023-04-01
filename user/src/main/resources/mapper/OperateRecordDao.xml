@@ -12,7 +12,7 @@
                     ,b.id as op_user_id from user_base b where username='admin'
                 </if>
     </insert>
-    <select id="getList" resultType="xyz.chener.zp.zpusermodule.entity.dto.OperateRecordDto">
+    <select id="getList" resultType="xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto">
         SELECT a.*,b.username as username FROM operate_record a LEFT JOIN user_base b
         ON a.op_user_id=b.id
         <where>

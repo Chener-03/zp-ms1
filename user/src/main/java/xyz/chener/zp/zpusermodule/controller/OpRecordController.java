@@ -6,8 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.zpusermodule.config.oplog.service.OperateRecordService;
-import xyz.chener.zp.zpusermodule.entity.dto.OperateRecordDto;
-import xyz.chener.zp.zpusermodule.entity.dto.UserLoginEventRecordDto;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto;
 
 /**
  * @Author: chenzp

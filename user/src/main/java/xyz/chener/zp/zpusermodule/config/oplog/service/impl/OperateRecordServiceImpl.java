@@ -7,7 +7,7 @@ import xyz.chener.zp.zpusermodule.config.oplog.dao.OperateRecordDao;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecord;
 import xyz.chener.zp.zpusermodule.config.oplog.service.OperateRecordService;
 import org.springframework.stereotype.Service;
-import xyz.chener.zp.zpusermodule.entity.dto.OperateRecordDto;
+import xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto;
 
 /**
  * (OperateRecord)表服务实现类

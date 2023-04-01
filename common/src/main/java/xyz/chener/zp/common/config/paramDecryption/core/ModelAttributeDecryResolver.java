@@ -1,13 +1,22 @@
 package xyz.chener.zp.common.config.paramDecryption.core;
 
+import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Conventions;
 import org.springframework.core.MethodParameter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.support.WebArgumentResolver;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.paramDecryption.annotation.DecryField;
 import xyz.chener.zp.common.config.paramDecryption.annotation.ModelAttributeDecry;
 import xyz.chener.zp.common.config.paramDecryption.decryProcess.DecryInterface;
@@ -74,6 +83,18 @@ public class ModelAttributeDecryResolver implements HandlerMethodArgumentResolve
                                 }
                             });
                 });
+
+
+        Validated validatedAnn = parameter.getParameterAnnotation(Validated.class);
+        if (validatedAnn != null) {
+            Validator validator = ApplicationContextHolder.getApplicationContext().getBean(Validator.class);
+            String name = Conventions.getVariableNameForParameter(parameter);
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(res.get(), name);
+            validator.validate(res.get(), bindingResult);
+            if (bindingResult.hasErrors()) {
+                throw new MethodArgumentNotValidException(parameter, bindingResult);
+            }
+        }
         return res.get();
     }
 
@@ -86,7 +107,7 @@ public class ModelAttributeDecryResolver implements HandlerMethodArgumentResolve
         DecryInterface decryInterface = null;
         if (decryField != null && decryField.required()){
             decryInterface = buildDecryInterfaceWithCache( decryField.decryClass(), decryInstanceCache);
-        }else {
+        }else if (decryField == null) {
             decryInterface = buildDecryInterfaceWithCache( clz, decryInstanceCache);
         }
         if (Objects.nonNull(decryInterface)){
@@ -145,6 +166,7 @@ public class ModelAttributeDecryResolver implements HandlerMethodArgumentResolve
         }
         return null;
     }
+
 
 
 

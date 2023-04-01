@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -62,6 +63,9 @@ public class RequestParamDecryResolver implements HandlerMethodArgumentResolver 
         }
         if (parameterValue == null) {
             parameterValue = requestParamDecry.defaultValue();
+            if (parameterValue.equals(ValueConstants.DEFAULT_NONE))
+                return null;
+            return parameterValue;
         }
         DecryInterface instance = (DecryInterface) requestParamDecry.decryClass().getConstructor().newInstance();
         String decryValue = instance.decry(parameterValue);
