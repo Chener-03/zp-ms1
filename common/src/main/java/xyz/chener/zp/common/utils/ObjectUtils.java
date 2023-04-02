@@ -2,6 +2,10 @@ package xyz.chener.zp.common.utils;
 
 import xyz.chener.zp.common.entity.SFunction;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -212,6 +216,23 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
             return r;
         }
 
+    }
+
+
+    public static long getSerializableObjectSize(Object obj){
+        int length = 0;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(obj);
+            oos.flush();
+            oos.close();
+            length = baos.toByteArray().length;
+            oos.close();
+            baos.reset();
+            baos.close();
+        }catch (Throwable ignored){ }
+        return length;
     }
 
 

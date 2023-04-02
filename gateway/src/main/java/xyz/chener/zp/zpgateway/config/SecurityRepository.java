@@ -201,6 +201,10 @@ public class SecurityRepository implements WebFilter {
     }
 
     private boolean matchUrl(String uri, String s) {
+        if (s.contains("{") && s.contains("}"))
+        {
+            s = s.substring(0, s.indexOf("{")) + "**" + s.substring(s.indexOf("}") + 1);
+        }
         if (s.contains("/**"))
         {
             int i = s.indexOf("/**");

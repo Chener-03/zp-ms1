@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
 import jakarta.websocket.Session;
+import xyz.chener.zp.common.utils.TickNotification;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 
 import java.time.Duration;
@@ -28,20 +29,13 @@ public class WsCache {
                 .expireAfterWrite(Duration.ofSeconds(60))
                 .removalListener(WsCache::removeListener)
                 .build();
-        Thread t = new Thread(()->{
-            while (!Thread.interrupted()){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        TickNotification.getInstance().addRunnable(()->{
+            try {
                 unAuthConnect.cleanUp();
                 authConnect.cleanUp();
-            }
+            }catch (Throwable ignored){}
         });
-        t.setDaemon(true);
-        t.setName("websocet cache flush thread");
-        t.start();
+
     }
 
 

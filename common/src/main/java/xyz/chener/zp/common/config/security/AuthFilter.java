@@ -87,6 +87,11 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private boolean matchUrl(String uri, String s) {
+        // 这里只处理了 单个{pathVariable} 和 /** 的情况
+        if (s.contains("{") && s.contains("}"))
+        {
+            s = s.substring(0, s.indexOf("{")) + "**" + s.substring(s.indexOf("}") + 1);
+        }
         if (s.contains("/**"))
         {
             int i = s.indexOf("/**");

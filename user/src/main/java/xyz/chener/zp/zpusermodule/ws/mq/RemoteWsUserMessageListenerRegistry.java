@@ -12,6 +12,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import xyz.chener.zp.common.utils.ThreadUtils;
+import xyz.chener.zp.common.utils.TickNotification;
 import xyz.chener.zp.zpusermodule.ws.mq.listener.NotifyMessageListener;
 import xyz.chener.zp.zpusermodule.ws.mq.listener.MqListener;
 
@@ -33,10 +35,12 @@ public class RemoteWsUserMessageListenerRegistry implements ApplicationListener<
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    private Channel cn = null;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         try {
-            Channel cn = rabbitTemplate.getConnectionFactory()
+            cn = rabbitTemplate.getConnectionFactory()
                     .createConnection()
                     .createChannel(false);
             cn.basicConsume(RemoteMessageConfig.WS_MESSAGE_QUEUE,true,new MqWsMessageListenerDispatch(cn,listeners));
@@ -44,6 +48,20 @@ public class RemoteWsUserMessageListenerRegistry implements ApplicationListener<
             throw new RuntimeException(exception);
         }
         this.listeners.add(new NotifyMessageListener());
+
+
+        TickNotification.getInstance().addRunnable(()->{
+            ThreadUtils.runIgnoreException(()->{
+                if (cn != null && !cn.isOpen()){
+                    ThreadUtils.runIgnoreException(()-> cn.close());
+                    cn = rabbitTemplate.getConnectionFactory()
+                            .createConnection()
+                            .createChannel(false);
+                    cn.basicConsume(RemoteMessageConfig.WS_MESSAGE_QUEUE,true,new MqWsMessageListenerDispatch(cn,listeners));
+                }
+            });
+        });
+
     }
 
     public void addListener(MqListener listener){
