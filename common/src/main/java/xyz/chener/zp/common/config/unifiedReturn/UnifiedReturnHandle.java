@@ -72,7 +72,6 @@ public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
                 }
             }else {
                 SimpleModule sm = new SimpleModule();
-                sm.addSerializer(String.class, new EncryCore.EncryJacksonSerializerDispatch<>(String.class));
                 Class[] allType = {String.class,Integer.class,Long.class
                         ,Double.class,Float.class,Boolean.class,Short.class
                         , BigDecimal.class, BigInteger.class,Date.class};

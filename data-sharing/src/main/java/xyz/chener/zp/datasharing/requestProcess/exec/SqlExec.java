@@ -39,6 +39,8 @@ public class SqlExec extends AbstractChainExecute {
                 for (SqlPe.SQL_ENTITY sqlEntity : sqls) {
                     String sql = sqlEntity.getSql();
                     sql = parseSQL(sql, pap);
+                    sqlEntity.setCompileSql(sql);
+
                     if (sqlEntity.getType().equalsIgnoreCase(SqlPe.TYPE_SELECT)) {
                         List<Map<String,Object>> resList = processSelect(connection, sql);
                         int ac = count.getAndIncrement();

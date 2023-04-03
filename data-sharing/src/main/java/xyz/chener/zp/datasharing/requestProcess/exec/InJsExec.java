@@ -23,7 +23,7 @@ public class InJsExec extends AbstractChainExecute {
     @Override
     protected Object handle(Object param) throws Exception {
         if (param instanceof PeAllParams pap){
-            if (pap.getInJsPe()!=null) {
+            if (pap.getInJsPe()!=null && StringUtils.hasText(pap.getInJsPe().getJs())) {
                 String js = pap.getInJsPe().getJs();
                 String error = null;
                 String paramJson = null;

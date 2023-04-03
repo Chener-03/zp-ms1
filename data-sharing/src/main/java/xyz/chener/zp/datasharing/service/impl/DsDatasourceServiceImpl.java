@@ -1,9 +1,12 @@
 package xyz.chener.zp.datasharing.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
+import xyz.chener.zp.common.config.query.QueryHelper;
+import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.datasharing.connect.DBConnector;
@@ -11,13 +14,17 @@ import xyz.chener.zp.datasharing.connect.error.ConnectError;
 import xyz.chener.zp.datasharing.dao.DsDatasourceDao;
 import xyz.chener.zp.datasharing.entity.DsDatasource;
 import xyz.chener.zp.datasharing.entity.dto.ConnectResult;
+import xyz.chener.zp.datasharing.entity.dto.DsDatasourceDto;
+import xyz.chener.zp.datasharing.entity.thirdparty.OrgBase;
 import xyz.chener.zp.datasharing.entity.thirdparty.UserBase;
 import xyz.chener.zp.datasharing.error.datasource.SaveDatasourceError;
 import xyz.chener.zp.datasharing.service.DsDatasourceService;
 import org.springframework.stereotype.Service;
 import xyz.chener.zp.datasharing.service.UserModuleService;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * (DsDatasource)表服务实现类
@@ -66,6 +73,18 @@ public class DsDatasourceServiceImpl extends ServiceImpl<DsDatasourceDao, DsData
             this.updateById(dsDatasource);
         }
         return dsDatasource;
+    }
+
+    @Override
+    public PageInfo<DsDatasourceDto> getList(DsDatasourceDto params, FieldQuery fieldQuery, Integer page, Integer size) {
+        List<OrgBase> userOrgs = userModuleService.getUserOrgs(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (userOrgs == null || userOrgs.size() == 0) {
+            return new PageInfo<>(Collections.emptyList());
+        }
+        QueryHelper.StartQuery(fieldQuery,DsDatasourceDto.class);
+        PageHelper.startPage(page, size);
+        List<DsDatasourceDto> list = getBaseMapper().getList(params, userOrgs.stream().map(e -> String.valueOf(e.getId())).toList());
+        return new PageInfo<>(list);
     }
 
 

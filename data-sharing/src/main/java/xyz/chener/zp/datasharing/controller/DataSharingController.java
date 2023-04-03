@@ -27,7 +27,7 @@ public class DataSharingController {
     @WriteList
     public void sharing(@PathVariable("requestId") String requestId
             , HttpServletRequest request, HttpServletResponse response) {
-        dataSharingService.sharing(requestId,request,response);
+        dataSharingService.sharing(requestId,false,request,response);
     }
 
 

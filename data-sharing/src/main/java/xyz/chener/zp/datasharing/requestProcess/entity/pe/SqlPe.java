@@ -23,6 +23,7 @@ public class SqlPe implements Serializable {
     public static class SQL_ENTITY{
         private String sql;
         private String type;
+        private String compileSql;
     }
 
 }

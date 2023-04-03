@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.datasharing.entity.thirdparty.OrgBase;
 import xyz.chener.zp.datasharing.entity.thirdparty.UserBase;
 import xyz.chener.zp.datasharing.service.impl.UserModuleServiceFallback;
 
@@ -18,5 +19,9 @@ public interface UserModuleService {
     PageInfo<UserBase> getUserBaseInfo(@ModelAttribute @RequestParam("userBase") UserBase userBase
             , @RequestParam("page") Integer page
             , @RequestParam("size") Integer size);
+
+
+    @RequestMapping(value = "/api/web/getUserOrgsByUsername", method = RequestMethod.GET)
+    List<OrgBase> getUserOrgs(@RequestParam("username") String username);
 
 }

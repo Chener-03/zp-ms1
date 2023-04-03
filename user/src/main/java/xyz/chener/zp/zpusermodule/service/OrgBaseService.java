@@ -28,5 +28,7 @@ public interface OrgBaseService extends IService<OrgBase> {
 
     boolean deleteOrg(Long id);
 
+    List<OrgBase> getUserOrgs( String username);
+
 }
 

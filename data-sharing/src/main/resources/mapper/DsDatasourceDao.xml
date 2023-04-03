@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.datasharing.dao.DsDatasourceDao">
+
+
+    <select id="getList" resultType="xyz.chener.zp.datasharing.entity.dto.DsDatasourceDto">
+
+        select a.*,b.org_ch_simple_name as org_simple_name
+        from ds_datasource a ,org_base b
+        where a.org_id = b.id
+        and a.org_id in
+        <foreach item="item" index="index" collection="orgIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="params.datasourceName != null and params.datasourceName != ''">
+            and a.datasource_name like concat('%',#{params.datasourceName},'%')
+        </if>
+        <if test="params.type != null and params.type != ''">
+            and a.type = #{params.type}
+        </if>
+
+    </select>
+</mapper>
+

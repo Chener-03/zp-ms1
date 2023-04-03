@@ -111,7 +111,7 @@ public class PermissionController {
             , @Length(max = 20,min = 3,message = "角色名长度3-20") @RequestParam String roleName
             , @RequestParam(required = false) List<String> roleList)
     {
-        AssertUrils.state(id == null || id > 1000 , DefaultRoleDeleteError.class);
+//        AssertUrils.state(id == null || id > 1000 , DefaultRoleDeleteError.class);
         DemonstrationSystemUtils.ban();
         return roleService.saveOrUpdateRole(id,roleName,roleList);
     }

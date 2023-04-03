@@ -23,7 +23,7 @@ public class OutJsExec extends AbstractChainExecute {
     @Override
     protected Object handle(Object param) throws Exception {
         if (param instanceof PeAllParams pap){
-            if (pap.getOutJsPe()!=null){
+            if (pap.getOutJsPe()!=null && StringUtils.hasText(pap.getOutJsPe().getJs())){
                 String js = pap.getOutJsPe().getJs();
 
                 String error = null;

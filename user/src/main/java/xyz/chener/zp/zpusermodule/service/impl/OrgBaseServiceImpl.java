@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -112,6 +114,23 @@ public class OrgBaseServiceImpl extends ServiceImpl<OrgBaseDao, OrgBase> impleme
         AssertUrils.state(org.getParentId() != null, RootOrgNotDelete.class);
         deleteAll(id);
         return true;
+    }
+
+    @Override
+    public List<OrgBase> getUserOrgs(String username) {
+        UserBase user = userBaseService.lambdaQuery().select(UserBase::getId).eq(UserBase::getUsername, username).one();
+        if (user == null){
+            return Collections.emptyList();
+        }
+        List<Long> orgIds = orgUserMapService.lambdaQuery()
+                .select(OrgUserMap::getOrgId)
+                .eq(OrgUserMap::getUserId, user.getId()).list()
+                .stream().map(OrgUserMap::getOrgId).toList();
+        LambdaQueryChainWrapper<OrgBase> chain = this.lambdaQuery().eq(OrgBase::getMainUserId, user.getId());
+        if (!orgIds.isEmpty()){
+            chain.or().in(OrgBase::getId,orgIds);
+        }
+        return chain.list();
     }
 
     private void deleteAll(Long id){

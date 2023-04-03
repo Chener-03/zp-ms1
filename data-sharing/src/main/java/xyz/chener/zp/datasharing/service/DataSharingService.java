@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 public interface DataSharingService {
 
-    void sharing( String requestId , HttpServletRequest request, HttpServletResponse response);
+    void sharing( String requestId , Boolean istest, HttpServletRequest request, HttpServletResponse response);
 
 }

@@ -160,4 +160,12 @@ public class OrgController {
         return orgUserMapService.disableUserAuth(orgId,userIds,disable);
     }
 
+
+
+    @GetMapping("/getUserOrgsByUsername")
+    @PreAuthorize("hasAnyRole('microservice_call')")
+    public List<OrgBase> getUserOrgs(@RequestParam("username") String username) {
+        return orgBaseService.getUserOrgs(username);
+    }
+
 }
