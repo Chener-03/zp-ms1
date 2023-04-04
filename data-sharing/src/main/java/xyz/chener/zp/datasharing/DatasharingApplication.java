@@ -16,6 +16,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import xyz.chener.zp.common.utils.MapBuilder;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.common.utils.UriMatcherUtils;
 import xyz.chener.zp.datasharing.config.DataSharingSourceConfig;
 import xyz.chener.zp.datasharing.entity.thirdparty.UserBase;
 import xyz.chener.zp.datasharing.requestProcess.entity.pe.*;
@@ -36,6 +37,8 @@ import java.util.concurrent.CompletableFuture;
 @EnableConfigurationProperties({DataSharingSourceConfig.class})
 public class DatasharingApplication {
     public static void main(String[] args) throws Exception {
+
+        UriMatcherUtils.match1("/a/**/b","/a/aa/aaa/b");
 
         System.setProperty("csp.sentinel.log.output.type","console");
         System.setProperty("polyglot.engine.WarnInterpreterOnly","false");

@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.chener.zp.common.config.CommonConfig;
 import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
 import xyz.chener.zp.common.entity.CommonVar;
+import xyz.chener.zp.common.utils.UriMatcherUtils;
 
 import java.io.IOException;
 
@@ -87,33 +88,11 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private boolean matchUrl(String uri, String s) {
-        // 这里只处理了 单个{pathVariable} 和 /** 的情况
         if (s.contains("{") && s.contains("}"))
         {
-            s = s.substring(0, s.indexOf("{")) + "**" + s.substring(s.indexOf("}") + 1);
+            s = s.substring(0, s.indexOf("{")) + "*" + s.substring(s.indexOf("}") + 1);
         }
-        if (s.contains("/**"))
-        {
-            int i = s.indexOf("/**");
-            if (i == 0)
-            {
-                return true;
-            } else
-            {
-                s = s.substring(0, i);
-                if (uri.contains(s))
-                {
-                    return true;
-                }
-            }
-        } else
-        {
-            if (uri.contains(s))
-            {
-                return true;
-            }
-        }
-        return false;
+        return UriMatcherUtils.match(s,uri);
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import xyz.chener.zp.common.config.paramDecryption.annotation.DecryField;
 import xyz.chener.zp.common.config.query.annotation.QueryTableName;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryField;
+import xyz.chener.zp.datasharing.commons.PasswordEncry;
 
 import java.util.Date;
 
@@ -44,11 +45,11 @@ public class DsDatasourceDto {
     @QueryTableName("ds_datasource")
     private String paramUrl;
 
-    @EncryField(enableEncry = false,hasAnyAuthority = {"none"})
+    @EncryField(encryClass = PasswordEncry.class)
     @QueryTableName("ds_datasource")
     private String username;
 
-    @EncryField(enableEncry = false,hasAnyAuthority = {"none"})
+    @EncryField(encryClass = PasswordEncry.class)
     @QueryTableName("ds_datasource")
     private String password;
     //组织ID

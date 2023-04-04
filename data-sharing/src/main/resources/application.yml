@@ -41,11 +41,11 @@ spring:
       - optional:nacos:zp-mvc-normal?group=zp
       - optional:nacos:zp-rabbit-config?group=zp
 
+
 server:
   port: 7051
   compression:
     enabled: true
-
 
 
 mybatis-plus:

@@ -17,6 +17,9 @@
         <if test="params.type != null and params.type != ''">
             and a.type = #{params.type}
         </if>
+        <if test="params.id != null">
+            and a.id = #{params.id}
+        </if>
 
     </select>
 </mapper>
