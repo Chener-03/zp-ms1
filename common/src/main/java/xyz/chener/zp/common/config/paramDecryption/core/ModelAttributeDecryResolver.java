@@ -87,6 +87,9 @@ public class ModelAttributeDecryResolver implements HandlerMethodArgumentResolve
 
         Validated validatedAnn = parameter.getParameterAnnotation(Validated.class);
         if (validatedAnn != null) {
+            if (res.get() == null){
+                res.set(ObjectUtils.newInstance(parameter.getParameterType()));
+            }
             Validator validator = ApplicationContextHolder.getApplicationContext().getBean(Validator.class);
             String name = Conventions.getVariableNameForParameter(parameter);
             BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(res.get(), name);

@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Author: chenzp
@@ -233,6 +234,14 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
             baos.close();
         }catch (Throwable ignored){ }
         return length;
+    }
+
+    public static Object newInstance(Class<?> clazz){
+        try {
+            return clazz.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

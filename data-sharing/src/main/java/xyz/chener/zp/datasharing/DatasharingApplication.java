@@ -37,9 +37,6 @@ import java.util.concurrent.CompletableFuture;
 @EnableConfigurationProperties({DataSharingSourceConfig.class})
 public class DatasharingApplication {
     public static void main(String[] args) throws Exception {
-
-        UriMatcherUtils.match1("/a/**/b","/a/aa/aaa/b");
-
         System.setProperty("csp.sentinel.log.output.type","console");
         System.setProperty("polyglot.engine.WarnInterpreterOnly","false");
         SpringApplication.run(DatasharingApplication.class, args);
