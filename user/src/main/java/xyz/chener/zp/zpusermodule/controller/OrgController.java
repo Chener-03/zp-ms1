@@ -164,8 +164,15 @@ public class OrgController {
 
     @GetMapping("/getUserOrgsByUsername")
     @PreAuthorize("hasAnyRole('microservice_call')")
-    public List<OrgBase> getUserOrgs(@RequestParam("username") String username) {
+    public List<OrgBase> getUserOrgs(@RequestParam(value = "username") String username) {
         return orgBaseService.getUserOrgs(username);
     }
+
+
+    @GetMapping("/getUserOrgsByConcurrentUser")
+    public List<OrgBase> getUserOrgsByConcurrentUser() {
+        return orgBaseService.getUserOrgs(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
 
 }

@@ -44,6 +44,13 @@ public class DsDatasourceServiceImpl extends ServiceImpl<DsDatasourceDao, DsData
 
     @Override
     public ConnectResult testConnection(DsDatasource dsDatasource) {
+        if (dsDatasource.getId() != null && (dsDatasource.getPassword().matches("^[*]+$") || dsDatasource.getUsername().matches("^[*]+$"))){
+            DsDatasource old = this.getById(dsDatasource.getId());
+            if (old != null){
+                dsDatasource.setPassword(old.getPassword());
+                dsDatasource.setUsername(old.getUsername());
+            }
+        }
         ConnectResult res = new ConnectResult();
         DBConnector connector = DBConnector.chooseConnector(dsDatasource.getType());
         try {
