@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "zp.datasharing.datasource")
 public class DataSharingSourceConfig {
 
-    private Integer maxPoolSize = 10;
+    private Integer maxPoolSize = 5;
 
     private Integer connectionTimeout = 5000;
 

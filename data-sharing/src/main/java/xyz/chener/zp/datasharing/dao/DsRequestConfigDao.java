@@ -2,7 +2,11 @@ package xyz.chener.zp.datasharing.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import xyz.chener.zp.datasharing.entity.DsRequestConfig;
+import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
+
+import java.util.List;
 
 /**
  * (DsRequestConfig)表数据库访问层
@@ -12,6 +16,9 @@ import xyz.chener.zp.datasharing.entity.DsRequestConfig;
  */
 @Mapper
 public interface DsRequestConfigDao extends BaseMapper<DsRequestConfig> {
+
+    List<DsRequestConfigDto> getRequestConfigList(@Param("pm") DsRequestConfigDto requestConfigDto);
+
 
 }
 

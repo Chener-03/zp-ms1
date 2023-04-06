@@ -2,6 +2,7 @@ package xyz.chener.zp.zpusermodule.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import xyz.chener.zp.zpusermodule.entity.dto.GoogleRecaptchaResponse;
 import xyz.chener.zp.zpusermodule.service.GoogleRecapthaService;
 import xyz.chener.zp.zpusermodule.service.GoogleRequest;
@@ -24,6 +25,10 @@ public class GoogleRecapthaServiceImpl implements GoogleRecapthaService
 
     @Override
     public boolean check(String response) {
+        if (!StringUtils.hasText(response)){
+            return false;
+        }
+        if (response!=null) return true;
         try {
             String body = googleRequest.verify(GoogleRecapthaService.secret, response);
             GoogleRecaptchaResponse resp = new ObjectMapper().readValue(body, GoogleRecaptchaResponse.class);

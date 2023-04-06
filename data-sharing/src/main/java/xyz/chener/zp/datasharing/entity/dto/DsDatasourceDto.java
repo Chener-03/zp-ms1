@@ -74,6 +74,16 @@ public class DsDatasourceDto {
     private String type;
 
 
+    private Boolean healthy;
+
+    public Boolean getHealthy() {
+        return healthy;
+    }
+
+    public void setHealthy(Boolean healthy) {
+        this.healthy = healthy;
+    }
+
     public Integer getId() {
         return id;
     }

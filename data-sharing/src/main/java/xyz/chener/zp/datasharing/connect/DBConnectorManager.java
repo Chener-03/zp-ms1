@@ -2,6 +2,7 @@ package xyz.chener.zp.datasharing.connect;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import xyz.chener.zp.datasharing.connect.entity.DataSourceStruce;
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @Slf4j
-public class DBConnectorManager implements CommandLineRunner {
+public class DBConnectorManager implements CommandLineRunner, DisposableBean {
 
     public static final ConcurrentHashMap<Integer, DataSourceStruce> dbConnectorMap = new ConcurrentHashMap<>();
 
@@ -30,21 +31,29 @@ public class DBConnectorManager implements CommandLineRunner {
     }
 
     public void flushDataSource(){
-        List<DsDatasource> list = dsDatasourceService.list();
+        initDataSource();
+    }
+
+    public void flushDataSource(Integer id){
         lock.lock();
         try {
-            dbConnectorMap.keySet().stream().filter(e->
-                    list.stream().noneMatch(e1->e1.getId().equals(e)))
-                    .forEach(this::closeDataSource);
-            list.stream().filter(e-> !dbConnectorMap.containsKey(e.getId())).forEach(e->{
-                DBConnector connector = DBConnector.chooseConnector(e.getType());
-                if (connector == null){
-                    log.error("不支持的数据源类型:{},{}",e.getId(),e.getType());
-                    return;
+            if (dbConnectorMap.get(id)!=null) {
+                closeDataSource(id);
+            }
+            DsDatasource e = dsDatasourceService.getById(id);
+            if (e != null){
+                try {
+                    DBConnector connector = DBConnector.chooseConnector(e.getType());
+                    if (connector == null){
+                        log.error("不支持的数据源类型:{},{}",e.getId(),e.getType());
+                        return;
+                    }
+                    DataSourceStruce dataSource = connector.getDataSource(e.getHost(), e.getPort(), e.getParamUrl(), e.getDatabaseName(), e.getUsername(), e.getPassword());
+                    dbConnectorMap.put(e.getId(),dataSource);
+                }catch (Exception exception){
+                    log.error("初始化数据源失败,数据源ID{},ERROR:{}",e.getId(),exception.getMessage());
                 }
-                DataSourceStruce dataSource = connector.getDataSource(e.getHost(), e.getPort(), e.getParamUrl(), e.getDatabaseName(), e.getUsername(), e.getPassword());
-                dbConnectorMap.put(e.getId(),dataSource);
-            });
+            }
         }
         finally {
             lock.unlock();
@@ -59,13 +68,17 @@ public class DBConnectorManager implements CommandLineRunner {
             });
             List<DsDatasource> dsList = dsDatasourceService.list();
             dsList.forEach(e->{
-                DBConnector connector = DBConnector.chooseConnector(e.getType());
-                if (connector == null){
-                    log.error("不支持的数据源类型:{},{}",e.getId(),e.getType());
-                    return;
+                try {
+                    DBConnector connector = DBConnector.chooseConnector(e.getType());
+                    if (connector == null){
+                        log.error("不支持的数据源类型:{},{}",e.getId(),e.getType());
+                        return;
+                    }
+                    DataSourceStruce dataSource = connector.getDataSource(e.getHost(), e.getPort(), e.getParamUrl(), e.getDatabaseName(), e.getUsername(), e.getPassword());
+                    dbConnectorMap.put(e.getId(),dataSource);
+                }catch (Exception exception){
+                    log.error("初始化数据源失败,数据源ID{},ERROR:{}",e.getId(),exception.getMessage());
                 }
-                DataSourceStruce dataSource = connector.getDataSource(e.getHost(), e.getPort(), e.getParamUrl(), e.getDatabaseName(), e.getUsername(), e.getPassword());
-                dbConnectorMap.put(e.getId(),dataSource);
             });
         }
         finally {
@@ -79,7 +92,7 @@ public class DBConnectorManager implements CommandLineRunner {
         if (ds instanceof Closeable ds0){
             try {
                 ds0.close();
-            } catch (IOException ignored) { }
+            } catch (Exception ignored) { }
         }
     }
 
@@ -89,15 +102,19 @@ public class DBConnectorManager implements CommandLineRunner {
             DsDatasource dsd = dsDatasourceService.lambdaQuery().eq(DsDatasource::getId, key).one();
             lock.lock();
             try {
-                if (dsd == null){
-                    return null;
+                if (dbConnectorMap.get(key)==null){
+                    if (dsd == null){
+                        return null;
+                    }
+                    DBConnector connector = DBConnector.chooseConnector(dsd.getType());
+                    if (connector == null){
+                        return null;
+                    }
+                    dataSourceStruce = connector.getDataSource(dsd.getHost(), dsd.getPort(), dsd.getParamUrl(), dsd.getDatabaseName(), dsd.getUsername(), dsd.getPassword());
+                    dbConnectorMap.put(key,dataSourceStruce);
+                }else {
+                    dataSourceStruce = dbConnectorMap.get(key);
                 }
-                DBConnector connector = DBConnector.chooseConnector(dsd.getType());
-                if (connector == null){
-                    return null;
-                }
-                dataSourceStruce = connector.getDataSource(dsd.getHost(), dsd.getPort(), dsd.getParamUrl(), dsd.getDatabaseName(), dsd.getUsername(), dsd.getPassword());
-                dbConnectorMap.put(key,dataSourceStruce);
             }finally {
                 lock.unlock();
             }
@@ -105,8 +122,27 @@ public class DBConnectorManager implements CommandLineRunner {
         return dataSourceStruce;
     }
 
+    public Boolean getConnectHealthy(Integer id){
+        DataSourceStruce dataSourceStruce = dbConnectorMap.get(id);
+        if (dataSourceStruce == null){
+            return false;
+        }
+        DataSource ds = dataSourceStruce.getDataSource();
+        if (ds instanceof HikariDataSource ds0){
+            return ds0.isRunning();
+        }
+        return false;
+    }
+
     @Override
     public void run(String... args) throws Exception {
         initDataSource();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        dbConnectorMap.forEach((k,v)->{
+            closeDataSource(k);
+        });
     }
 }

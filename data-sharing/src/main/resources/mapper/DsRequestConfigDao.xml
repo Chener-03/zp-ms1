@@ -1,0 +1,20 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chener.zp.datasharing.dao.DsRequestConfigDao">
+
+
+    <select id="getRequestConfigList" resultType="xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto">
+        select a.*, b.username as createUserName, c.org_ch_simple_name as orgName
+        from ds_request_config a
+                 left join user_base b on a.create_user_id = b.id
+                 left join org_base c on a.org_id = c.id
+        <where>
+            <if test="pm.requestName!=null and pm.requestName!=''">
+                and a.request_name like concat('%', #{pm.requestName}, '%')
+            </if>
+            <if test="pm.requestUid!=null and pm.requestUid!=''">
+                and a.request_uid like concat('%', #{pm.requestUid}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>
+

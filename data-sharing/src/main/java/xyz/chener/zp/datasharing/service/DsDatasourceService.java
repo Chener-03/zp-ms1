@@ -30,5 +30,10 @@ public interface DsDatasourceService extends IService<DsDatasource> {
 
     PageInfo<DsDatasourceDto> getList(DsDatasourceDto params, FieldQuery fieldQuery, Integer page, Integer size);
 
+
+    Boolean flushAllDatasource();
+
+    Boolean removeDataSource(Long id);
+
 }
 

@@ -56,6 +56,17 @@ public class DataSourceController {
         return  dsDatasourceService.saveOrUpdateDataSource(dsDatasource);
     }
 
+    @DeleteMapping("/delete")
+    @OpLog(operateName = "删除数据源",recordClass = OpRecordMybatisWrapper.class)
+    public Boolean delete(@RequestParam @NotNull(message = "id不能为空") Long id){
+        return dsDatasourceService.removeDataSource(id);
+    }
+
+    @PostMapping("/flushAllDatasource")
+    public Boolean flushAllDatasource(){
+        return  dsDatasourceService.flushAllDatasource();
+    }
+
 
     @GetMapping("/list")
     @EncryResult
@@ -81,7 +92,7 @@ public class DataSourceController {
     @RequestMapping("/test")
     @WriteList
     public void test(){
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.MESSAGE, NotifyType.FLUSH_DATASOURCE);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.MESSAGE, NotifyType.FLUSH_DATASOURCE_ALL);
         System.out.println();
     }
 
