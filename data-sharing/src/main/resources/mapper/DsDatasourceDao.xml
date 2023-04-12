@@ -20,6 +20,9 @@
         <if test="params.id != null">
             and a.id = #{params.id}
         </if>
+        <if test="params.orgId != null">
+            and a.org_id = #{params.orgId}
+        </if>
 
     </select>
 </mapper>

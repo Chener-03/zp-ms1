@@ -29,10 +29,12 @@ public class OutExec extends AbstractChainExecute {
                 res0.forEach(e->{
                     Map<String, Object> newval = new HashMap<>();
                     outItems.forEach(item->{
+                        if (item.getParamKey()==null)
+                            return;
                         Object o = e.get(item.getParamKey());
                         o = processFormat(item, o);
                         o = processTransform(item, o);
-                        newval.put(item.getShowKey(), o);
+                        newval.put(Optional.ofNullable(item.getShowKey()).orElse(item.getParamKey()), o);
                     });
                     newres.add(newval);
                 });
