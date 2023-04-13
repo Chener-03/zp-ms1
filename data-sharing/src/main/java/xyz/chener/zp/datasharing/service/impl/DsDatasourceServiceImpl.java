@@ -123,9 +123,11 @@ public class DsDatasourceServiceImpl extends ServiceImpl<DsDatasourceDao, DsData
         PageHelper.startPage(page, size);
         List<DsDatasourceDto> list = getBaseMapper().getList(params, userOrgs.stream().map(e -> String.valueOf(e.getId())).toList());
         PageInfo<DsDatasourceDto> l = new PageInfo<>(list);
-        l.getList().forEach(ec->{
-            ec.setHealthy(connectorManager.getConnectHealthy(ec.getId()));
-        });
+        if ( fieldQuery.getQueryFields().size() == 0 || fieldQuery.getQueryFields().contains("healthy")) {
+            l.getList().forEach(ec->{
+                ec.setHealthy(connectorManager.getConnectHealthy(ec.getId()));
+            });
+        }
         return l;
     }
 

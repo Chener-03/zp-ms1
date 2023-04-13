@@ -2,8 +2,11 @@ package xyz.chener.zp.datasharing.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import org.springframework.web.bind.annotation.RequestParam;
 import xyz.chener.zp.datasharing.entity.DsRequestConfig;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
+
+import java.util.List;
 
 /**
  * (DsRequestConfig)表服务接口
@@ -14,6 +17,8 @@ import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
 public interface DsRequestConfigService extends IService<DsRequestConfig> {
 
     PageInfo<DsRequestConfigDto> getDsRequestConfigList(DsRequestConfigDto dsRequestConfigDto,int page,int size);
+
+    List<String>[] getSqlResultParam(String sql,Integer datasourceId);
 
 }
 

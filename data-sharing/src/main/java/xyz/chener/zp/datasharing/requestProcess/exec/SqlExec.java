@@ -10,6 +10,8 @@ import xyz.chener.zp.datasharing.connect.DBConnectorManager;
 import xyz.chener.zp.datasharing.connect.entity.DataSourceStruce;
 import xyz.chener.zp.datasharing.requestProcess.entity.pe.PeAllParams;
 import xyz.chener.zp.datasharing.requestProcess.entity.pe.SqlPe;
+import xyz.chener.zp.datasharing.requestProcess.error.SqlTypeNotSupportProcess;
+import xyz.chener.zp.datasharing.utils.SqlUtils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,6 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SqlExec extends AbstractChainExecute {
+
+    public static final String UPDATE_COLUMN_NAME = "update_count";
+
     @Override
     protected Object handle(Object param) throws Exception {
         if (param instanceof PeAllParams pap){
@@ -40,6 +45,16 @@ public class SqlExec extends AbstractChainExecute {
                     String sql = sqlEntity.getSql();
                     sql = parseSQL(sql, pap);
                     sqlEntity.setCompileSql(sql);
+                    try{
+                        if (SqlUtils.getSqlType(sql).equalsIgnoreCase(SqlPe.TYPE_SELECT)) {
+                            sqlEntity.setType(SqlPe.TYPE_SELECT);
+                        }else {
+                            sqlEntity.setType(SqlPe.TYPE_UPDATE);
+                        }
+                    }catch (Exception e){
+                        SqlTypeNotSupportProcess.process(pap.getRequest(),pap.getResponse(),sql);
+                        return null;
+                    }
 
                     if (sqlEntity.getType().equalsIgnoreCase(SqlPe.TYPE_SELECT)) {
                         List<Map<String,Object>> resList = processSelect(connection, sql);
@@ -122,7 +137,7 @@ public class SqlExec extends AbstractChainExecute {
         try(Statement statement = connection.createStatement()) {
             int res = statement.executeUpdate(sql);
             List<Map<String,Object>> resList = new ArrayList<>();
-            resList.add(MapBuilder.<String,Object>getInstance().add("update_count",res).build());
+            resList.add(MapBuilder.<String,Object>getInstance().add(UPDATE_COLUMN_NAME,res).build());
             return resList;
         }
     }

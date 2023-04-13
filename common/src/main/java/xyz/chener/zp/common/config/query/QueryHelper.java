@@ -76,7 +76,6 @@ public class QueryHelper {
         return mbpLambdaQuery;
     }
 
-
     static List<TableField> getQuery()
     {
         List<TableField> list = localVar.get();
