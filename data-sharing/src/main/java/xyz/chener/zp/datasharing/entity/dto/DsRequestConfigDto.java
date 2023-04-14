@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
@@ -18,11 +19,14 @@ public class DsRequestConfigDto {
 
     private Integer id;
 
+    @NotNull(message = "请求名称不能为空")
     private String requestName;
 
+    @NotNull(message = "请求UID不能为空")
     private String requestUid;
 
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "组织不能为空")
     private Long orgId;
 
     private String orgName;
@@ -35,16 +39,22 @@ public class DsRequestConfigDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     //日调用限制
+    @NotNull(message = "日调用限制不能为空")
     private Integer dayLimit;
     //单次返回字节限制
+    @NotNull(message = "单次返回字节限制不能为空")
     private String byteReturnLimie;
     //单次请求参数字节限制
+    @NotNull(message = "单次请求参数字节限制不能为空")
     private String byteReqLimit;
     //0 禁用  1启用
+    @NotNull(message = "是否启用不能为空")
     private Boolean enable;
     //get  post .....
+    @NotNull(message = "请求方式不能为空")
     private String requestMethod;
     //form    json   只有post时才区分
+    @NotNull(message = "请求参数类型不能为空")
     private String paramType;
 
     // 今日调用次数

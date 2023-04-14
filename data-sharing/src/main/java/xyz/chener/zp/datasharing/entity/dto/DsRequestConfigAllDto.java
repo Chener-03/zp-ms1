@@ -1,5 +1,6 @@
 package xyz.chener.zp.datasharing.entity.dto;
 
+import jakarta.validation.Valid;
 import lombok.Data;
 import xyz.chener.zp.datasharing.requestProcess.entity.pe.*;
 
@@ -12,6 +13,7 @@ import xyz.chener.zp.datasharing.requestProcess.entity.pe.*;
 @Data
 public class DsRequestConfigAllDto {
 
+    @Valid
     private DsRequestConfigDto dsRequestConfigDto;
 
     private AuthPe authPe;

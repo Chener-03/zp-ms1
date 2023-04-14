@@ -49,8 +49,8 @@ public class RequestConfigController {
     }
 
     @PostMapping("/save")
-    public void save(@RequestBody @Validated DsRequestConfigAllDto dto){
-
+    public Boolean save(@RequestBody @Validated DsRequestConfigAllDto dto){
+        return dsRequestConfigService.save(dto);
     }
 
 
