@@ -25,5 +25,7 @@ public interface DsRequestConfigService extends IService<DsRequestConfig> {
 
     Boolean save(DsRequestConfigAllDto dto);
 
+    DsRequestConfigAllDto getDetail(Integer id);
+
 }
 

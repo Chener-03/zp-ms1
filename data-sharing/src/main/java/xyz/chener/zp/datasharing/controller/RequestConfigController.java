@@ -10,7 +10,9 @@ import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
 import xyz.chener.zp.datasharing.service.DsRequestConfigService;
 import xyz.chener.zp.datasharing.service.DsRequestProcessConfigService;
 
+import java.lang.ref.Reference;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @Author: chenzp
@@ -40,6 +42,12 @@ public class RequestConfigController {
     public PageInfo<DsRequestConfigDto> list(@ModelAttribute DsRequestConfigDto dto
         , @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size){
         return dsRequestConfigService.getDsRequestConfigList(dto,page,size);
+    }
+
+
+    @GetMapping("/getDetail")
+    public DsRequestConfigAllDto getDetail(@RequestParam("id") Integer id){
+        return dsRequestConfigService.getDetail(id);
     }
 
 

@@ -9,12 +9,15 @@ import org.redisson.Redisson;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.common.utils.ThreadUtils;
 import xyz.chener.zp.common.utils.TransactionUtils;
 import xyz.chener.zp.datasharing.connect.DBConnectorManager;
 import xyz.chener.zp.datasharing.connect.entity.DataSourceStruce;
@@ -25,7 +28,9 @@ import xyz.chener.zp.datasharing.entity.DsRequestProcessConfig;
 import xyz.chener.zp.datasharing.entity.dto.DsDatasourceDto;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigAllDto;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
+import xyz.chener.zp.datasharing.entity.thirdparty.UserBase;
 import xyz.chener.zp.datasharing.error.config.BindDatasourceNotFount;
+import xyz.chener.zp.datasharing.error.config.DsRequestConfigNotFoundError;
 import xyz.chener.zp.datasharing.error.config.SqlRunError;
 import xyz.chener.zp.datasharing.requestProcess.entity.RequestProcessType;
 import xyz.chener.zp.datasharing.requestProcess.entity.pe.*;
@@ -34,6 +39,7 @@ import xyz.chener.zp.datasharing.service.DsDatasourceService;
 import xyz.chener.zp.datasharing.service.DsRequestConfigService;
 import org.springframework.stereotype.Service;
 import xyz.chener.zp.datasharing.service.DsRequestProcessConfigService;
+import xyz.chener.zp.datasharing.service.UserModuleService;
 import xyz.chener.zp.datasharing.utils.SqlUtils;
 
 import java.sql.Connection;
@@ -62,6 +68,13 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
 
     private DsRequestProcessConfigService dsRequestProcessConfigService;
     private DsRequestProcessConfigDao dsRequestProcessConfigDao;
+    private UserModuleService userModuleService;
+
+    @Autowired
+    @Qualifier("xyz.chener.zp.datasharing.service.UserModuleService")
+    public void setUserModuleService(UserModuleService userModuleService) {
+        this.userModuleService = userModuleService;
+    }
 
     @Autowired
     public void setDsRequestProcessConfigDao(DsRequestProcessConfigDao dsRequestProcessConfigDao) {
@@ -151,7 +164,14 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
 
         TransactionStatus transaction = dataSourceTransactionManager.getTransaction(TransactionUtils.getTransactionDefinition());
         try{
-            requestConfig.setCreateTime(new Date());
+            if (requestConfigDto.getId()==null){
+                requestConfig.setCreateTime(new Date());
+                UserBase ub = new UserBase();
+                ub.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                PageInfo<UserBase> userBaseInfo = userModuleService.getUserBaseInfo(ub, 1, 1);
+                AssertUrils.state(userBaseInfo.getTotal()>0, new RuntimeException("创建用户未找到"));
+                requestConfig.setCreateUserId(userBaseInfo.getList().get(0).getId());
+            }
             saveOrUpdate(requestConfig);
             ObjectMapper om = new ObjectMapper();
 
@@ -161,10 +181,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.AUTH);
                 dpc.setConfigJson(om.writeValueAsString(authPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.AUTH)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
 
             InPe inPe = dto.getInPe();
@@ -174,10 +191,6 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setType(RequestProcessType.IN);
                 dpc.setConfigJson(om.writeValueAsString(inPe));
                 dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
-                /*dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.IN)
-                        .update(dpc);*/
             }
 
             InJsPe inJsPe = dto.getInJsPe();
@@ -186,10 +199,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.IN_JS);
                 dpc.setConfigJson(om.writeValueAsString(inJsPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.IN_JS)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
 
             SqlPe sqlPe = dto.getSqlPe();
@@ -198,10 +208,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.SQL);
                 dpc.setConfigJson(om.writeValueAsString(sqlPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.SQL)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
 
             OutPe outPe = dto.getOutPe();
@@ -210,10 +217,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.OUT);
                 dpc.setConfigJson(om.writeValueAsString(outPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.OUT)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
 
             OutJsPe outJsPe = dto.getOutJsPe();
@@ -222,10 +226,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.OUT_JS);
                 dpc.setConfigJson(om.writeValueAsString(outJsPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.OUT_JS)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
 
             OutDataPe outDataPe = dto.getOutDataPe();
@@ -234,19 +235,63 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                 dpc.setRequestConfigId(requestConfig.getId());
                 dpc.setType(RequestProcessType.OUT_DATA);
                 dpc.setConfigJson(om.writeValueAsString(outDataPe));
-                dsRequestProcessConfigService.lambdaUpdate()
-                        .eq(DsRequestProcessConfig::getRequestConfigId, requestConfig.getId())
-                        .eq(DsRequestProcessConfig::getType, RequestProcessType.OUT_DATA)
-                        .update(dpc);
+                dsRequestProcessConfigDao.saveOrUpdateByTypeAndConfigId(dpc);
             }
-
             dataSourceTransactionManager.commit(transaction);
         }catch (Exception exception){
             dataSourceTransactionManager.rollback(transaction);
         }
 
-
         return true;
+    }
+
+    @Override
+    public DsRequestConfigAllDto getDetail(Integer id) {
+        DsRequestConfigAllDto dto = new DsRequestConfigAllDto();
+        DsRequestConfig config = this.getById(id);
+        AssertUrils.state(config != null, DsRequestConfigNotFoundError.class);
+        DsRequestConfigDto c = new DsRequestConfigDto();
+        ObjectUtils.copyFields(config, c);
+        dto.setDsRequestConfigDto(c);
+        List<DsRequestProcessConfig> list = dsRequestProcessConfigService.lambdaQuery()
+                .eq(DsRequestProcessConfig::getRequestConfigId, id)
+                .list();
+        ObjectMapper om = new ObjectMapper();
+        list.forEach(e->{
+            ThreadUtils.runIgnoreException(()->{
+                switch(e.getType()){
+                    case RequestProcessType.AUTH -> {
+                        AuthPe authPe = om.readValue(e.getConfigJson(), AuthPe.class);
+                        dto.setAuthPe(authPe);
+                    }
+                    case RequestProcessType.IN -> {
+                        InPe inPe = om.readValue(e.getConfigJson(), InPe.class);
+                        dto.setInPe(inPe);
+                    }
+                    case RequestProcessType.IN_JS -> {
+                        InJsPe inJsPe = om.readValue(e.getConfigJson(), InJsPe.class);
+                        dto.setInJsPe(inJsPe);
+                    }
+                    case RequestProcessType.SQL -> {
+                        SqlPe sqlPe = om.readValue(e.getConfigJson(), SqlPe.class);
+                        dto.setSqlPe(sqlPe);
+                    }
+                    case RequestProcessType.OUT -> {
+                        OutPe outPe = om.readValue(e.getConfigJson(), OutPe.class);
+                        dto.setOutPe(outPe);
+                    }
+                    case RequestProcessType.OUT_JS -> {
+                        OutJsPe outJsPe = om.readValue(e.getConfigJson(), OutJsPe.class);
+                        dto.setOutJsPe(outJsPe);
+                    }
+                    case RequestProcessType.OUT_DATA -> {
+                        OutDataPe outDataPe = om.readValue(e.getConfigJson(), OutDataPe.class);
+                        dto.setOutDataPe(outDataPe);
+                    }
+                }
+            });
+        });
+        return dto;
     }
 }
 

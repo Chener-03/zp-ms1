@@ -3,6 +3,7 @@ package xyz.chener.zp.datasharing.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import xyz.chener.zp.datasharing.dao.DsRequestProcessConfigDao;
 import xyz.chener.zp.datasharing.entity.DsRequestProcessConfig;
+import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigAllDto;
 import xyz.chener.zp.datasharing.service.DsRequestProcessConfigService;
 import org.springframework.stereotype.Service;
 
