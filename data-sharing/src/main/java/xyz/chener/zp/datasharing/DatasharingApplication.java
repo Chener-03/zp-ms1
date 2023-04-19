@@ -5,6 +5,7 @@ import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration;
 import com.esotericsoftware.kryo.util.ObjectMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.aviator.AviatorEvaluator;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;

@@ -170,6 +170,16 @@ public class CommonConfig {
         private String redisCachePrefix = "mybatis-cache:";
         private Integer redisCacheExpireMs = 1000*60*60;
 
+        private Boolean enableDealyDelete = true;
+
+        public Boolean getEnableDealyDelete() {
+            return enableDealyDelete;
+        }
+
+        public void setEnableDealyDelete(Boolean enableDealyDelete) {
+            this.enableDealyDelete = enableDealyDelete;
+        }
+
         public String getRedisCachePrefix() {
             return redisCachePrefix;
         }
