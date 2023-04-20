@@ -17,7 +17,7 @@ import java.util.List;
 @Mapper
 public interface DsRequestConfigDao extends BaseMapper<DsRequestConfig> {
 
-    List<DsRequestConfigDto> getRequestConfigList(@Param("pm") DsRequestConfigDto requestConfigDto);
+    List<DsRequestConfigDto> getRequestConfigList(@Param("pm") DsRequestConfigDto requestConfigDto,@Param("orgIds") List<String> orgIds);
 
 
 }

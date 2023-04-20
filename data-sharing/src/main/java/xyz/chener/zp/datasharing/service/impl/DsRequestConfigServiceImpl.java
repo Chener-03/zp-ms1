@@ -14,6 +14,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.query.entity.FieldQuery;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.ObjectUtils;
@@ -28,6 +29,7 @@ import xyz.chener.zp.datasharing.entity.DsRequestProcessConfig;
 import xyz.chener.zp.datasharing.entity.dto.DsDatasourceDto;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigAllDto;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
+import xyz.chener.zp.datasharing.entity.thirdparty.OrgBase;
 import xyz.chener.zp.datasharing.entity.thirdparty.UserBase;
 import xyz.chener.zp.datasharing.error.config.BindDatasourceNotFount;
 import xyz.chener.zp.datasharing.error.config.DsRequestConfigNotFoundError;
@@ -44,9 +46,9 @@ import xyz.chener.zp.datasharing.utils.SqlUtils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static xyz.chener.zp.datasharing.service.impl.DataSharingServiceImpl.RequestLimitKeyPrefix;
 
@@ -108,9 +110,12 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
 
     @Override
     public PageInfo<DsRequestConfigDto> getDsRequestConfigList(DsRequestConfigDto dsRequestConfigDto, int page, int size) {
-
+        List<OrgBase> userOrgs = userModuleService.getUserOrgs(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (userOrgs == null || userOrgs.size() == 0) {
+            return new PageInfo<>(Collections.emptyList());
+        }
         PageHelper.startPage(page, size);
-        List<DsRequestConfigDto> list = getBaseMapper().getRequestConfigList(dsRequestConfigDto);
+        List<DsRequestConfigDto> list = getBaseMapper().getRequestConfigList(dsRequestConfigDto,userOrgs.stream().map(e -> String.valueOf(e.getId())).toList());
         list.forEach(e->{
             String key = RequestLimitKeyPrefix + e.getRequestUid() + ":" + e.getId();
             RAtomicLong count = redissonClient.getAtomicLong(key);
@@ -293,5 +298,126 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
         });
         return dto;
     }
+
+    @Override
+    public Boolean delete(Integer id) {
+        DsRequestConfig config = getById(id);
+        AssertUrils.state(config != null, DsRequestConfigNotFoundError.class);
+
+        List<OrgBase> userOrgs = userModuleService.getUserOrgs(SecurityContextHolder.getContext().getAuthentication().getName());
+        AssertUrils.state(userOrgs!=null && userOrgs.size() > 0, DsRequestConfigNotFoundError.class);
+        AssertUrils.state( userOrgs.stream().anyMatch(orgBase -> orgBase.getId().equals(config.getOrgId())) , DsRequestConfigNotFoundError.class);
+
+        TransactionStatus transaction = dataSourceTransactionManager.getTransaction(TransactionUtils.getTransactionDefinition());
+        try{
+            removeById(id);
+            dsRequestProcessConfigService.lambdaUpdate()
+                    .eq(DsRequestProcessConfig::getRequestConfigId, id)
+                    .remove();
+            dataSourceTransactionManager.commit(transaction);
+        }catch (Exception exception){
+            dataSourceTransactionManager.rollback(transaction);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String getDocumentMD(Integer id) {
+        DsRequestConfig config = getById(id);
+        if (config != null){
+            StringBuilder sb = new StringBuilder();
+            List<DsRequestProcessConfig> list = dsRequestProcessConfigService.lambdaQuery()
+                    .eq(DsRequestProcessConfig::getRequestConfigId, id)
+                    .list();
+            sb.append("## ").append(config.getRequestName()).append("\n");
+            sb.append("##### 自动生成").append("\n");
+            sb.append("### 基本信息").append("\n");
+            sb.append("* 接口地址: http://ip:port/v1/datasharing/api/web/datasharing/out/").append(config.getRequestUid()).append("\n");
+            sb.append("* 请求方式: ").append(config.getRequestMethod()).append("\n");
+            String reqParamType = Optional.ofNullable(config.getParamType()).orElse("").equalsIgnoreCase("JSON")?"application/json":"application/x-www-form-urlencoded";
+            sb.append("* 参数类型: ").append(reqParamType).append("\n");
+            sb.append("* 日限制: ").append(Optional.ofNullable(config.getDayLimit()).orElse(0) == 0?"无限制":config.getDayLimit()).append("\n");
+            sb.append("* 请求字节数: ").append(Optional.ofNullable(config.getByteReqLimit()).orElse("0").equals("0")?"无限制":config.getByteReqLimit()).append("\n");
+            sb.append("* 返回字节数: ").append(Optional.ofNullable(config.getByteReturnLimie()).orElse("0").equals("0")?"无限制":config.getByteReturnLimie()).append("\n");
+            sb.append("\n");
+
+            sb.append("### 授权方式").append("\n");
+            DsRequestProcessConfig authConfig = findConfigByList(list,RequestProcessType.AUTH);
+            AuthPe authPe = null;
+            if (authConfig != null
+                    && (authPe = deJsonIgnoreException(authConfig.getConfigJson(), AuthPe.class))!= null
+                    && authPe.getAuthItems() != null && authPe.getAuthItems().size() > 0){
+                authPe.getAuthItems().forEach(ec->{
+                    if (ec.getAuthType().equalsIgnoreCase(AuthPe.IP)) {
+                        sb.append("#### IP白名单").append("\n");
+                        sb.append("```shell").append("\n");
+                        sb.append("允许的IP列表:").append("\n");
+                        sb.append(String.join(";", ec.getIps())).append("\n```\n");
+                    }
+
+                    if (ec.getAuthType().equalsIgnoreCase(AuthPe.MD5)) {
+                        sb.append("#### 签名验证").append("\n");
+                        sb.append("```shell").append("\n");
+                        sb.append("签名生成方式为:").append("\n");
+                        sb.append("MD5(");
+                        ec.getParamKeys().forEach(e0->{
+                            sb.append("[").append(e0).append("]");
+                        });
+                        sb.append(ec.getMd5Slat());
+                        sb.append(")").append("\n");
+                        sb.append("将参数替换为请求的值,注意没有中括号,这里的括号为了说明参数的位置,将计算完的值放入请求的 ")
+                                .append(ec.getMd5ParamKey()).append(" 字段中。")
+                                .append("\n");
+                        sb.append("```\n");
+                    }
+
+                    if (ec.getAuthType().equals(AuthPe.HEAD)){
+                        sb.append("#### 请求头验证").append("\n");
+                        sb.append("```shell").append("\n");
+                        sb.append("请求头中必须包含以下字段:").append("\n");
+                        if (StringUtils.hasText(ec.getHeads())){
+                            Arrays.stream(ec.getHeads().split("&"))
+                                    .filter(StringUtils::hasText)
+                                    .forEach(e2->{
+                                        sb.append(e2).append("\n");
+                                    });
+                        }
+                        sb.append("```\n");
+                    }
+                });
+
+
+            }else {
+                sb.append("> 无需授权").append("\n");
+            }
+
+
+
+            return sb.toString();
+        }
+
+
+
+        return """
+                ## Oops!😅😅😅
+                #### 未找到该接口信息""";
+    }
+
+
+    private DsRequestProcessConfig findConfigByList(List<DsRequestProcessConfig> list,String type){
+        return list.stream().filter(e->e.getType().equalsIgnoreCase(type)).findFirst().orElse(null);
+    }
+
+    private <T> T deJsonIgnoreException(String json,Class<T> clazz) {
+        ObjectMapper om = new ObjectMapper();
+        try {
+            return om.readValue(json, clazz);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
 }
 

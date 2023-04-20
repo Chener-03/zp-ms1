@@ -10,6 +10,7 @@ import xyz.chener.zp.datasharing.entity.DsRequestProcessConfig;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Data
 public class PeAllParams {
@@ -36,9 +37,9 @@ public class PeAllParams {
 
     private List<DsRequestProcessConfig> processList;
 
-    private Map<String,String> normalParams = new HashMap<>();
+    private Map<String,String> normalParams = new TreeMap<>();
 
     // 结果集  res0->sql0  res1->sql1  res2->sql2 .......
-    private Map<String,List<Map<String,Object>>> result = new HashMap<>();
+    private Map<String,List<Map<String,Object>>> result = new TreeMap<>();
 
 }

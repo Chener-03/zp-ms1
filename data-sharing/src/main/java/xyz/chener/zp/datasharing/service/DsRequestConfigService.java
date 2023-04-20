@@ -27,5 +27,10 @@ public interface DsRequestConfigService extends IService<DsRequestConfig> {
 
     DsRequestConfigAllDto getDetail(Integer id);
 
+    Boolean delete(Integer id);
+
+
+    String getDocumentMD(Integer id);
+
 }
 

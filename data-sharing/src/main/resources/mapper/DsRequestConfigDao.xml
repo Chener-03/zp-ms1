@@ -7,14 +7,17 @@
         from ds_request_config a
                  left join user_base b on a.create_user_id = b.id
                  left join org_base c on a.org_id = c.id
-        <where>
-            <if test="pm.requestName!=null and pm.requestName!=''">
-                and a.request_name like concat('%', #{pm.requestName}, '%')
-            </if>
-            <if test="pm.requestUid!=null and pm.requestUid!=''">
-                and a.request_uid like concat('%', #{pm.requestUid}, '%')
-            </if>
-        </where>
+        where a.org_id in
+        <foreach item="item" index="index" collection="orgIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="pm.requestName!=null and pm.requestName!=''">
+            and a.request_name like concat('%', #{pm.requestName}, '%')
+        </if>
+        <if test="pm.requestUid!=null and pm.requestUid!=''">
+            and a.request_uid like concat('%', #{pm.requestUid}, '%')
+        </if>
+
     </select>
 </mapper>
 

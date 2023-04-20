@@ -61,5 +61,14 @@ public class RequestConfigController {
         return dsRequestConfigService.save(dto);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public Boolean delete(@PathVariable("id") Integer id){
+        return dsRequestConfigService.delete(id);
+    }
+
+    @GetMapping("/getDocumentMD")
+    public String getDocumentMD(@RequestParam("id") Integer id){
+        return dsRequestConfigService.getDocumentMD(id);
+    }
 
 }

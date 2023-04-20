@@ -43,6 +43,8 @@ public class SqlExec extends AbstractChainExecute {
                 AtomicInteger count = new AtomicInteger(0);
                 for (SqlPe.SQL_ENTITY sqlEntity : sqls) {
                     String sql = sqlEntity.getSql();
+                    if (!StringUtils.hasText(sql))
+                        continue;
                     sql = parseSQL(sql, pap);
                     sqlEntity.setCompileSql(sql);
                     try{
@@ -119,7 +121,7 @@ public class SqlExec extends AbstractChainExecute {
             }
 
             while (resultSet.next()){
-                Map<String,Object> map = new HashMap<>();
+                Map<String,Object> map = new TreeMap<>();
                 columNames.forEach(e->{
                     ThreadUtils.runIgnoreException(()-> map.put(e,resultSet.getObject(e)));
                 });

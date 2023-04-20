@@ -27,15 +27,19 @@ public class ParamGetterEc extends AbstractChainExecute {
             ) {
                 try(ServletInputStream is = pap.getRequest().getInputStream()) {
                     String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                    ObjectMapper om = new ObjectMapper();
-                    Map<String, String> map = om.readValue(json, new TypeReference<Map<String, String>>() {
-                    });
-                    pap.setNormalParams(map);
+                    if (StringUtils.hasText(json)){
+                        ObjectMapper om = new ObjectMapper();
+                        Map<String, String> map = om.readValue(json, new TypeReference<Map<String, String>>() {
+                        });
+                        pap.setNormalParams(map);
+                    }
+
                     pap.getInPe().getInItems().forEach(e->{
                         if (!pap.getNormalParams().containsKey(e.getParamKey())) {
                             pap.getNormalParams().put(e.getParamKey(), e.getDefaultValue());
                         }
                     });
+
                 }catch (Exception exception){
                     throw new RuntimeException("JSON类型参数解析失败(注意:暂不支持嵌套对象类型),异常为: " + exception.getMessage());
                 }
