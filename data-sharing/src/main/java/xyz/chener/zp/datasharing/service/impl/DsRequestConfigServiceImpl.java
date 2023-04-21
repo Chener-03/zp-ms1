@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import feign.Retryer;
 import org.redisson.Redisson;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
@@ -385,14 +386,73 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
                         }
                         sb.append("```\n");
                     }
+
+
                 });
-
-
             }else {
                 sb.append("> 无需授权").append("\n");
             }
 
+            sb.append("\n");
+            sb.append("### 请求参数").append("\n");
+            DsRequestProcessConfig inConfig = findConfigByList(list, RequestProcessType.IN);
+            InPe inpe = null;
+            if (inConfig != null
+                    && (inpe = deJsonIgnoreException(inConfig.getConfigJson(), InPe.class)) != null
+                    && inpe.getInItems()!= null && inpe.getInItems().size()>0) {
+                sb.append("| 参数名 | 必填 | 默认 | 类型 | 编码 | 备注 |").append("\n");
+                sb.append("|----|----|----|----|----|----|").append("\n");
+                inpe.getInItems().forEach(e->{
+                    sb.append("| ")
+                            .append(e.getParamKey())
+                            .append(" | ").append(e.isMust()?"是":"否")
+                            .append(" | ").append(e.getDefaultValue())
+                            .append(" | ").append(e.getVerifyTypes())
+                            .append(" | ").append(e.getTransformTypes())
+                            .append(" | ").append(" | ").append("\n");
+                });
+            }else {
+                sb.append("> 无需参数").append("\n");
+            }
+            sb.append("\n");
+            sb.append("### 返回参数").append("\n");
+            DsRequestProcessConfig outConfig = findConfigByList(list, RequestProcessType.OUT);
+            OutPe outPe = null;
+            if (outConfig != null
+                    && (outPe = deJsonIgnoreException(outConfig.getConfigJson(), OutPe.class)) != null
+                    && outPe.getOutItems()!= null && outPe.getOutItems().size()>0) {
+                sb.append("| 字段名 | 默认值 | 备注 |").append("\n");
+                sb.append("|----|----|----|").append("\n");
+                outPe.getOutItems().forEach(e -> {
+                    sb.append("| ")
+                            .append(e.getShowKey())
+                            .append(" | ").append(e.getDefaultValue())
+                            .append(" | ").append(" | ").append("\n");
+                });
+                sb.append("\n");
+                DsRequestProcessConfig outDataConfig = findConfigByList(list, RequestProcessType.OUT_DATA);
+                OutDataPe outDataPe = null;
+                if (outDataConfig != null
+                        && (outDataPe = deJsonIgnoreException(outDataConfig.getConfigJson(), OutDataPe.class)) != null) {
+                    if (StringUtils.hasText(outDataPe.getType())) {
+                        sb.append("> 返回数据类型: ").append(outDataPe.getType()).append("\n");
+                    }
+                }
+            }else {
+                sb.append("> 无返回").append("\n");
+            }
+            sb.append("\n");
+            sb.append("### 请求示例").append("\n");
+            sb.append("```json").append("\n");
+            sb.append("自定义填写");
+            sb.append("\n```\n");
+            sb.append("\n");
 
+            sb.append("### 返回示例").append("\n");
+            sb.append("```json").append("\n");
+            sb.append("自定义填写");
+            sb.append("\n```\n");
+            sb.append("\n");
 
             return sb.toString();
         }

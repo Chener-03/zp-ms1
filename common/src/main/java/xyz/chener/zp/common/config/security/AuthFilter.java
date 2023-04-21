@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.chener.zp.common.config.CommonConfig;
 import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
 import xyz.chener.zp.common.entity.CommonVar;
+import xyz.chener.zp.common.utils.ThreadUtils;
 import xyz.chener.zp.common.utils.UriMatcherUtils;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (writeListCheck(request)) {
-            filterChain.doFilter(request,response);
+            ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
             return;
         }
 
@@ -44,7 +45,7 @@ public class AuthFilter extends OncePerRequestFilter {
                     CommonVar.SERVICE_CALL_AUTH_NAME, null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList(CommonVar.SERVICE_CALL_AUTH_NAME)));
             SecurityContextHolder.setContext(context);
-            filterChain.doFilter(request,response);
+            ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
             return;
         }
 
@@ -56,7 +57,7 @@ public class AuthFilter extends OncePerRequestFilter {
                     user, null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList(auth)));
             SecurityContextHolder.setContext(context);
-            filterChain.doFilter(request,response);
+            ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
             return;
         }
 

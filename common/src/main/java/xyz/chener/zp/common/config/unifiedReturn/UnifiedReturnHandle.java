@@ -49,52 +49,57 @@ public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
     public void handleReturnValue(Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
         mavContainer.setRequestHandled(true);
         HttpServletResponse resp = webRequest.getNativeResponse(HttpServletResponse.class);
-        resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        resp.setStatus(R.HttpCode.HTTP_OK.get());
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        String json = "";
-        ObjectMapper om = new ObjectMapper();
 
-        if ((returnType.hasMethodAnnotation(EncryResult.class)
-                || returnType.getDeclaringClass().isAnnotationPresent(EncryResult.class))
-                && returnValue != null){
-
-            if (ObjectUtils.isBasicType(returnValue.getClass())){
-                EncryField encryField = returnType.getMethodAnnotation(EncryField.class);
-                if (encryField != null){
-                    try {
-                        EncryInterface instance = (EncryInterface) encryField.encryClass().getConstructor().newInstance();
-                        returnValue = instance.encry(returnValue.toString(),encryField);
-                        if (encryField.hasAnyAuthority().length>0){
-                            log.warn("权限划分数据只适用于返回实体对象，不适用于返回基本类型");
-                        }
-                    }catch (Exception ignored){}
-                }
-            }else {
-                SimpleModule sm = new SimpleModule();
-                Class[] allType = {String.class,Integer.class,Long.class
-                        ,Double.class,Float.class,Boolean.class,Short.class
-                        , BigDecimal.class, BigInteger.class,Date.class};
-                for (Class type : allType) {
-                    sm.addSerializer(type, new EncryCore.EncryJacksonSerializerDispatch<>(type));
-                }
-                om.registerModule(sm);
-            }
-        }
-
-
-        SimpleModule sm = new SimpleModule();
-        om.registerModule(sm);
-        if (returnValue instanceof R)
-        {
-            json = om.writeValueAsString(returnValue);
-        }else
-        {
-            json = om.writeValueAsString(R.Builder.getInstance().setCode(R.HttpCode.HTTP_OK.get())
-                    .setObj(returnValue).build());
-        }
         try (ServletOutputStream os = resp.getOutputStream()){
+
+            resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            resp.setStatus(R.HttpCode.HTTP_OK.get());
+            resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            String json = "";
+            ObjectMapper om = new ObjectMapper();
+
+            if ((returnType.hasMethodAnnotation(EncryResult.class)
+                    || returnType.getDeclaringClass().isAnnotationPresent(EncryResult.class))
+                    && returnValue != null){
+
+                if (ObjectUtils.isBasicType(returnValue.getClass())){
+                    EncryField encryField = returnType.getMethodAnnotation(EncryField.class);
+                    if (encryField != null){
+                        try {
+                            EncryInterface instance = (EncryInterface) encryField.encryClass().getConstructor().newInstance();
+                            returnValue = instance.encry(returnValue.toString(),encryField);
+                            if (encryField.hasAnyAuthority().length>0){
+                                log.warn("权限划分数据只适用于返回实体对象，不适用于返回基本类型");
+                            }
+                        }catch (Exception ignored){}
+                    }
+                }else {
+                    SimpleModule sm = new SimpleModule();
+                    Class[] allType = {String.class,Integer.class,Long.class
+                            ,Double.class,Float.class,Boolean.class,Short.class
+                            , BigDecimal.class, BigInteger.class,Date.class};
+                    for (Class type : allType) {
+                        sm.addSerializer(type, new EncryCore.EncryJacksonSerializerDispatch<>(type));
+                    }
+                    om.registerModule(sm);
+                }
+            }
+
+
+            SimpleModule sm = new SimpleModule();
+            om.registerModule(sm);
+            if (returnValue instanceof R)
+            {
+                json = om.writeValueAsString(returnValue);
+            }else
+            {
+                json = om.writeValueAsString(R.Builder.getInstance().setCode(R.HttpCode.HTTP_OK.get())
+                        .setObj(returnValue).build());
+            }
+
             StreamUtils.copy(json.getBytes(StandardCharsets.UTF_8),os);
+        }catch (Exception openOutputError){
+            log.info("无法打开输出流,可能已经通过Response返回,如果是这样,请忽略此异常,并且尽量不要使用统一返回");
         }
     }
 
