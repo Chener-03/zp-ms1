@@ -96,7 +96,6 @@ public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
                 json = om.writeValueAsString(R.Builder.getInstance().setCode(R.HttpCode.HTTP_OK.get())
                         .setObj(returnValue).build());
             }
-
             StreamUtils.copy(json.getBytes(StandardCharsets.UTF_8),os);
         }catch (Exception openOutputError){
             log.info("无法打开输出流,可能已经通过Response返回,如果是这样,请忽略此异常,并且尽量不要使用统一返回");
