@@ -11,23 +11,37 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import xyz.chener.zp.common.config.paramDecryption.core.RequestBodyDecryResolver;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryField;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryResult;
 import xyz.chener.zp.common.config.unifiedReturn.encry.core.EncryCore;
 import xyz.chener.zp.common.config.unifiedReturn.encry.encryProcess.EncryInterface;
+import xyz.chener.zp.common.config.unifiedReturn.handle.JsonObjectHandle;
+import xyz.chener.zp.common.config.unifiedReturn.handle.OutputStreamWarperHandle;
+import xyz.chener.zp.common.config.unifiedReturn.handle.ResultObjectCovertInterface;
+import xyz.chener.zp.common.config.unifiedReturn.warper.OutputStreamWarper;
+import xyz.chener.zp.common.config.unifiedReturn.warper.proxy.HttpServletResponseIgnoredOsProxy;
 import xyz.chener.zp.common.entity.R;
+import xyz.chener.zp.common.utils.LoggerUtils;
 import xyz.chener.zp.common.utils.ObjectUtils;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
+
+    private final static List<ResultObjectCovertInterface> resultObjectCovertHandleList = List.of(
+            new OutputStreamWarperHandle(),
+            new JsonObjectHandle()
+    );
+
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
         Annotation[] methodAnnotations = returnType.getMethodAnnotations();
@@ -52,58 +66,20 @@ public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
 
         try (ServletOutputStream os = resp.getOutputStream()){
 
-            resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            resp.setStatus(R.HttpCode.HTTP_OK.get());
-            resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            String json = "";
-            ObjectMapper om = new ObjectMapper();
-
-            if ((returnType.hasMethodAnnotation(EncryResult.class)
-                    || returnType.getDeclaringClass().isAnnotationPresent(EncryResult.class))
-                    && returnValue != null){
-
-                if (ObjectUtils.isBasicType(returnValue.getClass())){
-                    EncryField encryField = returnType.getMethodAnnotation(EncryField.class);
-                    if (encryField != null){
-                        try {
-                            EncryInterface instance = (EncryInterface) encryField.encryClass().getConstructor().newInstance();
-                            returnValue = instance.encry(returnValue.toString(),encryField);
-                            if (encryField.hasAnyAuthority().length>0){
-                                log.warn("权限划分数据只适用于返回实体对象，不适用于返回基本类型");
-                            }
-                        }catch (Exception ignored){}
-                    }
-                }else {
-                    SimpleModule sm = new SimpleModule();
-                    Class[] allType = {String.class,Integer.class,Long.class
-                            ,Double.class,Float.class,Boolean.class,Short.class
-                            , BigDecimal.class, BigInteger.class,Date.class};
-                    for (Class type : allType) {
-                        sm.addSerializer(type, new EncryCore.EncryJacksonSerializerDispatch<>(type));
-                    }
-                    om.registerModule(sm);
+            for (ResultObjectCovertInterface handle : resultObjectCovertHandleList) {
+                if (handle.support(returnValue, returnType, resp)){
+                    handle.process(returnValue, returnType, resp, os);
+                    break;
                 }
             }
 
-
-            SimpleModule sm = new SimpleModule();
-            om.registerModule(sm);
-            if (returnValue instanceof R)
-            {
-                json = om.writeValueAsString(returnValue);
-            }else
-            {
-                json = om.writeValueAsString(R.Builder.getInstance().setCode(R.HttpCode.HTTP_OK.get())
-                        .setObj(returnValue).build());
-            }
-            StreamUtils.copy(json.getBytes(StandardCharsets.UTF_8),os);
         }catch (Exception openOutputError){
-            log.info("无法打开输出流,可能已经通过Response返回,如果是这样,请忽略此异常,并且尽量不要使用统一返回");
+            if (openOutputError instanceof IllegalStateException){
+                log.info("无法打开输出流,可能已经通过Response返回,如果是这样,请忽略此异常,并且尽量不要使用统一返回");
+            }else {
+                LoggerUtils.logErrorStackTrace(openOutputError,log);
+            }
         }
     }
-
-
-
-
 
 }

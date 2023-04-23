@@ -47,6 +47,7 @@ import xyz.chener.zp.datasharing.utils.SqlUtils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -163,7 +164,7 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
     }
 
     @Override
-    public Boolean save(DsRequestConfigAllDto dto) {
+    public Integer save(DsRequestConfigAllDto dto) {
         DsRequestConfigDto requestConfigDto = dto.getDsRequestConfigDto();
         DsRequestConfig requestConfig = new DsRequestConfig();
         ObjectUtils.copyFields(requestConfigDto, requestConfig);
@@ -246,9 +247,9 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
             dataSourceTransactionManager.commit(transaction);
         }catch (Exception exception){
             dataSourceTransactionManager.rollback(transaction);
+            return null;
         }
-
-        return true;
+        return requestConfig.getId();
     }
 
     @Override
@@ -334,13 +335,13 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
             sb.append("## ").append(config.getRequestName()).append("\n");
             sb.append("##### 自动生成").append("\n");
             sb.append("### 基本信息").append("\n");
-            sb.append("* 接口地址: http://ip:port/v1/datasharing/api/web/datasharing/out/").append(config.getRequestUid()).append("\n");
-            sb.append("* 请求方式: ").append(config.getRequestMethod()).append("\n");
+            sb.append("* 接口地址: `http://ip:port/v1/datasharing/api/web/datasharing/out/").append(config.getRequestUid()).append("`\n");
+            sb.append("* 请求方式: `").append(config.getRequestMethod()).append("`\n");
             String reqParamType = Optional.ofNullable(config.getParamType()).orElse("").equalsIgnoreCase("JSON")?"application/json":"application/x-www-form-urlencoded";
-            sb.append("* 参数类型: ").append(reqParamType).append("\n");
-            sb.append("* 日限制: ").append(Optional.ofNullable(config.getDayLimit()).orElse(0) == 0?"无限制":config.getDayLimit()).append("\n");
-            sb.append("* 请求字节数: ").append(Optional.ofNullable(config.getByteReqLimit()).orElse("0").equals("0")?"无限制":config.getByteReqLimit()).append("\n");
-            sb.append("* 返回字节数: ").append(Optional.ofNullable(config.getByteReturnLimie()).orElse("0").equals("0")?"无限制":config.getByteReturnLimie()).append("\n");
+            sb.append("* 参数类型: `").append(reqParamType).append("`\n");
+            sb.append("* 日限制: `").append(Optional.ofNullable(config.getDayLimit()).orElse(0) == 0?"无限制":config.getDayLimit()).append("`\n");
+            sb.append("* 请求字节数: `").append(Optional.ofNullable(config.getByteReqLimit()).orElse("0").equals("0")?"无限制":config.getByteReqLimit()).append("`\n");
+            sb.append("* 返回字节数: `").append(Optional.ofNullable(config.getByteReturnLimie()).orElse("0").equals("0")?"无限制":config.getByteReturnLimie()).append("`\n");
             sb.append("\n");
 
             sb.append("### 授权方式").append("\n");
@@ -462,6 +463,19 @@ public class DsRequestConfigServiceImpl extends ServiceImpl<DsRequestConfigDao, 
         return """
                 ## Oops!😅😅😅
                 #### 未找到该接口信息""";
+    }
+
+    @Override
+    public String getDocumentMDs(List<Integer> id) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("# 接口文档").append("\n");
+        sb.append("#### ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
+                .append("\n")
+                .append("\n");
+        id.forEach(e->{
+            sb.append(getDocumentMD(e)).append("\n\n");
+        });
+        return sb.toString();
     }
 
 

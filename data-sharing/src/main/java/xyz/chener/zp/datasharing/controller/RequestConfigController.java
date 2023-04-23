@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.common.config.unifiedReturn.warper.FileWarper;
+import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigAllDto;
 import xyz.chener.zp.datasharing.entity.dto.DsRequestConfigDto;
 import xyz.chener.zp.datasharing.service.DsRequestConfigService;
 import xyz.chener.zp.datasharing.service.DsRequestProcessConfigService;
 
+import java.io.File;
 import java.lang.ref.Reference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -57,7 +60,7 @@ public class RequestConfigController {
     }
 
     @PostMapping("/save")
-    public Boolean save(@RequestBody @Validated DsRequestConfigAllDto dto){
+    public Integer save(@RequestBody @Validated DsRequestConfigAllDto dto){
         return dsRequestConfigService.save(dto);
     }
 
@@ -69,6 +72,18 @@ public class RequestConfigController {
     @GetMapping("/getDocumentMD")
     public String getDocumentMD(@RequestParam("id") Integer id){
         return dsRequestConfigService.getDocumentMD(id);
+    }
+
+    @GetMapping("/getDocumentMDs")
+    public String getDocumentMDs(@RequestParam("id") List<Integer> id){
+        return dsRequestConfigService.getDocumentMDs(id);
+    }
+
+    @GetMapping("/getDocumentMDsFile")
+    @WriteList
+    public FileWarper getDocumentMDsFile(@RequestParam("id") List<Integer> id){
+        String str = dsRequestConfigService.getDocumentMDs(id);
+        return new FileWarper(str,"接口文档.md");
     }
 
 }

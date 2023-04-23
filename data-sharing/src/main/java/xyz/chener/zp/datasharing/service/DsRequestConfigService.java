@@ -23,7 +23,7 @@ public interface DsRequestConfigService extends IService<DsRequestConfig> {
 
     List<String>[] getSqlResultParam(String sql,Integer datasourceId);
 
-    Boolean save(DsRequestConfigAllDto dto);
+    Integer save(DsRequestConfigAllDto dto);
 
     DsRequestConfigAllDto getDetail(Integer id);
 
@@ -31,6 +31,8 @@ public interface DsRequestConfigService extends IService<DsRequestConfig> {
 
 
     String getDocumentMD(Integer id);
+
+    String getDocumentMDs(List<Integer> id);
 
 }
 

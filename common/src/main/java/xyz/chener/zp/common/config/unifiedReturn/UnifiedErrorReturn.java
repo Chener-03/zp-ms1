@@ -16,6 +16,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.security.AccessDeniedProcess;
@@ -144,6 +145,17 @@ public class UnifiedErrorReturn {
             accessDeniedProcess.handle(request,response,exception);
         } catch (Exception e) { }
         return new R<>();
+    }
+
+    @DispatchException(MethodArgumentTypeMismatchException.class)
+    public R<String> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception)
+    {
+        LoggerUtils.logErrorStackTrace(exception,log);
+        return R.Builder.<String>getInstance()
+                .setCode(R.HttpCode.BAD_REQUEST.get())
+                .setMessage(String.format("%s [%s]"
+                        ,R.ErrorMessage.BAD_REQUEST.get(),exception.getMessage()))
+                .build();
     }
 
 
