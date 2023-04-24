@@ -80,9 +80,14 @@ public class RequestConfigController {
     }
 
     @GetMapping("/getDocumentMDsFile")
-    @WriteList
     public FileWarper getDocumentMDsFile(@RequestParam("id") List<Integer> id){
         String str = dsRequestConfigService.getDocumentMDs(id);
+        return new FileWarper(str,"接口文档.md");
+    }
+
+    @GetMapping("/getAllDocumentMDsFile")
+    public FileWarper getAllDocumentMDsFile(){
+        String str = "";//dsRequestConfigService.getDocumentMDs(null);
         return new FileWarper(str,"接口文档.md");
     }
 
