@@ -24,5 +24,4 @@ public class UserApplication {
         System.setProperty("csp.sentinel.log.output.type","console");
         SpringApplication.run(UserApplication.class, args);
     }
-
 }

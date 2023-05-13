@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.5'
+    id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -36,9 +36,9 @@ dependencies {
         exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
     }
 
-    implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
-    implementation 'org.apache.skywalking:apm-toolkit-trace:8.14.0'
-    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.14.0'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
+    implementation 'org.apache.skywalking:apm-toolkit-trace:8.15.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.15.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
@@ -56,7 +56,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2022.0.0.0-RC1'
+        mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2022.0.0.0-RC2'
     }
 }
 
