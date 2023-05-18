@@ -11,6 +11,7 @@ import xyz.chener.zp.datasharing.requestProcess.entity.pe.PeAllParams;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class AuthExec extends AbstractChainExecute {
     @Override
@@ -29,11 +30,13 @@ public class AuthExec extends AbstractChainExecute {
                                 }
                             });
                             if (StringUtils.hasText(authItem.getMd5Slat())){
-                                sb.append(authItem.getMd5Slat());
+                                sb.insert(0,authItem.getMd5Slat());
                             }
 
                             String strMd5 = Md5Utiles.getStrMd5(sb.toString());
-                            if (!ObjectUtils.nullSafeEquals(strMd5,pap.getNormalParams().get(authItem.getMd5ParamKey()))) {
+                            String ds = Optional.ofNullable(pap.getNormalParams().get(authItem.getMd5ParamKey())).orElse("");
+
+                            if (!ds.equalsIgnoreCase(strMd5)) {
                                 throw new Exception("权限验证失败,请检查MD5传参是否正确.");
                             }
                         }
