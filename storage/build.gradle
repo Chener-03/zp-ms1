@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.6'
+    id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -30,19 +30,19 @@ dependencies {
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
-    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
+    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.7'
 
     implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
         exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
     }
 
 
-    implementation 'com.github.oshi:oshi-core:6.4.2'
+    implementation 'com.github.oshi:oshi-core:6.4.3'
 
-    implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.22.0'
 
-    implementation 'org.apache.skywalking:apm-toolkit-trace:8.15.0'
-    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.15.0'
+    implementation 'org.apache.skywalking:apm-toolkit-trace:8.16.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.16.0'
 }
 
 dependencyManagement {

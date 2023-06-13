@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.6'
+    id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -37,8 +37,8 @@ dependencies {
     implementation 'com.alibaba.csp:sentinel-datasource-extension'*/
 
 
-    implementation 'org.apache.skywalking:apm-toolkit-trace:8.15.0'
-    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.15.0'
+    implementation 'org.apache.skywalking:apm-toolkit-trace:8.16.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.16.0'
 
     implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
