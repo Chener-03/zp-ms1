@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.listener.Event;
 import com.alibaba.nacos.api.naming.listener.EventListener;
 import com.alibaba.nacos.api.naming.listener.NamingEvent;
 import com.alibaba.nacos.api.naming.pojo.Instance;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -29,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 @Configuration
 public class WriteListListener implements CommandLineRunner, ApplicationContextAware {
 
@@ -139,7 +141,7 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                                     }
                                 }catch (Exception ignored) {
                                     isFirstRefresh.set(false);
-                                    System.out.println("waitRefreshListenerRunning error");
+                                    log.error("waitRefreshListenerRunning error:{}",ignored.getMessage());
                                 }
                             });
                         }

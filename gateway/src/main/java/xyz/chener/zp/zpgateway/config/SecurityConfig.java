@@ -55,16 +55,20 @@ public class SecurityConfig {
                         e = e.pathMatchers(s).permitAll();
                     }
                     e.anyExchange().access(new AuthorizationManager());
-        }).httpBasic().disable()
-                .formLogin().disable()
-                .logout().disable()
-                .anonymous().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .addFilterBefore(new SecurityRepository(userModuleService,jwt,commonConfig), SecurityWebFiltersOrder.AUTHENTICATION)
-                .csrf().disable()
-                .cors();
+                }).httpBasic(ServerHttpSecurity.HttpBasicSpec::disable
+                )
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable
+                )
+                .logout(ServerHttpSecurity.LogoutSpec::disable
+                )
+                .anonymous(ServerHttpSecurity.AnonymousSpec::disable
+                )
+                .exceptionHandling(cfg -> {
+                    cfg.authenticationEntryPoint(authenticationEntryPoint);
+                })
+                .addFilterBefore(new SecurityRepository(userModuleService, jwt, commonConfig), SecurityWebFiltersOrder.AUTHENTICATION)
+                .csrf(ServerHttpSecurity.CsrfSpec::disable);
+
         return http.build();
     }
 

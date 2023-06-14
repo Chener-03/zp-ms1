@@ -1,6 +1,7 @@
 package xyz.chener.zp.common.config.security;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -37,7 +38,10 @@ public class SecurityConfig {
     private final AccessDeniedProcess accessDeniedProcess;
     private final EntryPointProcess entryPointProcess;
 
-    public SecurityConfig(AuthFilter authFilter, CommonConfig commonConfig, AccessDeniedProcess accessDeniedProcess, EntryPointProcess entryPointProcess) {
+    public SecurityConfig(AuthFilter authFilter
+            , CommonConfig commonConfig
+            , AccessDeniedProcess accessDeniedProcess
+            , EntryPointProcess entryPointProcess) {
         this.authFilter = authFilter;
         this.commonConfig = commonConfig;
         this.accessDeniedProcess = accessDeniedProcess;
@@ -49,7 +53,6 @@ public class SecurityConfig {
     {
         return new BCryptPasswordEncoder();
     }
-
 
     @Bean
     @RefreshScope
