@@ -1,6 +1,7 @@
 package xyz.chener.zp.zpusermodule.ws;
 
 import jakarta.websocket.Session;
+import lombok.extern.slf4j.Slf4j;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.entity.LoginUserDetails;
 import xyz.chener.zp.common.utils.Jwt;
@@ -10,6 +11,8 @@ import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
+@Slf4j
 public class WsMessageProcesser {
 
     public static void checkMessageLegal(WsMessage message, Session session) {
@@ -32,6 +35,12 @@ public class WsMessageProcesser {
         if (unAuthConnect != null) {
             WsCache.unAuthConnect.invalidate(session.getId());
             unAuthConnect.setUsername(message.getUsername());
+        }else {
+            unAuthConnect = WsCache.getAuthConnect(session.getId());
+        }
+        if (unAuthConnect == null){
+            log.error("心跳包异常，未找到连接信息");
+            return;
         }
         WsCache.putAuthConnect(session.getId(), unAuthConnect);
         WsConnector.sendObject(message, session.getId());

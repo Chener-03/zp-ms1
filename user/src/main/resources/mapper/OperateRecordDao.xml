@@ -9,7 +9,7 @@
                ,#{op.returnData} as return_data,#{op.failReason} as fail_reason,#{op.opTime} as op_time
                ,#{op.traceId} as trace_id
                 <if test="op.username != null and op.username != ''">
-                    ,b.id as op_user_id from user_base b where username='admin'
+                    ,b.id as op_user_id from user_base b where username=#{op.username}
                 </if>
     </insert>
     <select id="getList" resultType="xyz.chener.zp.zpusermodule.config.oplog.entity.OperateRecordDto">
