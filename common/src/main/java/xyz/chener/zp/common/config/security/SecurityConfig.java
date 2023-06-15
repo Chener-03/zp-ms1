@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -54,6 +55,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+
     @Bean
     @RefreshScope
     @Primary
@@ -63,22 +66,16 @@ public class SecurityConfig {
         urls.addAll(WriteListAutoConfig.writeList);
         String[] writeList = urls.toArray(new String[0]);
 
-        http.formLogin().disable()
-                .logout().disable()
-                .anonymous().disable()
-                .httpBasic().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests()
-                .requestMatchers(writeList)
-                .permitAll()
-                .anyRequest().authenticated().and()
-                .exceptionHandling()
-                .authenticationEntryPoint(entryPointProcess)
-                .accessDeniedHandler(accessDeniedProcess)
-                .and()
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors().and()
-                .csrf().disable();
+        http.formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .anonymous(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(cfg -> cfg.requestMatchers(writeList).permitAll().anyRequest().authenticated())
+                .exceptionHandling(cfg -> cfg.authenticationEntryPoint(entryPointProcess)
+                        .accessDeniedHandler(accessDeniedProcess)).addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
+
         return http.build();
     }
 
