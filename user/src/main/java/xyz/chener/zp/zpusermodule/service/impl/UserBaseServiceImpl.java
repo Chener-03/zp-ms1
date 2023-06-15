@@ -116,6 +116,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             try{
                 uler.setTime(date);
                 uler.setIsSuccess(1);
+                uler.setLoginType(UserLoginTypeEnum.USERNAMEPASSWORD);
                 userLoginEventRecordService.save(uler);
                 AssertUrils.state(this.updateById(userBase),new RuntimeException(LoginResult.ErrorResult.SERVER_ERROR));
                 dataSourceTransactionManager.commit(transaction);

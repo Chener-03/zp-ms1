@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
 import jakarta.websocket.Session;
 import xyz.chener.zp.common.utils.TickNotification;
+import xyz.chener.zp.zpusermodule.service.QrCodeLoginService;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 
 import java.time.Duration;
@@ -19,6 +20,7 @@ public class WsCache {
 
     public static Cache<String, WsClient> unAuthConnect;
     public static Cache<String, WsClient> authConnect;
+    public static Cache<String, WsClient> qrCodeLoginConnect;
 
     static {
         unAuthConnect = CacheBuilder.newBuilder()
@@ -29,10 +31,15 @@ public class WsCache {
                 .expireAfterWrite(Duration.ofSeconds(60))
                 .removalListener(WsCache::removeListener)
                 .build();
+        qrCodeLoginConnect = CacheBuilder.newBuilder()
+                .expireAfterWrite(Duration.ofSeconds(QrCodeLoginService.EXPIRE_TIME))
+                .removalListener(WsCache::removeListener)
+                .build();
         TickNotification.getInstance().addRunnable(()->{
             try {
                 unAuthConnect.cleanUp();
                 authConnect.cleanUp();
+                qrCodeLoginConnect.cleanUp();
             }catch (Throwable ignored){}
         });
 
@@ -61,6 +68,7 @@ public class WsCache {
     public static void removeConnect(String sessionId){
         unAuthConnect.invalidate(sessionId);
         authConnect.invalidate(sessionId);
+        qrCodeLoginConnect.invalidate(sessionId);
     }
 
     private static void removeListener(RemovalNotification<String, WsClient> notification){

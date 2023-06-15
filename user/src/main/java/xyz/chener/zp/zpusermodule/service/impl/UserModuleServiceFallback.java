@@ -26,4 +26,14 @@ public class UserModuleServiceFallback implements UserModuleService {
     public List<String> getWsOnlineUsersName() {
         return new ArrayList<>();
     }
+
+    @Override
+    public Boolean postQrCodeLoginGet(String sessionId) {
+        return false;
+    }
+
+    @Override
+    public Boolean postQrCodeLoginAuthorization(String sessionId, String jwt) {
+        return false;
+    }
 }

@@ -39,6 +39,16 @@ public class UserLoginEventRecord extends Model<UserLoginEventRecord> {
     private String failReason;
 
 
+    private String loginType;
+
+    public String getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(String loginType) {
+        this.loginType = loginType;
+    }
+
     public Long getId() {
         return id;
     }

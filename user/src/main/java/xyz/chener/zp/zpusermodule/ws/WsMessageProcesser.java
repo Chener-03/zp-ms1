@@ -6,9 +6,12 @@ import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.entity.LoginUserDetails;
 import xyz.chener.zp.common.utils.Jwt;
 import xyz.chener.zp.common.utils.ObjectUtils;
+import xyz.chener.zp.zpusermodule.service.QrCodeLoginService;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.entity.WsMessage;
+import xyz.chener.zp.zpusermodule.ws.entity.WsMessageConstVar;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -30,7 +33,6 @@ public class WsMessageProcesser {
     }
 
     public static void heartBeat(WsMessage message, Session session) {
-        System.out.println("heartBeat："+session.getId());
         WsClient unAuthConnect = WsCache.getUnAuthConnect(session.getId());
         if (unAuthConnect != null) {
             WsCache.unAuthConnect.invalidate(session.getId());
@@ -46,12 +48,30 @@ public class WsMessageProcesser {
         WsConnector.sendObject(message, session.getId());
     }
 
-    public static void sendAll(WsMessage message) {
+    public static void qrCodeLogin(WsMessage message, Session session){
+        WsClient unAuthConnect = WsCache.getUnAuthConnect(session.getId());
+        if (unAuthConnect != null) {
+            String uuid = UUID.randomUUID().toString();
+            unAuthConnect.setUsername(uuid);
+            QrCodeLoginService qrCodeLoginService = ApplicationContextHolder.getApplicationContext().getBean(QrCodeLoginService.class);
+            WsMessage msg = new WsMessage();
+            if (!qrCodeLoginService.putQrCodeLogin(uuid,session.getId(),unAuthConnect.getIp(),message.getMessage())) {
+                msg.setCode(WsMessageConstVar.QRCODE_LOGIN_FAIL);
+                WsConnector.sendObject(msg,session.getId());
+                return;
+            }
+            msg.setCode(WsMessageConstVar.QRCODE_LOGIN_RESPONSE);
+            msg.setMessage(uuid);
+            WsCache.unAuthConnect.invalidate(session.getId());
+            WsCache.qrCodeLoginConnect.put(session.getId(), unAuthConnect);
+            WsConnector.sendObject(msg,session.getId());
+        }
+    }
 
+    public static void sendAll(WsMessage message) {
         WsCache.getAllAuthConnect().forEach((wsClient) -> {
             WsConnector.sendObject(message, wsClient.getSessionId());
         });
-
     }
 
     public static boolean sendUser(WsMessage message, String username) {

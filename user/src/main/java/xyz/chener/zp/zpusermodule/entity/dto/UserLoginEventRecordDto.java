@@ -42,6 +42,15 @@ public class UserLoginEventRecordDto {
     //失败原因
     private String failReason;
 
+    private String loginType;
+
+    public String getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(String loginType) {
+        this.loginType = loginType;
+    }
 
     public Date getStartTime() {
         return startTime;

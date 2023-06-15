@@ -35,7 +35,6 @@ public class WsConnector {
 
     @OnOpen
     public void onOpen(Session session) {
-
         cache.put(session.getId(),session);
         WsClient client = new WsClient();
         client.setSession(session);
@@ -87,12 +86,18 @@ public class WsConnector {
 
     @OnMessage
     public void onMessage(WsMessage message, Session session) {
-        WsMessageProcesser.checkMessageLegal(message,session);
         switch (message.getCode()){
             case WsMessageConstVar.HEART_BEAT_CODE:
+                WsMessageProcesser.checkMessageLegal(message,session);
                 WsMessageProcesser.heartBeat(message,session);
                 break;
+
+            case WsMessageConstVar.QRCODE_LOGIN_REQUEST:
+                WsMessageProcesser.qrCodeLogin(message,session);
+                break;
+
             default:
+                WsMessageProcesser.checkMessageLegal(message,session);
                 break;
         }
     }
