@@ -1,7 +1,10 @@
 package xyz.chener.zp.zpusermodule.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,7 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
 
     private final RedissonClient redissonClient;
 
-    private final ServerProperties serverProperties ;
+    private final ServerProperties serverProperties;
     private final Ip2RegUtils ip2RegUtils ;
 
     private final UserModuleService userModuleService;
@@ -54,6 +57,9 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
     private final DataSourceTransactionManager dataSourceTransactionManager;
 
     private final UserLoginEventRecordServiceImpl userLoginEventRecordService;
+
+    @Value("${spring.cloud.nacos.discovery.ip}")
+    private String regIp;
 
     public QrCodeLoginServiceImpl(RedissonClient redissonClient, ServerProperties serverProperties, Ip2RegUtils ip2RegUtils
             , @Qualifier("xyz.chener.zp.zpusermodule.service.UserModuleService") UserModuleService userModuleService, UserBaseService userBaseService, Jwt jwt, DataSourceTransactionManager dataSourceTransactionManager, UserLoginEventRecordServiceImpl userLoginEventRecordService) {
@@ -73,7 +79,7 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
         QrCodeLoginCache cache = new QrCodeLoginCache();
         cache.setUuid(uuid);
         cache.setSessionId(sessionId);
-        cache.setHost(serverProperties.getAddress().getHostAddress());
+        cache.setHost(regIp);
         cache.setPort(serverProperties.getPort());
         cache.setIpAddr(ip);
         cache.setOs(os);
@@ -127,7 +133,7 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
             if (Objects.isNull(userBase)) {
                 res.setSuccess(false);
                 res.setMessage(LoginResult.ErrorResult.NO_USER);
-                sendQrCodeResult(res,cache.getSessionId());
+                sendQrCodeResult(res,cache.getSessionId(), cache.getHost(), cache.getPort());
                 return false;
             }
             LoginUserDetails details = new LoginUserDetails();
@@ -166,14 +172,29 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
                 res.setSuccess(false);
                 res.setMessage(LoginResult.ErrorResult.SERVER_ERROR);
             }
-            sendQrCodeResult(res,cache.getSessionId());
+            sendQrCodeResult(res,cache.getSessionId(), cache.getHost(), cache.getPort());
             return true;
         }
         return false;
     }
 
-    private void sendQrCodeResult(LoginResult result,String sessionId){
+    @Override
+    public boolean postQrCodeLoginAuthorization(String sessionId, LoginResult result) {
+        WsMessage msg = new WsMessage();
+        msg.setCode(WsMessageConstVar.QRCODE_LOGIN_DOLOGIN);
+        try {
+            msg.setMessage(new ObjectMapper().writeValueAsString(result));
+        } catch (JsonProcessingException ignored) {}
+        if (WsCache.qrCodeLoginConnect.asMap().containsKey(sessionId)) {
+            WsConnector.sendObject(msg,sessionId);
+            return true;
+        }
+        return false;
+    }
 
+    private void sendQrCodeResult(LoginResult result,String sessionId,String host,Integer port){
+        LoadbalancerContextHolder.setNextInstance(new ServerInstance(host, port));
+        userModuleService.postQrCodeLoginAuthorization(sessionId,result);
     }
 
 }

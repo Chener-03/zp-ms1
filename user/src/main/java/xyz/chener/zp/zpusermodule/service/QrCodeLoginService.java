@@ -1,6 +1,8 @@
 package xyz.chener.zp.zpusermodule.service;
 
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.QrCodeLoginRespDto;
 
 /**
@@ -21,5 +23,7 @@ public interface QrCodeLoginService {
     boolean postQrCodeLoginGet(String sessionId);
 
     Boolean qrCodeAuthorization(String uuid,String username);
+
+    boolean postQrCodeLoginAuthorization(String sessionId,LoginResult result);
 
 }

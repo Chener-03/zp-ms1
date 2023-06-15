@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Component;
 import xyz.chener.zp.zpusermodule.entity.Role;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
+import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.service.UserModuleService;
 
 
@@ -33,7 +34,9 @@ public class UserModuleServiceFallback implements UserModuleService {
     }
 
     @Override
-    public Boolean postQrCodeLoginAuthorization(String sessionId, String jwt) {
+    public Boolean postQrCodeLoginAuthorization(String sessionId, LoginResult result) {
         return false;
     }
+
+
 }

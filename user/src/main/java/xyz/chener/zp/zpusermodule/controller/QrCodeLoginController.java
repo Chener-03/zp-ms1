@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
+import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.QrCodeLoginRespDto;
 import xyz.chener.zp.zpusermodule.service.QrCodeLoginService;
 
@@ -47,8 +48,8 @@ public class QrCodeLoginController {
 
     @RequestMapping("/user/postQrCodeLoginAuthorization")
     @PreAuthorize("hasAnyRole('microservice_call')")
-    public Boolean postQrCodeLoginAuthorization(@RequestParam("sessionId") String sessionId,@RequestParam("jwt") String jwt){
-        return
+    public Boolean postQrCodeLoginAuthorization(@RequestParam("sessionId") String sessionId,@ModelAttribute LoginResult result){
+        return qrCodeLoginService.postQrCodeLoginAuthorization(sessionId,result);
     }
 
 
