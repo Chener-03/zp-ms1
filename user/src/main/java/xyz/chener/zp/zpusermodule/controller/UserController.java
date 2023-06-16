@@ -44,10 +44,7 @@ import xyz.chener.zp.zpusermodule.ws.WsCache;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @Author: chenzp
@@ -271,6 +268,18 @@ public class UserController {
     @PreAuthorize("hasAnyRole('microservice_call')")
     public List<String> getWsOnlineUsersName(){
         return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
+    }
+
+    @GetMapping("/getWsOnlineUsersForMsTest")
+    @WriteList
+    public List<String> getWsOnlineUsersForMsTest(){
+        return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
+    }
+
+    @GetMapping("/getWsOnlineUsersForMsTest1")
+    @WriteList
+    public Map getWsOnlineUsersForMsTest1(){
+        return WsCache.authConnect.asMap();
     }
 
 }

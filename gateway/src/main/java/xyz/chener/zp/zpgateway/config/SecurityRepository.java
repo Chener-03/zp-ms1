@@ -192,10 +192,10 @@ public class SecurityRepository implements WebFilter {
     private boolean checkJwtBindSystem(LoginUserDetails details,String urlPath){
         switch (details.getSystem()) {
             case LoginUserDetails.SystemEnum.WEB -> {
-                return urlPath.contains("/web/");
+                return urlPath.contains("/api/web/");
             }
             case LoginUserDetails.SystemEnum.MOBILE -> {
-                return urlPath.contains("/mobile/");
+                return urlPath.contains("/api/client/");
             }
         }
         return true;

@@ -19,7 +19,7 @@ import xyz.chener.zp.zpusermodule.service.QrCodeLoginService;
 @RestController
 @UnifiedReturn
 @Slf4j
-@RequestMapping("/api/client")
+@RequestMapping({"/api/client","/api/web"})
 @Validated
 public class QrCodeLoginController {
 
@@ -41,14 +41,14 @@ public class QrCodeLoginController {
         return qrCodeLoginService.postQrCodeLoginGet(sessionId);
     }
 
-    @RequestMapping("/user/qrCodeAuthorization")
+    @GetMapping("/user/qrCodeAuthorization")
     public Boolean qrCodeAuthorization(@RequestParam("uuid") String uuid){
         return qrCodeLoginService.qrCodeAuthorization(uuid, SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    @RequestMapping("/user/postQrCodeLoginAuthorization")
+    @PostMapping("/user/postQrCodeLoginAuthorization")
     @PreAuthorize("hasAnyRole('microservice_call')")
-    public Boolean postQrCodeLoginAuthorization(@RequestParam("sessionId") String sessionId,@ModelAttribute LoginResult result){
+    public Boolean postQrCodeLoginAuthorization(@RequestParam("sessionId") String sessionId,@RequestBody LoginResult result){
         return qrCodeLoginService.postQrCodeLoginAuthorization(sessionId,result);
     }
 
