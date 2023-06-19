@@ -7,4 +7,5 @@ include 'logger'
 include 'system'
 include 'sentinel-adapter'
 include 'data-sharing'
+include 'workflow'
 

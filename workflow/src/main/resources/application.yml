@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: zp-workflow-module
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        group: zp
+        server-addr: 101.42.12.133:8848
+        namespace: 1379388b-aed1-4082-8ed2-54699a4cc9d4
+        #        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: nacos123456
+        file-extension: yml
+      discovery:
+        group: zp
+        server-addr: 101.42.12.133:8848
+        namespace: 1379388b-aed1-4082-8ed2-54699a4cc9d4
+        #        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
+        username: nacos
+        password: nacos123456
+        ip: 127.0.0.1
+    openfeign:
+      lazy-attributes-resolution: true
+      compression:
+        request:
+          enabled: true
+        response:
+          enabled:  true
+
+    sentinel:
+      enabled: false
+
+  config:
+    import:
+      - optional:nacos:zp-mysql-config.yml?group=zp
+      - optional:nacos:zp-config?group=zp
+      - optional:nacos:zp-actuator-config.yml?group=zp
+      - optional:nacos:zp-mvc-normal?group=zp
+
+
+
+server:
+  port: 7055
+  compression:
+    enabled: true
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+zp:
+  workflow:
+    activiti:
+      datasource:
+        jdbc-url: jdbc:mysql://bj-cynosdbmysql-grp-a7tnayym.sql.tencentcdb.com:21449/zpworkflowdev?characterEncoding=utf8&useSSL=false&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: admin01
+        password: CZPczp666...
+        max-lifetime: 60000
+        maximum-pool-size: 5
