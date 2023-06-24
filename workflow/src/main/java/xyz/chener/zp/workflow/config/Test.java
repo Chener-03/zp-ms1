@@ -1,8 +1,5 @@
 package xyz.chener.zp.workflow.config;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.repository.Deployment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +15,6 @@ import java.util.HashMap;
 
 @Component
 public class Test implements CommandLineRunner {
-
-    @Autowired
-    ProcessEngine processEngine;
 
     @Override
     public void run(String... args) throws Exception {
