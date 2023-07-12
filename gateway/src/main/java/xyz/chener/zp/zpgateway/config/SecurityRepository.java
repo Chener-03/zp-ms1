@@ -38,10 +38,7 @@ import xyz.chener.zp.zpgateway.utils.HeaderUtils;
 import xyz.chener.zp.zpgateway.utils.UriMatcherUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -125,8 +122,10 @@ public class SecurityRepository implements WebFilter {
 
                                             List<String> roleAuthList = Arrays.stream(role.getPermissionEnNameList().split(",")).filter(s -> StringUtils.hasText(s) && s.startsWith(SecurityVar.ROLE_PREFIX)).toList();
 
+                                            String base64Username = Base64.getEncoder().encodeToString(userBase.getUsername().getBytes(StandardCharsets.UTF_8));
+
                                             ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange
-                                                    , CommonVar.REQUEST_USER, userBase.getUsername()
+                                                    , CommonVar.REQUEST_USER, base64Username
                                                     ,CommonVar.REQUEST_USER_AUTH, String.join(",",roleAuthList));
                                             Context ctx = ReactiveSecurityContextHolder.withAuthentication(
                                                     new UsernamePasswordAuthenticationToken(

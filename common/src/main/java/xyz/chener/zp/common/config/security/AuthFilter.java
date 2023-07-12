@@ -19,6 +19,8 @@ import xyz.chener.zp.common.utils.ThreadUtils;
 import xyz.chener.zp.common.utils.UriMatcherUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Slf4j
 public class AuthFilter extends OncePerRequestFilter {
@@ -49,7 +51,9 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String user = request.getHeader(CommonVar.REQUEST_USER);
+        String userBase64 = request.getHeader(CommonVar.REQUEST_USER);
+        String user = new String(Base64.getDecoder().decode(userBase64), StandardCharsets.UTF_8);
+
         String auth = request.getHeader(CommonVar.REQUEST_USER_AUTH);
         if (StringUtils.hasText(user) && StringUtils.hasText(auth))
         {
