@@ -28,7 +28,7 @@ public class GoogleRecapthaServiceImpl implements GoogleRecapthaService
         if (!StringUtils.hasText(response)){
             return false;
         }
-        if (response!=null) return true;
+
         try {
             String body = googleRequest.verify(GoogleRecapthaService.secret, response);
             GoogleRecaptchaResponse resp = new ObjectMapper().readValue(body, GoogleRecaptchaResponse.class);
