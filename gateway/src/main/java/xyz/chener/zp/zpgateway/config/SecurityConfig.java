@@ -17,6 +17,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 import xyz.chener.zp.zpgateway.common.config.CommonConfig;
 import xyz.chener.zp.zpgateway.common.utils.Jwt;
+import xyz.chener.zp.zpgateway.config.nacoslistener.WriteListListener;
 import xyz.chener.zp.zpgateway.service.UserModuleService;
 
 import java.util.ArrayList;

@@ -8,4 +8,5 @@ public class CommonVar {
     public static final String SERVICE_CALL_AUTH_NAME = "ROLE_microservice_call";
     public static final String OPEN_FEIGN_HEADER = "open-feign-custom-header";
 
+    public static final String FA_HEADER_KEY = "2FA_AUTH";
 }
