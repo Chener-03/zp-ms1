@@ -21,4 +21,5 @@ public interface UserModuleService {
     @RequestMapping(value = "/api/web/getUserRole",method = RequestMethod.GET)
     PageInfo<Role> getUserRoleById(@RequestParam("id") Long id);
 
+
 }

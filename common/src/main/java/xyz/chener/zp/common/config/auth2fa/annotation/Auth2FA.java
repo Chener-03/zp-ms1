@@ -1,0 +1,10 @@
+package xyz.chener.zp.common.config.auth2fa.annotation;
+
+
+import java.lang.annotation.*;
+
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Auth2FA {
+}

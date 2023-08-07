@@ -1,15 +1,12 @@
-package xyz.chener.zp.zpgateway.config.nacoslistener;
+package xyz.chener.zp.zpgateway.config;
 
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -18,30 +15,25 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import xyz.chener.zp.zpgateway.common.entity.CommonVar;
 import xyz.chener.zp.zpgateway.common.entity.R;
+import xyz.chener.zp.zpgateway.config.nacoslistener.Auth2FaListener;
 import xyz.chener.zp.zpgateway.service.UserModuleService;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 import static xyz.chener.zp.zpgateway.common.entity.CommonVar.FA_HEADER_KEY;
 
-
 @Slf4j
 @Configuration
-public class Auth2FaConfig implements InstanceChangeInterface  {
+public class Auth2FaConfig {
 
-    public static final ConcurrentHashMap<String, CopyOnWriteArrayList<String>> faUrls = new ConcurrentHashMap<>();
 
     private UserModuleService userModuleService;
-
-    private final String KEY = "2FA_URL_LIST";
-    private final String DIVISION = "####";
 
     @Autowired
     @Qualifier("xyz.chener.zp.zpgateway.service.UserModuleService")
@@ -50,28 +42,47 @@ public class Auth2FaConfig implements InstanceChangeInterface  {
         this.userModuleService = userModuleService;
     }
 
+
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE-98)
     public GlobalFilter auth2FaFilter()
     {
         return (exchange, chain) -> {
+            List<String> user = exchange.getRequest().getHeaders().get(CommonVar.REQUEST_USER);
+            if (user == null || user.isEmpty()){
+                return chain.filter(exchange);
+            }
+
             ArrayList<String> lsFaUrls = new ArrayList<>();
-            faUrls.values().forEach(lsFaUrls::addAll);
+            Auth2FaListener.faUrls.values().forEach(lsFaUrls::addAll);
 
             if (lsFaUrls.stream().noneMatch(url -> exchange.getRequest().getURI().toString().equals(url))) {
                 return chain.filter(exchange);
             }
 
             List<String> fas = exchange.getRequest().getHeaders().get(FA_HEADER_KEY);
+            String faCode;
+            if (fas == null || fas.isEmpty()){
+                faCode = "";
+            }else {
+                faCode = fas.get(0);
+            }
+
+            Boolean fasuccess = check2Fa(faCode, user.get(0));
+            if (fasuccess) {
+                return chain.filter(exchange);
+            }
+
             if (fas == null || fas.isEmpty()){
                 return getNotAuth2FaResponse(exchange);
             }
-
-            return check2Fa(fas.get(0)) ? chain.filter(exchange) : getAuth2FaFailResponse(exchange);
+            return getAuth2FaFailResponse(exchange);
         };
     }
 
-    private Boolean check2Fa(String fa){
+
+
+    private Boolean check2Fa(String faCode,String userBase64){
         return false;
     }
 
@@ -108,34 +119,4 @@ public class Auth2FaConfig implements InstanceChangeInterface  {
         return response.writeWith(Mono.just(buffer));
     }
 
-
-    @Override
-    public void onChange(List<Instance> instances, String instanceName, RouteDefinition route) {
-        if (instances == null || instances.isEmpty()){
-            CopyOnWriteArrayList<String> m = faUrls.get(instanceName);
-            if (Objects.nonNull(m))
-                m.clear();
-            faUrls.remove(instanceName);
-        }else {
-            int i = new Random().nextInt(instances.size());
-            Instance instance = instances.get(i);
-            String s = instance.getMetadata().get(KEY);
-            List<String> l = Arrays.stream(s.split(DIVISION))
-                    .filter(StringUtils::hasText).toList();
-            CopyOnWriteArrayList<String> urls = new CopyOnWriteArrayList<>();
-
-            route.getPredicates().forEach(pd->{
-                Map<String, String> uarg = pd.getArgs();
-                if (Objects.nonNull(uarg))
-                {
-                    uarg.values().forEach(eus->{
-                        l.forEach(s1 -> {
-                            urls.add(eus.replace("/**",s1));
-                        });
-                    });
-                }
-            });
-            faUrls.put(instanceName,urls);
-        }
-    }
 }

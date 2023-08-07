@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
@@ -32,23 +33,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-@Configuration
+@Component
 public class WriteListListener implements InstanceChangeInterface {
-
-    private final GatewayProperties gatewayProperties;
-
-
-    private ApplicationContext applicationContext;
 
     private final String WRITE_LIST_KEY = "WRITE_LISTS";
     private final String WRITE_LIST_DIVISION = "####";
 
     public static ConcurrentHashMap<String, CopyOnWriteArrayList<String>> writeListMap = new ConcurrentHashMap<>();
 
-
-    public WriteListListener(GatewayProperties gatewayProperties) {
-        this.gatewayProperties = gatewayProperties;
-    }
 
     @Override
     public void onChange(List<Instance> instances,String instanceName, RouteDefinition route) {

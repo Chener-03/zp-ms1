@@ -76,7 +76,7 @@ public class NacosPropertiesListener implements CommandLineRunner, ApplicationCo
                             {
                                 List<Instance> instances = ev.getInstances();
                                 applicationContext.getBean(WriteListListener.class).onChange(instances,modelName,route);
-                                applicationContext.getBean(Auth2FaConfig.class).onChange(instances,modelName,route);
+                                applicationContext.getBean(Auth2FaListener.class).onChange(instances,modelName,route);
 
                                 applicationContext.publishEvent(new RefreshEvent(this, null, "Nacos Properties Refresh Event"));
                                 if (isFirstRefresh.get()) {
