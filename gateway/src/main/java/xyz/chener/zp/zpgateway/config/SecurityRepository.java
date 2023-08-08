@@ -97,7 +97,7 @@ public class SecurityRepository implements WebFilter {
         }
 
         String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        LoginUserDetails userDetails = jwt.decode(token);
+        final LoginUserDetails userDetails = jwt.decode(token);
 
         if (Objects.nonNull(userDetails))
         {
@@ -120,7 +120,9 @@ public class SecurityRepository implements WebFilter {
                                             Role role = rolePageInfo.getList().get(0);
 
                                             List<String> roleAuthList = Arrays.stream(role.getPermissionEnNameList().split(",")).filter(s -> StringUtils.hasText(s) && s.startsWith(SecurityVar.ROLE_PREFIX)).toList();
-
+                                            try {
+                                                String s = new ObjectMapper().writeValueAsString(userDetails);
+                                            } catch (Exception e) { }
                                             String base64Username = Base64.getEncoder().encodeToString(userBase.getUsername().getBytes(StandardCharsets.UTF_8));
 
                                             ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange
@@ -141,35 +143,6 @@ public class SecurityRepository implements WebFilter {
                         }
                         return chain.filter(exchange);
                     });
-            /*            try {
-                CompletableFuture<PageInfo<UserBase>> result = CompletableFuture.supplyAsync(() -> userModuleService.getUserBaseInfoByName(userDetails.getUsername()));
-                PageInfo<UserBase> userBaseInfo = result.get();
-                if (userBaseInfo.getList().size() == 0)
-                    throw new UserNotFoundError();
-                UserBase userBase = userBaseInfo.getList().get(0);
-                AssertUrils.state(Objects.equals(userDetails.getDs(),userBase.getDs()), TokenOverdueException.class);
-                if (checkUser(userBase)) {
-                    CompletableFuture<PageInfo<Role>> res = CompletableFuture.supplyAsync(() -> userModuleService.getUserRoleById(userBase.getRoleId()));
-                    PageInfo<Role> rolePageInfo = res.get();
-                    if (rolePageInfo.getList().size() == 0)
-                        throw new UserAuthNotFoundError();
-                    Role role = rolePageInfo.getList().get(0);
-                    ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange
-                            , CommonVar.REQUEST_USER, userBase.getUsername()
-                            ,CommonVar.REQUEST_USER_AUTH, role.getPermissionEnNameList());
-                    Context ctx = ReactiveSecurityContextHolder.withAuthentication(
-                            new UsernamePasswordAuthenticationToken(
-                                    userBase.getUsername(), null,
-                                    AuthorityUtils.commaSeparatedStringToAuthorityList(role.getPermissionEnNameList()))
-                    );
-                    return chain.filter(newExchange).contextWrite(ctx);
-                }
-            }catch (Exception exception)
-            {
-                log.error(exception.getMessage());
-                if (exception instanceof HttpErrorException ex)
-                    return getResponseMono(exchange,ex);
-            }*/
         }
 
         return chain.filter(exchange);
@@ -196,10 +169,10 @@ public class SecurityRepository implements WebFilter {
     private boolean checkJwtBindSystem(LoginUserDetails details,String urlPath){
         switch (details.getSystem()) {
             case LoginUserDetails.SystemEnum.WEB -> {
-                return urlPath.contains("/api/web/");
+                return urlPath.contains(CommonVar.WEB_URL_PREFIX);
             }
             case LoginUserDetails.SystemEnum.MOBILE -> {
-                return urlPath.contains("/api/client/");
+                return urlPath.contains(CommonVar.CLIENT_URL_PREFIX);
             }
         }
         return true;

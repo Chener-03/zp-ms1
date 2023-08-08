@@ -53,7 +53,7 @@ public class WriteListListener implements InstanceChangeInterface {
 
             int i = new Random().nextInt(instances.size());
             Instance instance = instances.get(i);
-            String s = instance.getMetadata().get(WRITE_LIST_KEY);
+            String s = Optional.ofNullable(instance.getMetadata().get(WRITE_LIST_KEY)).orElse("");
             List<String> l = Arrays.stream(s.split(WRITE_LIST_DIVISION))
                     .filter(StringUtils::hasText).toList();
             CopyOnWriteArrayList<String> urls = new CopyOnWriteArrayList<>();

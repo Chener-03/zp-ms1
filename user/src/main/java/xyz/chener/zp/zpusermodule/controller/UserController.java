@@ -55,7 +55,7 @@ import java.util.*;
 @RestController
 @UnifiedReturn
 @Slf4j
-@RequestMapping("/api/web")
+@RequestMapping({"/api/web","/api/client"})
 @Validated
 public class UserController {
 

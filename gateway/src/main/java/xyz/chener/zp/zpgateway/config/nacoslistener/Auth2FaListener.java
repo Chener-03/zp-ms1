@@ -52,7 +52,7 @@ public class Auth2FaListener implements InstanceChangeInterface  {
         }else {
             int i = new Random().nextInt(instances.size());
             Instance instance = instances.get(i);
-            String s = instance.getMetadata().get(KEY);
+            String s = Optional.ofNullable(instance.getMetadata().get(KEY)).orElse("");
             List<String> l = Arrays.stream(s.split(DIVISION))
                     .filter(StringUtils::hasText).toList();
             CopyOnWriteArrayList<String> urls = new CopyOnWriteArrayList<>();
