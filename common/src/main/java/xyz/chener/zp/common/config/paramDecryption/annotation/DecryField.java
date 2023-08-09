@@ -15,6 +15,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface DecryField {
 
+    // 是否需要解码  注意这里的意思不是该字段是否必填
     boolean required() default true;
 
     Class<?> decryClass() default DefaultParamBase64Decry.class;

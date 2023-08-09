@@ -68,6 +68,7 @@ public class SecurityConfig {
                     cfg.authenticationEntryPoint(authenticationEntryPoint);
                 })
                 .addFilterBefore(new SecurityRepository(userModuleService, jwt, commonConfig), SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAfter(new Auth2FaRepository(userModuleService), SecurityWebFiltersOrder.AUTHENTICATION)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable);
 
         return http.build();

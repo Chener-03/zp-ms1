@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.CommonConfig;

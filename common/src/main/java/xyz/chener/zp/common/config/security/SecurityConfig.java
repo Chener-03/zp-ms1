@@ -20,7 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import xyz.chener.zp.common.autoconfig.CommonAutoConfig;
 import xyz.chener.zp.common.config.CommonConfig;
-import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
+import xyz.chener.zp.common.config.writeList.WriteListRegister;
+
 
 import java.util.ArrayList;
 
@@ -63,7 +64,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         ArrayList<String> urls = new ArrayList<>();
         urls.addAll(commonConfig.getSecurity().getWriteList());
-        urls.addAll(WriteListAutoConfig.writeList);
+        urls.addAll(WriteListRegister.writeList);
         String[] writeList = urls.toArray(new String[0]);
 
         http.formLogin(AbstractHttpConfigurer::disable)
