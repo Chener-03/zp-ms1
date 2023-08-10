@@ -56,7 +56,9 @@ public class R<T> implements Serializable {
         ,HTTP_SERVER_MISS(503)
         ,HTTP_LIMIT(429)
         ,HTTP_NOT_ACCEPTABLE(406)
-        ,HTTP_RETRY(449);
+        ,HTTP_RETRY(449)
+        ,HTTP_2FA_NOT_AUTH(451)
+        ,HTTP_2FA__AUTH_FAIL(452);
         private final int code;
         private HttpCode (int code)
         {
@@ -84,7 +86,9 @@ public class R<T> implements Serializable {
         ,HTTP_IP_BAN("IP被禁止")
         ,HTTP_NO_ACCESS("没有权限")
         ,HTTP_NOT_ACCEPTABLE("参数解析错误或者不被允许")
-        ,HTTP_RETRY("此次执行异常,请重试");
+        ,HTTP_RETRY("此次执行异常,请重试")
+        ,HTTP_2FA_NOT_AUTH("未进行2FA认证")
+        ,HTTP_2FA__AUTH_FAIL("2FA认证失败");
         private final String message;
         private ErrorMessage (String message)
         {

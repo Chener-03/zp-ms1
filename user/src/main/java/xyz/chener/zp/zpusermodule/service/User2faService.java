@@ -1,6 +1,8 @@
 package xyz.chener.zp.zpusermodule.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestParam;
+import xyz.chener.zp.common.config.paramDecryption.annotation.ModelAttributeDecry;
 import xyz.chener.zp.zpusermodule.entity.User2fa;
 import xyz.chener.zp.zpusermodule.entity.dto.Auth2FaMessageDto;
 
@@ -13,6 +15,10 @@ import xyz.chener.zp.zpusermodule.entity.dto.Auth2FaMessageDto;
 public interface User2faService extends IService<User2fa> {
 
     Auth2FaMessageDto enable2Fa(String username);
+
+    Auth2FaMessageDto confirmEnable2Fa(Auth2FaMessageDto code,String username);
+
+    Boolean verify2Fa(String code,String username);
 
 }
 
