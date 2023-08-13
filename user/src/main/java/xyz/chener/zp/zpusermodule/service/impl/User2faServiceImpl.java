@@ -104,6 +104,18 @@ public class User2faServiceImpl extends ServiceImpl<User2faDao, User2fa> impleme
         return Auth2FAUtils.TwoFactorAuthenticator.verifyCode(code, user2fa.getTotpSecretKey());
     }
 
+    @Override
+    public Boolean disable2Fa(String code, String username) {
+        UserBase user = userBaseService.lambdaQuery()
+                .select(UserBase::getUsername,UserBase::getId)
+                .eq(UserBase::getUsername, username).one();
+        if (user == null){
+            return false;
+        }
+        int delete = this.getBaseMapper().delete(lambdaUpdate().eq(User2fa::getUserId, user.getId()));
+        return delete > 0;
+    }
+
 
     private String randomDisposableCode(){
         String uuid = UUID.randomUUID().toString().replace("-", "");
