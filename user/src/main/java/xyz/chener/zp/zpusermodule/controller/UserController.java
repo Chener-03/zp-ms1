@@ -179,6 +179,7 @@ public class UserController {
     @PostMapping("/setUserDisable")
     @PreAuthorize("hasAnyRole('user_user_query')")
     @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
+    @Auth2FA
     public Boolean setUserDisable(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             ,@RequestParam Integer disable)
     {
