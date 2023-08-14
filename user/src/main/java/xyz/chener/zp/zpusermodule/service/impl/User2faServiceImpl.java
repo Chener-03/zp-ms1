@@ -112,7 +112,8 @@ public class User2faServiceImpl extends ServiceImpl<User2faDao, User2fa> impleme
         if (user == null){
             return false;
         }
-        int delete = this.getBaseMapper().delete(lambdaUpdate().eq(User2fa::getUserId, user.getId()));
+
+        int delete = this.getBaseMapper().delete(lambdaUpdate().eq(User2fa::getUserId, user.getId()).getWrapper());
         return delete > 0;
     }
 

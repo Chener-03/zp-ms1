@@ -20,6 +20,7 @@ import xyz.chener.zp.zpgateway.service.UserModuleService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,8 +39,8 @@ public class Auth2FaRepository implements WebFilter {
 
 
     private Boolean check2Fa(String faCode,String userBase64){
-
-        return false;
+        String user = new String(Base64.getDecoder().decode(userBase64));
+        return userModuleService.verify2Fa(faCode,user);
     }
 
 
@@ -75,6 +76,8 @@ public class Auth2FaRepository implements WebFilter {
         return response.writeWith(Mono.just(buffer));
     }
 
+
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         List<String> user = exchange.getRequest().getHeaders().get(CommonVar.REQUEST_USER);
@@ -97,7 +100,8 @@ public class Auth2FaRepository implements WebFilter {
             faCode = fas.get(0);
         }
 
-        return Mono.fromFuture(CompletableFuture.supplyAsync(()-> check2Fa(faCode, user.get(0)))).flatMap(fasuccess->{
+        return Mono.fromFuture(CompletableFuture.supplyAsync(()-> check2Fa(faCode, user.get(0))))
+        .defaultIfEmpty(false).flatMap(fasuccess->{
             if (fasuccess) {
                 return chain.filter(exchange);
             }
@@ -105,6 +109,8 @@ public class Auth2FaRepository implements WebFilter {
                 return getNotAuth2FaResponse(exchange);
             }
             return getAuth2FaFailResponse(exchange);
+        }).onErrorResume(err->{
+            throw new RuntimeException(err);
         });
     }
 }

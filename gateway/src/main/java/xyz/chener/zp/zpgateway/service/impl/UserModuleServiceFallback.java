@@ -31,4 +31,9 @@ public class UserModuleServiceFallback implements UserModuleService {
         res.setList(Collections.EMPTY_LIST);
         return res;
     }
+
+    @Override
+    public Boolean verify2Fa(String code, String username) {
+        return false;
+    }
 }
