@@ -80,13 +80,27 @@ public class Auth2FaRepository implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+        /**
+         * 1. 无用户信息，pass
+         * 2. 查看是不是faurl
+         * 3. 是faurl，查看是否必须
+         * 4. 查看是否有标头
+         * 5. 有标头，验证
+         * 6. 没有标头，查看用户是否有fa
+         *      并且fa是不是必须
+         *      有fa则返回451，没有则pass
+         *      ... 太麻烦了交给usermodel做吧 睡了...
+         */
+
+
         List<String> user = exchange.getRequest().getHeaders().get(CommonVar.REQUEST_USER);
         if (user == null || user.isEmpty()){
             return chain.filter(exchange);
         }
 
         ArrayList<String> lsFaUrls = new ArrayList<>();
-        Auth2FaListener.faUrls.values().forEach(lsFaUrls::addAll);
+//        Auth2FaListener.faUrls.values().forEach(lsFaUrls::addAll);
 
         if (lsFaUrls.stream().noneMatch(url -> exchange.getRequest().getURI().toString().contains(url))) {
             return chain.filter(exchange);
