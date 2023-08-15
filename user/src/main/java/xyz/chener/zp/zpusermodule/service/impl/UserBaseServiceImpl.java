@@ -3,10 +3,14 @@ package xyz.chener.zp.zpusermodule.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.TooManyResultsException;
+import org.apache.skywalking.apm.toolkit.trace.Trace;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,9 +19,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.config.feign.loadbalance.LoadbalancerContextHolder;
 import xyz.chener.zp.common.config.feign.loadbalance.ServerInstance;
-import xyz.chener.zp.common.entity.DictionaryKeyEnum;
-import xyz.chener.zp.common.entity.LoginUserDetails;
-import xyz.chener.zp.common.entity.SecurityVar;
+import xyz.chener.zp.common.entity.*;
 import xyz.chener.zp.common.utils.*;
 import xyz.chener.zp.zpusermodule.dao.UserBaseDao;
 import xyz.chener.zp.zpusermodule.entity.*;
@@ -25,14 +27,12 @@ import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
+import xyz.chener.zp.zpusermodule.error.fa.Auth2FaNeedVerify;
 import xyz.chener.zp.zpusermodule.error.user.UserDisableException;
 import xyz.chener.zp.zpusermodule.error.user.UserExpireException;
 import xyz.chener.zp.zpusermodule.error.user.UserNotFoundException;
 import xyz.chener.zp.zpusermodule.error.user.UsernamePasswordErrorException;
-import xyz.chener.zp.zpusermodule.service.DictionariesService;
-import xyz.chener.zp.zpusermodule.service.GoogleRecapthaService;
-import xyz.chener.zp.zpusermodule.service.UserBaseService;
-import xyz.chener.zp.zpusermodule.service.UserModuleService;
+import xyz.chener.zp.zpusermodule.service.*;
 
 import java.util.*;
 
@@ -57,6 +57,15 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
     private final GoogleRecapthaService googleRecapthaService;
     private final NacosUtils nacosUtils;
     private final UserModuleService userModuleService;
+
+    private User2faService user2faService;
+
+
+    @Autowired
+    @Lazy
+    public void setUser2faService(User2faService user2faService) {
+        this.user2faService = user2faService;
+    }
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -97,6 +106,14 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             AssertUrils.state(bCryptPasswordEncoder.matches(password,userBase.getPassword()),UsernamePasswordErrorException.class);
             AssertUrils.state(userBase.getDisable() == 0 , UserDisableException.class);
             AssertUrils.state(userBase.getExpireTime().getTime() > new Date().getTime(), UserExpireException.class);
+
+            //todo: check 2fa
+            HttpServletRequest concurrentRequest = RequestUtils.getConcurrentRequest();
+            String faheader = concurrentRequest.getHeader(CommonVar.FA_HEADER_KEY);
+
+            Integer fares = user2faService.verify2Fa(Optional.ofNullable(faheader).orElse(""), userBase.getUsername(), false, faheader != null);
+            AssertUrils.state(fares == Auth2FaRegisterMetadata.AuthResultCode.SUCCESS, Auth2FaNeedVerify.class);
+
             LoginUserDetails details = new LoginUserDetails();
             details.setSystem(LoginUserDetails.SystemEnum.WEB);
             details.setUsername(userBase.getUsername());
@@ -129,6 +146,8 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             }
         }catch (Exception exception)
         {
+            if (exception instanceof Auth2FaNeedVerify)
+                throw exception;
             log.warn(exception.getMessage());
             res.setSuccess(false);
             res.setMessage(exception.getMessage());

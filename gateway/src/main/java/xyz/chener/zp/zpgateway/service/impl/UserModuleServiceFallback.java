@@ -2,6 +2,7 @@ package xyz.chener.zp.zpgateway.service.impl;
 
 import org.springframework.stereotype.Component;
 import xyz.chener.zp.zpgateway.common.entity.vo.PageInfo;
+import xyz.chener.zp.zpgateway.entity.Auth2FaRegisterMetadata;
 import xyz.chener.zp.zpgateway.entity.vo.Role;
 import xyz.chener.zp.zpgateway.entity.vo.UserBase;
 import xyz.chener.zp.zpgateway.service.UserModuleService;
@@ -33,7 +34,9 @@ public class UserModuleServiceFallback implements UserModuleService {
     }
 
     @Override
-    public Boolean verify2Fa(String code, String username) {
-        return false;
+    public Integer verify2Fa(String code, String username, boolean required, boolean containsHeader) {
+        return Auth2FaRegisterMetadata.AuthResultCode.FAIL;
     }
+
+
 }

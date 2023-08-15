@@ -13,6 +13,8 @@ public class CommonVar {
 
     public static final String FA_HEADER_KEY = "A_2FA_AUTH";
 
+    public static final String HUMAN_VERIFY_HEADER_KEY = "A_HUMAN_VERIFY";
+
 
     public static final String WEB_URL_PREFIX = "/api/web";
     public static final String CLIENT_URL_PREFIX = "/api/client";

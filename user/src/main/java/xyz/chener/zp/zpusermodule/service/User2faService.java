@@ -19,7 +19,7 @@ public interface User2faService extends IService<User2fa> {
 
     Auth2FaMessageDto confirmEnable2Fa(Auth2FaMessageDto code,String username);
 
-    Boolean verify2Fa(String code,String username);
+    Integer verify2Fa(String code,String username,boolean required,boolean containsHeader);
 
     Boolean disable2Fa(String code,String username);
 

@@ -48,9 +48,11 @@ public class User2FaController {
 
     @PostMapping("/2fa/verify")
     @PreAuthorize("hasAnyRole('microservice_call')")
-    public Boolean verify2Fa(@RequestParam(value = "code",defaultValue = "") String code
-            ,@RequestParam("username") String username){
-        return user2faService.verify2Fa(code,username);
+    public Integer verify2Fa(@RequestParam(value = "code",defaultValue = "") String code
+            ,@RequestParam("username") String username
+            ,@RequestParam("required") boolean required
+            ,@RequestParam("containsHeader") boolean containsHeader){
+        return user2faService.verify2Fa(code,username,required,containsHeader);
     }
 
     @GetMapping("/2fa/checkStatus")

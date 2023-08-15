@@ -23,6 +23,9 @@ public interface UserModuleService {
     PageInfo<Role> getUserRoleById(@RequestParam("id") Long id);
 
     @RequestMapping(value = "/api/web/2fa/verify",method = RequestMethod.POST)
-    Boolean verify2Fa(@RequestParam(value = "code",defaultValue = "") String code ,@RequestParam("username") String username);
+    Integer verify2Fa(@RequestParam(value = "code",defaultValue = "") String code
+            ,@RequestParam("username") String username
+            ,@RequestParam("required") boolean required
+            ,@RequestParam("containsHeader") boolean containsHeader);
 
 }

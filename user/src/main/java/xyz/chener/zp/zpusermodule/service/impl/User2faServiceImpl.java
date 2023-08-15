@@ -2,6 +2,8 @@ package xyz.chener.zp.zpusermodule.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+import xyz.chener.zp.common.entity.Auth2FaRegisterMetadata;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.Auth2FAUtils;
 import xyz.chener.zp.zpusermodule.dao.User2faDao;
@@ -79,17 +81,26 @@ public class User2faServiceImpl extends ServiceImpl<User2faDao, User2fa> impleme
     }
 
     @Override
-    public Boolean verify2Fa(String code, String username) {
+    public Integer verify2Fa(String code, String username, boolean required, boolean containsHeader) {
         UserBase user = userBaseService.lambdaQuery()
                 .select(UserBase::getUsername,UserBase::getId)
                 .eq(UserBase::getUsername, username).one();
+
        if (user == null){
-           return false;
+           return Auth2FaRegisterMetadata.AuthResultCode.FAIL;
        }
 
         User2fa user2fa = lambdaQuery().eq(User2fa::getUserId, user.getId()).one();
-        if (user2fa == null){
-            return true;
+        if (user2fa == null && !required){
+            return Auth2FaRegisterMetadata.AuthResultCode.SUCCESS;
+        }
+
+        if (user2fa == null) {
+            return Auth2FaRegisterMetadata.AuthResultCode.REQUIRE_AUTH;
+        }
+
+        if (!containsHeader || !StringUtils.hasText(code)){
+            return Auth2FaRegisterMetadata.AuthResultCode.NEED_AUTH;
         }
 
         List<String> bak2faCode = Arrays.stream(user2fa.getBakKey().split("[|]"))
@@ -99,9 +110,11 @@ public class User2faServiceImpl extends ServiceImpl<User2faDao, User2fa> impleme
             l.remove(code);
             user2fa.setBakKey(String.join("|",l));
             updateById(user2fa);
-            return true;
+            return Auth2FaRegisterMetadata.AuthResultCode.SUCCESS;
         }
-        return Auth2FAUtils.TwoFactorAuthenticator.verifyCode(code, user2fa.getTotpSecretKey());
+
+        return Auth2FAUtils.TwoFactorAuthenticator.verifyCode(code, user2fa.getTotpSecretKey())?
+                Auth2FaRegisterMetadata.AuthResultCode.SUCCESS:Auth2FaRegisterMetadata.AuthResultCode.FAIL;
     }
 
     @Override
