@@ -41,10 +41,13 @@ spring:
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
 
+
+
+
+
 server:
   port: 6050
   compression:
     enabled: true
-
 
 

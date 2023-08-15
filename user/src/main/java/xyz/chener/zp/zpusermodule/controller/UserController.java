@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.chener.zp.common.config.antiShaking.annotation.AntiShaking;
+import xyz.chener.zp.common.config.auth2fa.annotation.Auth2FA;
 import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
@@ -55,7 +58,7 @@ import java.util.*;
 @RestController
 @UnifiedReturn
 @Slf4j
-@RequestMapping("/api/web")
+@RequestMapping({"/api/web"})
 @Validated
 public class UserController {
 
@@ -177,6 +180,7 @@ public class UserController {
     @PostMapping("/setUserDisable")
     @PreAuthorize("hasAnyRole('user_user_query')")
     @OpLog(operateName = OpEnum.UPDATEUSERINFO,recordClass = OpRecordMybatisWrapper.class )
+    @Auth2FA(require = true)
     public Boolean setUserDisable(@RequestParam @Length(min = 3,max = 20,message = "用户名长度3-20") String username
             ,@RequestParam Integer disable)
     {

@@ -1,4 +1,5 @@
-package xyz.chener.zp.zpgateway.config;
+package xyz.chener.zp.zpgateway.config.nacoslistener;
+
 
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.exception.NacosException;
@@ -11,28 +12,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.cloud.endpoint.event.RefreshEventListener;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 
 @Slf4j
 @Configuration
-public class WriteListListener implements CommandLineRunner, ApplicationContextAware {
+public class NacosPropertiesListener implements CommandLineRunner, ApplicationContextAware {
+
 
     private final GatewayProperties gatewayProperties;
 
@@ -53,13 +49,8 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
 
     private ApplicationContext applicationContext;
 
-    private final String WRITE_LIST_KEY = "WRITE_LISTS";
-    private final String WRITE_LIST_DIVISION = "####";
 
-    public static ConcurrentHashMap<String, CopyOnWriteArrayList<String>> writeListMap = new ConcurrentHashMap<>();
-
-
-    public WriteListListener(GatewayProperties gatewayProperties) {
+    public NacosPropertiesListener(GatewayProperties gatewayProperties) {
         this.gatewayProperties = gatewayProperties;
     }
 
@@ -84,36 +75,12 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                             if (event instanceof NamingEvent ev)
                             {
                                 List<Instance> instances = ev.getInstances();
-                                if (instances.isEmpty()) {
-                                    CopyOnWriteArrayList<String> m = writeListMap.get(modelName);
-                                    if (Objects.nonNull(m))
-                                        m.clear();
-                                    writeListMap.remove(modelName);
-                                }else
-                                {
-                                    int i = new Random().nextInt(instances.size());
-                                    Instance instance = instances.get(i);
-                                    String s = instance.getMetadata().get(WRITE_LIST_KEY);
-                                    List<String> l = Arrays.stream(s.split(WRITE_LIST_DIVISION))
-                                            .filter(StringUtils::hasText).toList();
-                                    CopyOnWriteArrayList<String> urls = new CopyOnWriteArrayList<>();
+                                applicationContext.getBean(WriteListListener.class).onChange(instances,modelName,route);
+                                applicationContext.getBean(Auth2FaListener.class).onChange(instances,modelName,route);
 
-                                    route.getPredicates().forEach(pd->{
-                                        Map<String, String> uarg = pd.getArgs();
-                                        if (Objects.nonNull(uarg))
-                                        {
-                                            uarg.values().forEach(eus->{
-                                                l.forEach(s1 -> {
-                                                    urls.add(eus.replace("/**",s1));
-                                                });
-                                            });
-                                        }
-                                    });
-                                    writeListMap.put(modelName,urls);
-                                    applicationContext.publishEvent(new RefreshEvent(this, null, "writeList Refresh Event"));
-                                    if (isFirstRefresh.get()) {
-                                        waitRefreshListenerRunning();
-                                    }
+                                applicationContext.publishEvent(new RefreshEvent(this, null, "Nacos Properties Refresh Event"));
+                                if (isFirstRefresh.get()) {
+                                    waitRefreshListenerRunning();
                                 }
                             }
                         }
@@ -136,12 +103,12 @@ public class WriteListListener implements CommandLineRunner, ApplicationContextA
                                             Thread.sleep(500);
                                         }
                                         if (isFirstRefresh.compareAndSet(true,false)) {
-                                            applicationContext.publishEvent(new RefreshEvent(this, null, "writeList Refresh Event"));
+                                            applicationContext.publishEvent(new RefreshEvent(this, null, "Nacos Properties Refresh Event"));
                                         }
                                     }
                                 }catch (Exception ignored) {
                                     isFirstRefresh.set(false);
-                                    log.error("waitRefreshListenerRunning error:{}",ignored.getMessage());
+                                    log.error("Nacos Properties Refresh Listener Running error:{}",ignored.getMessage());
                                 }
                             });
                         }

@@ -1,5 +1,8 @@
 package xyz.chener.zp.zpusermodule.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
 
@@ -10,8 +13,11 @@ import java.io.Serializable;
  * @since 2023-07-25 20:21:47
  */
 
+@TableName("user_2fa")
 public class User2fa extends Model<User2fa> {
-    
+
+
+    @TableId(type = IdType.AUTO)
     private Long id;
     
     private Long userId;

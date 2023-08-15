@@ -51,6 +51,9 @@ public class GatewayIpConfig {
         };
     }
 
+    /**
+     *
+     */
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE-99)
     public GlobalFilter ipFilter()

@@ -1,5 +1,6 @@
 package xyz.chener.zp.common.config.dynamicVerification.annotation;
 
+import xyz.chener.zp.common.config.dynamicVerification.rules.DynamicVerRuleInterface;
 import xyz.chener.zp.common.config.dynamicVerification.rules.impl.DefaultDynamicVer;
 
 import java.lang.annotation.*;
@@ -17,6 +18,6 @@ public @interface Ds {
 
     String value();
 
-    Class<?> verImplClass() default DefaultDynamicVer.class;
+    Class<? extends DynamicVerRuleInterface> verImplClass() default DefaultDynamicVer.class;
 
 }

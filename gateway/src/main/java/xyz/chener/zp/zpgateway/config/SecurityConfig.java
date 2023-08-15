@@ -17,6 +17,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 import xyz.chener.zp.zpgateway.common.config.CommonConfig;
 import xyz.chener.zp.zpgateway.common.utils.Jwt;
+import xyz.chener.zp.zpgateway.config.nacoslistener.WriteListListener;
 import xyz.chener.zp.zpgateway.service.UserModuleService;
 
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ public class SecurityConfig {
                     cfg.authenticationEntryPoint(authenticationEntryPoint);
                 })
                 .addFilterBefore(new SecurityRepository(userModuleService, jwt, commonConfig), SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAfter(new Auth2FaRepository(userModuleService), SecurityWebFiltersOrder.AUTHENTICATION)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable);
 
         return http.build();

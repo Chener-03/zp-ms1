@@ -1,73 +1,76 @@
-package xyz.chener.zp.common.config.writeList;
+package xyz.chener.zp.common.config.auth2fa;
 
-import com.alibaba.cloud.nacos.NacosDiscoveryProperties;
-import com.alibaba.cloud.nacos.NacosServiceManager;
-import com.alibaba.cloud.nacos.discovery.NacosWatch;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import xyz.chener.zp.common.config.auth2fa.Auth2FaRegister;
 import xyz.chener.zp.common.config.auth2fa.annotation.Auth2FA;
 import xyz.chener.zp.common.config.nacosMetadataReg.MetatadaRegInterface;
 import xyz.chener.zp.common.config.nacosMetadataReg.NacosMetadataRegister;
 import xyz.chener.zp.common.config.requesturliterator.RequestUrlBeanDefinitionIterator;
 import xyz.chener.zp.common.config.requesturliterator.UrlClassNotice;
-import xyz.chener.zp.common.entity.WriteList;
+import xyz.chener.zp.common.entity.Auth2FaRegisterMetadata;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
 
-public class WriteListRegister implements UrlClassNotice , MetatadaRegInterface {
+@Slf4j
+public class Auth2FaRegister implements UrlClassNotice , MetatadaRegInterface {
 
-
-    private WriteListRegister(){}
+    private Auth2FaRegister(){}
 
     @Getter
-    private static WriteListRegister instance = new WriteListRegister();
+    private static Auth2FaRegister instance = new Auth2FaRegister();
+
+    private final String KEY = "2FA_URL_LIST";
 
 
-    private final String WRITE_LIST_KEY = "WRITE_LISTS";
-    private final String WRITE_LIST_DIVISION = "####";
-
-    public static final List<String> writeList = new ArrayList<>();
-
-
+    public static final List<Auth2FaRegisterMetadata> auth2FAUrlList = new ArrayList<>();
 
     @Override
-    public void notice(List<? extends Class<?>> urlClass, String contextPath) {
+    public void notice(List<? extends Class<?>> urlClass,String contextPath) {
         final String lsContextPath = Optional.ofNullable(contextPath).orElse("");
-        ArrayList<String> urls = new ArrayList<>();
+        ArrayList<Auth2FaRegisterMetadata> metadata = new ArrayList<>();
 
         urlClass.forEach(e->{
             List<String> classRequestMappingValues = getClassRequestMappingValues(e);
-            boolean containsAll = e.getAnnotation(WriteList.class) != null;
+            Auth2FA class2faAnn = e.getAnnotation(Auth2FA.class);
             Method[] methods = e.getMethods();
 
             Arrays.stream(methods)
                     .filter(this::hasMapping)
                     .forEach(method->{
-                        if (method.getAnnotation(WriteList.class) == null && !containsAll){
+                        Auth2FA method2faAnn = method.getAnnotation(Auth2FA.class);
+                        if (method2faAnn == null && class2faAnn == null){
                             return;
                         }
                         List<String> methodUrls = getMethodUrls(method);
                         methodUrls.forEach(url->{
                             if (classRequestMappingValues.isEmpty()){
-                                urls.add(lsContextPath + url);
+                                Auth2FaRegisterMetadata mtd = new Auth2FaRegisterMetadata();
+                                mtd.setRequire(method2faAnn == null?class2faAnn.require():method2faAnn.require());
+                                mtd.setUrl(lsContextPath + url);
+                                metadata.add(mtd);
                             }else {
                                 classRequestMappingValues.forEach(classUrl->{
-                                    urls.add(lsContextPath + classUrl + url);
+                                    Auth2FaRegisterMetadata mtd = new Auth2FaRegisterMetadata();
+                                    mtd.setRequire(method2faAnn == null?class2faAnn.require():method2faAnn.require());
+                                    mtd.setUrl(lsContextPath + classUrl + url);
+                                    metadata.add(mtd);
                                 });
                             }
                         });
                     });
         });
 
-        writeList.addAll(urls);
+        auth2FAUrlList.addAll(metadata);
     }
-
 
     private List<String> getClassRequestMappingValues(Class<?> clazz){
         RequestMapping requestMappingAnn = clazz.getAnnotation(RequestMapping.class);
@@ -115,8 +118,13 @@ public class WriteListRegister implements UrlClassNotice , MetatadaRegInterface 
         return methodUrls.stream().filter(e-> e != null && !e.isEmpty()).toList();
     }
 
+
     @Override
     public void registerMetadata(Map<String, String> map) {
-        map.put(WRITE_LIST_KEY, String.join(WRITE_LIST_DIVISION, writeList));
+        try {
+            map.put(KEY,new ObjectMapper().writeValueAsString(auth2FAUrlList));
+        } catch (Exception e) {
+            log.error("2FA_URL_LIST 注册元数据失败：",e);
+        }
     }
 }

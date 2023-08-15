@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.chener.zp.common.config.CommonConfig;
-import xyz.chener.zp.common.config.writeList.WriteListAutoConfig;
+import xyz.chener.zp.common.config.writeList.WriteListRegister;
 import xyz.chener.zp.common.entity.CommonVar;
 import xyz.chener.zp.common.utils.ThreadUtils;
 import xyz.chener.zp.common.utils.UriMatcherUtils;
@@ -84,7 +84,7 @@ public class AuthFilter extends OncePerRequestFilter {
             if (matchUrl(uri, s)) return true;
         }
 
-        for (String s : WriteListAutoConfig.writeList)
+        for (String s : WriteListRegister.writeList)
         {
             if (matchUrl(uri, s)) return true;
         }
