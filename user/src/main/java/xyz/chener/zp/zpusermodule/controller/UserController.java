@@ -22,12 +22,14 @@ import xyz.chener.zp.common.config.opLog.annotation.OpLog;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryResult;
+import xyz.chener.zp.common.entity.CommonVar;
 import xyz.chener.zp.common.entity.DictionaryKeyEnum;
 import xyz.chener.zp.common.entity.R;
 import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
+import xyz.chener.zp.common.utils.RequestUtils;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResource;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
@@ -127,7 +129,7 @@ public class UserController {
     public LoginResult userDoLogin(@RequestParamDecry(value = "username") String username
             ,@RequestParamDecry(value = "phone") String phone
             ,@RequestParamDecry(value = "email") String email
-            , @RequestParamDecry(value = "password") String password, @RequestParam String verification)
+            , @RequestParamDecry(value = "password") String password)
     {
         if (!StringUtils.hasText(username) &&
                 !StringUtils.hasText(phone) &&
@@ -135,7 +137,7 @@ public class UserController {
         {
             throw new HttpParamErrorException();
         }
-        return userBaseService.processLogin(username, phone, email, password, verification);
+        return userBaseService.processLogin(username, phone, email, password, Optional.ofNullable(RequestUtils.getConcurrentHeader(CommonVar.HUMAN_VERIFY_HEADER_KEY)).orElse(""));
     }
 
 

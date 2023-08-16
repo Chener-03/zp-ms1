@@ -114,6 +114,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             Integer fares = user2faService.verify2Fa(Optional.ofNullable(faheader).orElse(""), userBase.getUsername(), false, faheader != null);
             AssertUrils.state(fares == Auth2FaRegisterMetadata.AuthResultCode.SUCCESS, Auth2FaNeedVerify.class);
 
+
             LoginUserDetails details = new LoginUserDetails();
             details.setSystem(LoginUserDetails.SystemEnum.WEB);
             details.setUsername(userBase.getUsername());
