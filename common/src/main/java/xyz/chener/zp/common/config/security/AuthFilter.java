@@ -52,7 +52,7 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         String userBase64 = request.getHeader(CommonVar.REQUEST_USER);
-        String user = new String(Base64.getDecoder().decode(userBase64), StandardCharsets.UTF_8);
+        String user = userBase64 == null ? null : new String(Base64.getDecoder().decode(userBase64), StandardCharsets.UTF_8);
 
         String auth = request.getHeader(CommonVar.REQUEST_USER_AUTH);
         if (StringUtils.hasText(user) && StringUtils.hasText(auth))

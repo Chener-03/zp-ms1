@@ -2,13 +2,17 @@ package xyz.chener.zp.zpusermodule.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.WebAsyncTask;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.Ds;
 import xyz.chener.zp.common.config.dynamicVerification.annotation.DsTargetField;
+import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
 import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
@@ -18,6 +22,9 @@ import xyz.chener.zp.zpusermodule.entity.dto.UserOtherInfo;
 import xyz.chener.zp.zpusermodule.error.userinfo.OnlyUpdateSelfError;
 import xyz.chener.zp.zpusermodule.service.UserBaseService;
 import xyz.chener.zp.zpusermodule.service.UserExtendService;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * @Author: chenzp
@@ -75,6 +82,5 @@ public class UserInfoController {
     {
          return userExtendService.getSelfOtherInfo(SecurityContextHolder.getContext().getAuthentication().getName());
     }
-
 
 }

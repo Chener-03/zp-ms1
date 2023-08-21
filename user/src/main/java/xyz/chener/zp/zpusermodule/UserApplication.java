@@ -12,6 +12,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 @SpringBootApplication(exclude = SentinelEndpointAutoConfiguration.class)
 @EnableFeignClients
@@ -23,7 +28,7 @@ import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfig
 public class UserApplication  {
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
         System.setProperty("csp.sentinel.log.output.type","console");
         SpringApplication.run(UserApplication.class, args);
     }
