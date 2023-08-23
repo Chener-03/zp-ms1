@@ -1,5 +1,6 @@
 package xyz.chener.zp.common.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
@@ -41,9 +42,12 @@ public class CommonConfig {
         return security;
     }
 
+
+
     public static class Jwt{
         private String salt = "qwer";
-        private Integer expires = 1000*60*60;
+        private Long expires = 1000*60*60L;
+        private Long clientExpires = 1000 * 60 * 60 * 24 *30L;
 
         public String getSalt() {
             return salt;
@@ -53,12 +57,20 @@ public class CommonConfig {
             this.salt = salt;
         }
 
-        public Integer getExpires() {
+        public Long getExpires() {
             return expires;
         }
 
-        public void setExpires(Integer expires) {
+        public void setExpires(Long expires) {
             this.expires = expires;
+        }
+
+        public Long getClientExpires() {
+            return clientExpires;
+        }
+
+        public void setClientExpires(Long clientExpires) {
+            this.clientExpires = clientExpires;
         }
     }
 

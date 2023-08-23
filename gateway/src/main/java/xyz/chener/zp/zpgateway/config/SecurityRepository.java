@@ -36,7 +36,6 @@ import xyz.chener.zp.zpgateway.service.UserModuleService;
 import xyz.chener.zp.zpgateway.utils.HeaderUtils;
 import xyz.chener.zp.zpgateway.utils.UriMatcherUtils;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
@@ -172,7 +171,7 @@ public class SecurityRepository implements WebFilter {
             case LoginUserDetails.SystemEnum.WEB -> {
                 return urlPath.contains(CommonVar.WEB_URL_PREFIX);
             }
-            case LoginUserDetails.SystemEnum.MOBILE -> {
+            case LoginUserDetails.SystemEnum.CLIENT -> {
                 return urlPath.contains(CommonVar.CLIENT_URL_PREFIX);
             }
         }

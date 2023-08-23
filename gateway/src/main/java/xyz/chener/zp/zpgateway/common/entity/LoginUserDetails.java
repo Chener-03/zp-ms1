@@ -32,7 +32,7 @@ public class LoginUserDetails {
 
     public static class SystemEnum{
         public static final String WEB = "WEB";
-        public static final String MOBILE = "MOBILE";
+        public static final String CLIENT = "CLIENT";
     }
 
     public String getSystem() {

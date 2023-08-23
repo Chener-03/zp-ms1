@@ -11,4 +11,6 @@ public class DictionariesKeyEnum {
     public static final Integer NOTICES_TYPE = 4;
     public static final Integer NOTICES_DITCH = 5;
 
+    public static final Integer ANDROID_APP_VERSION = 7;
+
 }

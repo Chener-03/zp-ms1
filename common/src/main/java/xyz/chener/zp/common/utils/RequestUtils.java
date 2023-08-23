@@ -45,13 +45,19 @@ public class RequestUtils {
     public static String getConcurrentOs()
     {
         String userAgent = getConcurrentHeader(HttpHeaders.USER_AGENT);
-        String os = "unknown";
-        String browser = "unknown";
+        String os = null;
+        String browser = null;
         if (StringUtils.hasText(userAgent))
         {
             // system
             {
-                if (userAgent.toLowerCase().contains("windows"))
+                if (userAgent.contains("AndroidApp") || userAgent.contains("IosApp")){
+                    int startIndex = userAgent.indexOf('(');
+                    int endIndex = userAgent.indexOf(')');
+                    if (startIndex != -1 && endIndex != -1){
+                        os = userAgent.substring(startIndex + 1, endIndex);
+                    }
+                } else if (userAgent.toLowerCase().contains("windows"))
                 {
                     os = "Windows";
                 }else if (userAgent.toLowerCase().contains("mac"))
@@ -72,9 +78,11 @@ public class RequestUtils {
             // brower
             {
                 String user = userAgent.toLowerCase();
-                if (user.contains("edge"))
+                if (userAgent.contains("AndroidApp") || userAgent.contains("IosApp")){
+                    browser="";
+                }else if (user.contains("edg"))
                 {
-                    browser=(userAgent.substring(userAgent.indexOf("Edge")).split(" ")[0]).replace("/", "-");
+                    browser=(userAgent.substring(userAgent.indexOf("Edg")).split(" ")[0]).replace("/", "-");
                 } else if (user.contains("msie"))
                 {
                     String substring=userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
@@ -101,7 +109,6 @@ public class RequestUtils {
                         (user.contains("mozilla/4.08")) || (user.contains("mozilla/3")) )
                 {
                     browser = "Netscape-?";
-
                 } else if (user.contains("firefox"))
                 {
                     browser=(userAgent.substring(userAgent.indexOf("Firefox")).split(" ")[0]).replace("/", "-");
@@ -112,7 +119,8 @@ public class RequestUtils {
                 }
             }
         }
-        return String.format("%s-%s",os,browser);
+        String res = os == null && browser == null ? "Unknown" : String.format("%s-%s",os,browser);
+        return res.charAt(res.length()-1) == '-' ? res.substring(0,res.length()-1):res;
     }
 
 }

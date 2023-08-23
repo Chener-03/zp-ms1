@@ -1,5 +1,6 @@
 package xyz.chener.zp.zpusermodule.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.apache.skywalking.apm.toolkit.trace.Trace;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,7 +91,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
     }
 
     @Override
-    public LoginResult processUsernameLogin(String username, String password) {
+    public LoginResult processUsernameLogin(String username, String password,String systemEnum) {
         LoginResult res = new LoginResult();
         res.setSuccess(false);
         UserLoginEventRecord uler = new UserLoginEventRecord();
@@ -116,14 +118,14 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
 
 
             LoginUserDetails details = new LoginUserDetails();
-            details.setSystem(LoginUserDetails.SystemEnum.WEB);
+            details.setSystem(systemEnum);
             details.setUsername(userBase.getUsername());
             details.setDs(userBase.getDs());
             res.setLastLoginTime(userBase.getLastLoginTime());
             res.setLastLoginIp(userBase.getLastLoginIp());
             details.setIp(ip);
             details.setOs(os);
-            String encode = jwt.encode(details);
+            String encode = jwt.encode(details,systemEnum);
             userBase.setLastLoginIp(ip);
             userBase.setLastLoginOs(os);
             Date date = new Date();
@@ -135,6 +137,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
                 uler.setTime(date);
                 uler.setIsSuccess(1);
                 uler.setLoginType(UserLoginTypeEnum.USERNAMEPASSWORD);
+                uler.setLoginOsType(systemEnum);
                 userLoginEventRecordService.save(uler);
                 AssertUrils.state(this.updateById(userBase),new RuntimeException(LoginResult.ErrorResult.SERVER_ERROR));
                 dataSourceTransactionManager.commit(transaction);
@@ -182,7 +185,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
         }
 
         if (StringUtils.hasText(username))
-            return processUsernameLogin(username,password);
+            return processUsernameLogin(username,password, LoginUserDetails.SystemEnum.WEB);
 
         return null;
     }
@@ -292,6 +295,12 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             res.addAll(wsOnlineUsersName);
         });
         return res;
+    }
+
+    @Override
+    public LoginResult doLoginClient(String username, String password) {
+        // recapcha Android 国内无代理 跳过验证
+        return processUsernameLogin(username,password, LoginUserDetails.SystemEnum.CLIENT);
     }
 
 }

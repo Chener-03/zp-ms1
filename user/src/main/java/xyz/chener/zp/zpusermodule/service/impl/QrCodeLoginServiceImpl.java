@@ -161,6 +161,7 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
                 uler.setTime(date);
                 uler.setIsSuccess(1);
                 uler.setLoginType(UserLoginTypeEnum.QRCODE);
+                uler.setLoginOsType(LoginUserDetails.SystemEnum.WEB);
                 userLoginEventRecordService.save(uler);
                 AssertUrils.state(userBaseService.updateById(userBase),new RuntimeException(LoginResult.ErrorResult.SERVER_ERROR));
                 dataSourceTransactionManager.commit(transaction);

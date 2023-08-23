@@ -41,6 +41,16 @@ public class UserLoginEventRecord extends Model<UserLoginEventRecord> {
 
     private String loginType;
 
+    private String loginOsType;
+
+    public String getLoginOsType() {
+        return loginOsType;
+    }
+
+    public void setLoginOsType(String loginOsType) {
+        this.loginOsType = loginOsType;
+    }
+
     public String getLoginType() {
         return loginType;
     }
