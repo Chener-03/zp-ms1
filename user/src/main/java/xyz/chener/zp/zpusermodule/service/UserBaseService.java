@@ -5,10 +5,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.validation.constraints.NotNull;
 import xyz.chener.zp.common.config.paramDecryption.annotation.RequestParamDecry;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
-import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
-import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
-import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
-import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
+import xyz.chener.zp.zpusermodule.entity.dto.*;
 
 import java.util.List;
 
@@ -38,6 +35,8 @@ public interface UserBaseService extends IService<UserBase> {
 
 
     List<String> getAllWsOnlineUsersName();
+
+    List<OnlineUserInfo> getAllWsOnlineUsersData();
 
 
     LoginResult doLoginClient(String username,String password);

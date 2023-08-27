@@ -8,6 +8,7 @@ import jakarta.websocket.Session;
  * @Email: chen@chener.xyz
  */
 public class WsClient {
+
     private String sessionId;
     private Session session;
     private String username;

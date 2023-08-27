@@ -25,10 +25,7 @@ import xyz.chener.zp.common.entity.*;
 import xyz.chener.zp.common.utils.*;
 import xyz.chener.zp.zpusermodule.dao.UserBaseDao;
 import xyz.chener.zp.zpusermodule.entity.*;
-import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
-import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
-import xyz.chener.zp.zpusermodule.entity.dto.ResetPasswordDto;
-import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
+import xyz.chener.zp.zpusermodule.entity.dto.*;
 import xyz.chener.zp.zpusermodule.error.fa.Auth2FaNeedVerify;
 import xyz.chener.zp.zpusermodule.error.user.UserDisableException;
 import xyz.chener.zp.zpusermodule.error.user.UserExpireException;
@@ -286,13 +283,30 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
     @Override
     public List<String> getAllWsOnlineUsersName() {
         List<ServerInstance> serverInstance = nacosUtils.getServerInstance(applicationName, applicationNacosGroup);
-        if (serverInstance.size() == 0)
+        if (serverInstance.isEmpty())
             return Collections.emptyList();
         ArrayList<String > res = new ArrayList<>();
         serverInstance.forEach(e->{
             LoadbalancerContextHolder.setNextInstance(e);
             List<String> wsOnlineUsersName = userModuleService.getWsOnlineUsersName();
             res.addAll(wsOnlineUsersName);
+        });
+        return res;
+    }
+
+    @Override
+    public List<OnlineUserInfo> getAllWsOnlineUsersData() {
+        List<ServerInstance> serverInstance = nacosUtils.getServerInstance(applicationName, applicationNacosGroup);
+        if (serverInstance.isEmpty())
+            return Collections.emptyList();
+        ArrayList<OnlineUserInfo> res = new ArrayList<>();
+        serverInstance.forEach(e->{
+            LoadbalancerContextHolder.setNextInstance(e);
+            List<OnlineUserInfo> wsOnlineUsersDataForMs = userModuleService.getWsOnlineUsersDataForMs();
+            wsOnlineUsersDataForMs.forEach(dt->{
+                dt.setSessionId(e.host().replaceAll("[.]","") + e.port() +"-"+dt.getSessionId());
+                res.add(dt);
+            });
         });
         return res;
     }

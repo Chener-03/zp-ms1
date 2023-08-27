@@ -1,7 +1,6 @@
 package xyz.chener.zp.common.config.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+
+// OncePerRequestFilter 会导致spring的异步请求 第二次进入时无法授权 报401
 @Slf4j
-public class AuthFilter extends OncePerRequestFilter {
+public class AuthFilter implements Filter {
 
     private final CommonConfig commonConfig;
 
@@ -33,7 +34,7 @@ public class AuthFilter extends OncePerRequestFilter {
         this.commonConfig = commonConfig;
     }
 
-    @Override
+
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (writeListCheck(request)) {
             ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
@@ -100,4 +101,8 @@ public class AuthFilter extends OncePerRequestFilter {
         return UriMatcherUtils.match(s,uri);
     }
 
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        doFilterInternal((HttpServletRequest) request,(HttpServletResponse) response,chain);
+    }
 }

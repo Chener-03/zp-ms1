@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import xyz.chener.zp.zpusermodule.entity.Role;
 import xyz.chener.zp.zpusermodule.entity.UserBase;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
+import xyz.chener.zp.zpusermodule.entity.dto.OnlineUserInfo;
 import xyz.chener.zp.zpusermodule.service.UserModuleService;
 
 
@@ -26,6 +27,11 @@ public class UserModuleServiceFallback implements UserModuleService {
     @Override
     public List<String> getWsOnlineUsersName() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<OnlineUserInfo> getWsOnlineUsersDataForMs() {
+        return Collections.EMPTY_LIST;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package xyz.chener.zp.common.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -22,6 +23,17 @@ public class RequestUtils {
         if (ra instanceof ServletRequestAttributes sra)
         {
             return sra.getRequest();
+        }
+        return null;
+    }
+
+
+    public static HttpServletResponse getConcurrentResponse()
+    {
+        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+        if (ra instanceof ServletRequestAttributes sra)
+        {
+            return sra.getResponse();
         }
         return null;
     }

@@ -5,7 +5,11 @@ import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreake
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.ocsp.Req;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.async.WebAsyncTask;
 import xyz.chener.zp.common.config.antiShaking.annotation.AntiShaking;
 import xyz.chener.zp.common.config.auth2fa.annotation.Auth2FA;
 import xyz.chener.zp.common.config.opLog.annotation.OpLog;
@@ -29,6 +35,7 @@ import xyz.chener.zp.common.entity.WriteList;
 import xyz.chener.zp.common.error.HttpParamErrorException;
 import xyz.chener.zp.common.utils.AssertUrils;
 import xyz.chener.zp.common.utils.DemonstrationSystemUtils;
+import xyz.chener.zp.common.utils.MapBuilder;
 import xyz.chener.zp.common.utils.RequestUtils;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResource;
@@ -36,6 +43,7 @@ import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.*;
 import xyz.chener.zp.zpusermodule.entity.dto.LoginResult;
+import xyz.chener.zp.zpusermodule.entity.dto.OnlineUserInfo;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 import xyz.chener.zp.zpusermodule.error.SqlRunException;
@@ -49,7 +57,10 @@ import xyz.chener.zp.zpusermodule.ws.WsCache;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
 import xyz.chener.zp.zpusermodule.ws.WsMessagePublisher;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @Author: chenzp
@@ -276,16 +287,47 @@ public class UserController {
         return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
     }
 
+    @GetMapping("/getWsOnlineUsersDataForMs")
+    @PreAuthorize("hasAnyRole('microservice_call')")
+    public List<OnlineUserInfo> getWsOnlineUsersDataForMs(){
+        return WsCache.getAllAuthConnect().stream().map(e->{
+            OnlineUserInfo onlineUserInfo = new OnlineUserInfo();
+            onlineUserInfo.setUsername(e.getUsername());
+            onlineUserInfo.setSessionId(e.getSessionId());
+            onlineUserInfo.setIp(e.getIp());
+            onlineUserInfo.setSystem(e.getSystem());
+            return onlineUserInfo;
+        }).toList();
+    }
+
+    @GetMapping("/getWsOnlineUsersData")
+    public WebAsyncTask<List<OnlineUserInfo>> getWsOnlineUsersData(){
+        return new WebAsyncTask<>(userBaseService::getAllWsOnlineUsersData);
+    }
+
+
     @GetMapping("/getWsOnlineUsersForMsTest")
     @WriteList
+    @Deprecated
     public List<String> getWsOnlineUsersForMsTest(){
         return WsCache.getAllAuthConnect().stream().map(WsClient::getUsername).distinct().toList();
     }
 
     @GetMapping("/getWsOnlineUsersForMsTest1")
     @WriteList
-    public Map getWsOnlineUsersForMsTest1(){
-        return WsCache.authConnect.asMap();
+    @Deprecated
+    public List getWsOnlineUsersForMsTest1(){
+        ConcurrentMap<String, WsClient> map = WsCache.authConnect.asMap();
+        List res = new ArrayList();
+        map.values().stream().forEach(e->{
+            res.add(MapBuilder.getInstance(true)
+                    .add("username",e.getUsername())
+                    .add("sessionId",e.getSessionId())
+                    .add("ip",e.getIp())
+                    .add("system",e.getSystem())
+                    .add("token",e.getToken()).build());
+        });
+        return res;
     }
 
 }
