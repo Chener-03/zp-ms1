@@ -16,4 +16,6 @@ public class OnlineUserInfo implements Serializable {
 
     private String system;
 
+    private String realSessionId;
+
 }

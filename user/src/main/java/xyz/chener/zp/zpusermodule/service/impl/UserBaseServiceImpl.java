@@ -304,7 +304,9 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             LoadbalancerContextHolder.setNextInstance(e);
             List<OnlineUserInfo> wsOnlineUsersDataForMs = userModuleService.getWsOnlineUsersDataForMs();
             wsOnlineUsersDataForMs.forEach(dt->{
-                dt.setSessionId(e.host().replaceAll("[.]","") + e.port() +"-"+dt.getSessionId());
+                String real = e.host() + ":" + e.port() + "-" + dt.getSessionId();
+                dt.setSessionId(Md5Utiles.getStrMd5(real).substring(0,8));
+                dt.setRealSessionId(Base64.getEncoder().encodeToString(real.getBytes()));
                 res.add(dt);
             });
         });
