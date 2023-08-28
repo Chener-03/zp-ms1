@@ -9,6 +9,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 import org.bouncycastle.cert.ocsp.Req;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +48,7 @@ import xyz.chener.zp.zpusermodule.entity.dto.OnlineUserInfo;
 import xyz.chener.zp.zpusermodule.entity.dto.OwnInformation;
 import xyz.chener.zp.zpusermodule.entity.dto.UserAllInfoDto;
 import xyz.chener.zp.zpusermodule.error.SqlRunException;
+import xyz.chener.zp.zpusermodule.error.role.DefaultRoleDeleteError;
 import xyz.chener.zp.zpusermodule.error.user.DisableUserIsConcurrent;
 import xyz.chener.zp.zpusermodule.error.user.UserIsExitsException;
 import xyz.chener.zp.zpusermodule.service.UserLoginEventRecordService;
@@ -249,12 +251,15 @@ public class UserController {
             boolean res = false;
             if (Objects.nonNull(user))
             {
+                AssertUrils.state(user.getId() > 1000L, DefaultRoleDeleteError.class);
                 res = userBaseService.lambdaUpdate().eq(UserBase::getId,user.getId()).remove();
                 userExtendService.lambdaUpdate().eq(UserExtend::getUserId,user.getId()).remove();
             }
             return res;
         }catch (Exception exception)
         {
+            if (exception instanceof DefaultRoleDeleteError)
+                throw exception;
             log.error(exception.getMessage());
             throw new SqlRunException(R.ErrorMessage.SQL_RUN_ERROR.get());
         }

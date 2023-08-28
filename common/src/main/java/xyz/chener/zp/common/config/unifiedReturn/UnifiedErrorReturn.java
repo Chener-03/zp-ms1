@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -44,6 +45,7 @@ public class UnifiedErrorReturn {
         return R.Builder.<String>getInstance()
                 .setCode(exception.getHttpCode())
                 .setMessage(exception.getHttpErrorMessage())
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -60,6 +62,7 @@ public class UnifiedErrorReturn {
         return R.Builder.<String>getInstance()
                 .setCode(R.HttpCode.BAD_REQUEST.get())
                 .setMessage(String.format("%s [%s]",R.ErrorMessage.BAD_REQUEST.get(),sb.toString()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -88,6 +91,7 @@ public class UnifiedErrorReturn {
                 .setMessage(String.format("%s [%s]"
                         ,R.ErrorMessage.HTTP_PAGE_NOT_FOND.get()
                         ,exception.getRequestURL()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -101,6 +105,7 @@ public class UnifiedErrorReturn {
                 .setCode(R.HttpCode.BAD_REQUEST.get())
                 .setMessage(String.format("%s"
                         ,R.ErrorMessage.BAD_REQUEST.get()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -114,6 +119,7 @@ public class UnifiedErrorReturn {
                 .setCode(R.HttpCode.METHOD_ERROR.get())
                 .setMessage(String.format("%s [%s]"
                         ,R.ErrorMessage.METHOD_ERROR.get(),exception.getMethod()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -131,6 +137,7 @@ public class UnifiedErrorReturn {
                 .setCode(R.HttpCode.HTTP_NOT_ACCEPTABLE.get())
                 .setMessage(String.format("%s [%s]"
                         ,R.ErrorMessage.HTTP_NOT_ACCEPTABLE.get(),sb.toString()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -143,7 +150,7 @@ public class UnifiedErrorReturn {
                     .getApplicationContext()
                     .getBean(AccessDeniedProcess.class);
             accessDeniedProcess.handle(request,response,exception);
-        } catch (Exception e) { }
+        } catch (Exception ignored) { }
         return new R<>();
     }
 
@@ -155,6 +162,7 @@ public class UnifiedErrorReturn {
                 .setCode(R.HttpCode.BAD_REQUEST.get())
                 .setMessage(String.format("%s [%s]"
                         ,R.ErrorMessage.BAD_REQUEST.get(),exception.getMessage()))
+                .setObj(TraceContext.traceId())
                 .build();
     }
 
@@ -206,6 +214,7 @@ public class UnifiedErrorReturn {
                     .setMessage(String.format("%s [%s]"
                             ,R.ErrorMessage.HTTP_ERR.get()
                             ,exception.getClass().getSimpleName()))
+                    .setObj(TraceContext.traceId())
                     .build();
         }
         return res.get();
