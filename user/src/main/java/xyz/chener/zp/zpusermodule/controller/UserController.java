@@ -301,6 +301,7 @@ public class UserController {
     }
 
     @GetMapping("/getWsOnlineUsersData")
+    @EncryResult
     public WebAsyncTask<List<OnlineUserInfo>> getWsOnlineUsersData(){
         return new WebAsyncTask<>(userBaseService::getAllWsOnlineUsersData);
     }

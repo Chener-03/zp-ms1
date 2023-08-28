@@ -2,6 +2,7 @@ package xyz.chener.zp.zpusermodule.entity.dto;
 
 
 import lombok.Data;
+import xyz.chener.zp.common.config.unifiedReturn.annotation.EncryField;
 
 import java.io.Serializable;
 
@@ -16,6 +17,7 @@ public class OnlineUserInfo implements Serializable {
 
     private String system;
 
+    @EncryField
     private String realSessionId;
 
 }

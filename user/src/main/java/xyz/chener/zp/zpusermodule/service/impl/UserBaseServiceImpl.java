@@ -306,7 +306,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
             wsOnlineUsersDataForMs.forEach(dt->{
                 String real = e.host() + ":" + e.port() + "-" + dt.getSessionId();
                 dt.setSessionId(Md5Utiles.getStrMd5(real).substring(0,8));
-                dt.setRealSessionId(Base64.getEncoder().encodeToString(real.getBytes()));
+                dt.setRealSessionId(real);
                 res.add(dt);
             });
         });
