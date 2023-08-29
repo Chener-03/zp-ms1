@@ -8,4 +8,5 @@ include 'system'
 include 'sentinel-adapter'
 include 'data-sharing'
 include 'workflow'
+include 'storage-v2'
 
