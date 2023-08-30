@@ -20,8 +20,31 @@ interface FileInterface {
     }
 
 
-    fun save() : Boolean
+    /**
+     * 保存文件
+     */
+    fun save(data:ByteArray,path:String) : Boolean
 
-    fun getUrl():String
+
+    /**
+     * 获取文件url
+     */
+    fun getUrl(file:String):String?
+
+    /**
+     * 上传文件url
+     */
+    fun saveUrl(file: String):String?
+
+
+    /**
+     * 删除文件
+     */
+    fun delete(file:String):Boolean
+
+    /**
+     * 文件是否存在
+     */
+    fun exist(file:String):Boolean
 
 }

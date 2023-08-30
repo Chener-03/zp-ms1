@@ -12,7 +12,7 @@ import xyz.chener.zp.zpgateway.entity.vo.Role;
 import xyz.chener.zp.zpgateway.entity.vo.UserBase;
 import xyz.chener.zp.zpgateway.service.impl.UserModuleServiceFallback;
 
-@FeignClient(name = "zp-user-module",fallback = UserModuleServiceFallback.class)
+@FeignClient(name = "zp-base-module",fallback = UserModuleServiceFallback.class)
 @CircuitBreakResourceFeign
 public interface UserModuleService {
 

@@ -1,6 +1,6 @@
 rootProject.name = 'zp-ms'
 include 'common'
-include 'user'
+include 'base'
 include 'storage'
 include 'gateway'
 include 'logger'

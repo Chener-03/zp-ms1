@@ -115,6 +115,7 @@ public class UserBaseServiceImpl extends ServiceImpl<UserBaseDao, UserBase> impl
 
 
             LoginUserDetails details = new LoginUserDetails();
+            details.setUserId(userBase.getId());
             details.setSystem(systemEnum);
             details.setUsername(userBase.getUsername());
             details.setDs(userBase.getDs());

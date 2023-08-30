@@ -12,7 +12,7 @@ import xyz.chener.zp.storagev2.config.StorageV2Config
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(StorageV2Config::class)
-class Storagev2Application  {
+open class Storagev2Application  {
 
 
     companion object {

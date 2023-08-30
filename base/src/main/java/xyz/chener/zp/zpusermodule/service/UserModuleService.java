@@ -13,7 +13,7 @@ import xyz.chener.zp.zpusermodule.service.impl.UserModuleServiceFallback;
 import java.util.List;
 
 
-@FeignClient(name = "zp-user-module",fallback = UserModuleServiceFallback.class)
+@FeignClient(name = "zp-base-module",fallback = UserModuleServiceFallback.class)
 public interface UserModuleService {
 
     @RequestMapping(value = "/api/web/getWsOnlineUsersForMs",method = RequestMethod.GET)

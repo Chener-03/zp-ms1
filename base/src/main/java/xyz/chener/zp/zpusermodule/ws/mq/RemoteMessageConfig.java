@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import xyz.chener.zp.common.config.InfoRegistration;
-import xyz.chener.zp.zpusermodule.UserApplication;
 
 
 @Configuration

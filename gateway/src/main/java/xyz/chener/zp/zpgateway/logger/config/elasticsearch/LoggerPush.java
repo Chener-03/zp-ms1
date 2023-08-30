@@ -109,8 +109,9 @@ public class LoggerPush  implements ApplicationListener<ApplicationStartedEvent>
 
     private void checkIndex() {
         String indexPattnerName = esIndexName + "-*";
+        String endpoint = "_index_template/" + esIndexName + "-logs-template";
         try {
-            Request req = new Request("GET", "_index_template/zplogs-template");
+            Request req = new Request("GET", endpoint);
             restClient.performRequest(req);
         } catch (ResponseException responseException) {
             if (responseException.getResponse().getStatusLine().getStatusCode() == 404) {
@@ -120,7 +121,7 @@ public class LoggerPush  implements ApplicationListener<ApplicationStartedEvent>
                     ObjectMapper om = new ObjectMapper();
                     Map map = om.readValue(bios.toString(StandardCharsets.UTF_8), Map.class);
                     map.put("index_patterns", indexPattnerName);
-                    Request request = new Request("PUT","_index_template/zplogs-template" );
+                    Request request = new Request("PUT",endpoint);
                     request.setJsonEntity(om.writeValueAsString(map));
                     restClient.performRequest(request);
                 }catch (Exception exception){
@@ -149,6 +150,7 @@ public class LoggerPush  implements ApplicationListener<ApplicationStartedEvent>
                     });
                 }
             });
+
         } catch (Exception ignored) { }
     }
 

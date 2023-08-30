@@ -5,12 +5,24 @@ import xyz.chener.zp.storagev2.core.FileInterface
 
 
 @Service("xyz.chener.zp.storagev2.core.impl.QINIUFile")
-class QINIUFile : FileInterface {
-    override fun save(): Boolean {
+open class QINIUFile : FileInterface {
+    override fun save(data: ByteArray, path: String): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun getUrl(): String {
+    override fun exist(file: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(file: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveUrl(file: String): String? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUrl(file: String): String? {
         TODO("Not yet implemented")
     }
 }

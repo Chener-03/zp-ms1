@@ -1,6 +1,6 @@
 spring:
   application:
-    name: zp-user-module
+    name: zp-base-module
   profiles:
     active: dev
   cloud:

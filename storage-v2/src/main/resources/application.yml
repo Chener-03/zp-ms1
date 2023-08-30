@@ -32,7 +32,6 @@ spring:
   config:
     import:
       - optional:nacos:zp-mysql-config.yml?group=zp
-      - optional:nacos:zp-redis-config.yml?group=zp
       - optional:nacos:zp-config?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
@@ -44,13 +43,19 @@ server:
   port: 6101
   compression:
     enabled: true
+
+
 zp:
   storage:
     v2:
       config:
         MINIO: |
-          host: 127.0.0.1
-          port: 9000
+          {
+            "endpoint": "http://101.42.12.133:29001",
+            "ak": "mKnPWIhs4POXV2WdBweC",
+            "sk": "6y7PVhZnX9XzjBiM3NZEcBDVOBBUvKVmdfrIvdYv",
+            "bucketName": "zp-admin-dev"
+          }
         QINIU: |
           host: 127.0.0.1
           port: 8000

@@ -15,14 +15,14 @@ import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfig
 @EnableDiscoveryClient
 @EnableTransactionManagement
 @LoadBalancerClients({
-        @LoadBalancerClient(name = "zp-user-module",configuration = NormalLoadBalanceAutoConfiguration.class)
+        @LoadBalancerClient(name = "zp-base-module",configuration = NormalLoadBalanceAutoConfiguration.class)
 })
-public class UserApplication  {
+public class BaseApplication {
 
 
     public static void main(String[] args)  {
         System.setProperty("csp.sentinel.log.output.type","console");
-        SpringApplication.run(UserApplication.class, args);
+        SpringApplication.run(BaseApplication.class, args);
     }
 
 }

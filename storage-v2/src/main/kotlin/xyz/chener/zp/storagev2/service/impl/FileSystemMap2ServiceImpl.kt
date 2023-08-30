@@ -8,4 +8,4 @@ import xyz.chener.zp.storagev2.service.FileSystemMap2Service
 
 
 @Service
-class FileSystemMap2ServiceImpl : ServiceImpl<FileSystemMap2Dao,   FileSystemMap2>(), FileSystemMap2Service
+open class FileSystemMap2ServiceImpl : ServiceImpl<FileSystemMap2Dao,   FileSystemMap2>(), FileSystemMap2Service

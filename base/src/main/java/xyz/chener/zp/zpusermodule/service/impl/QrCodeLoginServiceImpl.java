@@ -138,6 +138,7 @@ public class QrCodeLoginServiceImpl implements QrCodeLoginService {
             }
             LoginUserDetails details = new LoginUserDetails();
 
+            details.setUserId(userBase.getId());
             details.setSystem(LoginUserDetails.SystemEnum.WEB);
             details.setUsername(userBase.getUsername());
             details.setDs(userBase.getDs());

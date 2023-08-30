@@ -1,20 +1,23 @@
 package xyz.chener.zp.storagev2.core.impl
 
-import io.minio.GetPresignedObjectUrlArgs
-import io.minio.MinioClient
-import lombok.extern.slf4j.Slf4j
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.minio.*
+import io.minio.http.Method
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.context.ApplicationListener
-import org.springframework.core.metrics.ApplicationStartup
 import org.springframework.stereotype.Service
+import xyz.chener.zp.common.utils.AssertUrils
 import xyz.chener.zp.storagev2.core.FileInterface
-import java.lang.Exception
+import xyz.chener.zp.storagev2.error.MinioClientNotStartError
+import java.io.ByteArrayInputStream
+import java.util.concurrent.TimeUnit
 
 
 @Service("xyz.chener.zp.storagev2.core.impl.MINIOFile")
-class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEvent> {
+open class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEvent> {
 
     companion object {
         val log : Logger = org.slf4j.LoggerFactory.getLogger(MINIOFile::class.java)
@@ -22,35 +25,84 @@ class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEvent> {
 
     val TYPE = "MINIO"
 
-    lateinit var minioClient:MinioClient
+    var minioClient:MinioClient?=null
+
+    var minioConfig:MinioConfig?=null
 
     @Autowired
     lateinit var storageV2Config: xyz.chener.zp.storagev2.config.StorageV2Config
 
     override fun onApplicationEvent(event: ApplicationStartedEvent) {
-        //mKnPWIhs4POXV2WdBweC       6y7PVhZnX9XzjBiM3NZEcBDVOBBUvKVmdfrIvdYv
-        minioClient = MinioClient.builder().also {
-            it.endpoint("http://101.42.12.133:29001")
-            it.credentials("mKnPWIhs4POXV2WdBweC", "6y7PVhZnX9XzjBiM3NZEcBDVOBBUvKVmdfrIvdYv")
-        }.build()?.also {
-            log.info("minio client init success")
-        }!!
-
-        val presignedObjectUrl = minioClient.getPresignedObjectUrl(
-            GetPresignedObjectUrlArgs.builder()
-                .bucket("zp-admin-dev")
-                .`object`("sky.yml").build()
-        )
-
-        println(presignedObjectUrl)
-
+        storageV2Config.config?.get(TYPE)?.run {
+            minioConfig = ObjectMapper().readValue(this, object : TypeReference<MinioConfig>() {})
+            minioClient = MinioClient.builder().also {
+                it.endpoint(minioConfig?.endpoint)
+                it.credentials(minioConfig?.ak, minioConfig?.sk)
+            }.build()?.also {
+                log.info("minio client init success")
+            }
+        }
     }
 
-    override fun save(): Boolean {
-        TODO("Not yet implemented")
+
+    override fun save(data:ByteArray,path:String): Boolean {
+        AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
+
+        try {
+            PutObjectArgs.builder().bucket(minioConfig!!.bucketName).`object`(path).stream(ByteArrayInputStream(data),
+                data.size.toLong(),-1).build().run {
+                minioClient!!.putObject(this)
+            }
+        }catch (e:Exception){
+            log.error("minio save file error",e)
+            return false
+        }
+        return true
     }
 
-    override fun getUrl(): String {
-        TODO("Not yet implemented")
+    override fun getUrl(file:String): String? {
+        AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
+
+        val url = GetPresignedObjectUrlArgs.builder().expiry(storageV2Config.downloadUrlExp,TimeUnit.SECONDS)
+            .bucket(minioConfig?.bucketName).`object`(file).method(Method.GET).build()
+        return minioClient?.getPresignedObjectUrl(url)
+    }
+
+    override fun saveUrl(file: String): String? {
+        AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
+
+        val url = GetPresignedObjectUrlArgs.builder().expiry(storageV2Config.uploadUrlExp,TimeUnit.SECONDS)
+            .bucket(minioConfig?.bucketName).`object`(file).method(Method.PUT).build()
+        return minioClient?.getPresignedObjectUrl(url)
+    }
+
+    override fun delete(file: String): Boolean {
+        AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
+
+        RemoveObjectArgs.builder().bucket(minioConfig!!.bucketName).`object`(file).build().runCatching {
+            minioClient!!.removeObject(this)
+            return true
+        }.onFailure {
+            log.error("minio delete file error",it)
+        }
+        return false
+    }
+
+    override fun exist(file: String): Boolean {
+        AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
+
+        minioClient?.statObject(StatObjectArgs.builder().bucket(minioConfig!!.bucketName).`object`(file).build())?.run {
+            return@exist true
+        }
+        return false
     }
 }
+
+
+data class MinioConfig(val ak:String,val sk:String,val endpoint:String,val bucketName:String){
+    constructor():this("","","","")
+}
+
+
+
+
