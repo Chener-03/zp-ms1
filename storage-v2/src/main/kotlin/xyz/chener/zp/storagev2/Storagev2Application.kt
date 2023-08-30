@@ -14,7 +14,6 @@ import xyz.chener.zp.storagev2.config.StorageV2Config
 @EnableConfigurationProperties(StorageV2Config::class)
 open class Storagev2Application  {
 
-
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
@@ -22,4 +21,5 @@ open class Storagev2Application  {
             org.springframework.boot.runApplication<Storagev2Application>(*args)
         }
     }
+
 }

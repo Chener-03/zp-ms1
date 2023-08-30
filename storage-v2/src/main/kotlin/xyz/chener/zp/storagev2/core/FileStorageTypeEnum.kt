@@ -1,9 +1,9 @@
 package xyz.chener.zp.storagev2.core
 
-enum class FileStorageTypeEnum(val type:String) {
+enum class FileStorageTypeEnum(val type:String,val clazzStr:String) {
 
-    QINIU("QINIU"),
-    MINIO("MINIO"),
+    QINIU("QINIU",""),
+    MINIO("MINIO","xyz.chener.zp.storagev2.core.impl.MINIOFile"),
     ;
 
     companion object {

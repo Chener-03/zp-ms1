@@ -1,9 +1,11 @@
 package xyz.chener.zp.storagev2.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.cloud.context.config.annotation.RefreshScope
 
 
 @ConfigurationProperties(prefix = "zp.storage.v2")
+@RefreshScope
 class StorageV2Config {
 
     var config : Map<String,String>? = null;

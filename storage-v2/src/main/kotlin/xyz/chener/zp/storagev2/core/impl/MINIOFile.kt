@@ -7,6 +7,7 @@ import io.minio.http.Method
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.event.ApplicationStartedEvent
+import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import xyz.chener.zp.common.utils.AssertUrils
@@ -16,8 +17,7 @@ import java.io.ByteArrayInputStream
 import java.util.concurrent.TimeUnit
 
 
-@Service("xyz.chener.zp.storagev2.core.impl.MINIOFile")
-open class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEvent> {
+open class MINIOFile (val storageV2Config: xyz.chener.zp.storagev2.config.StorageV2Config) : FileInterface{
 
     companion object {
         val log : Logger = org.slf4j.LoggerFactory.getLogger(MINIOFile::class.java)
@@ -29,10 +29,8 @@ open class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEven
 
     var minioConfig:MinioConfig?=null
 
-    @Autowired
-    lateinit var storageV2Config: xyz.chener.zp.storagev2.config.StorageV2Config
 
-    override fun onApplicationEvent(event: ApplicationStartedEvent) {
+    init {
         storageV2Config.config?.get(TYPE)?.run {
             minioConfig = ObjectMapper().readValue(this, object : TypeReference<MinioConfig>() {})
             minioClient = MinioClient.builder().also {
@@ -43,6 +41,7 @@ open class MINIOFile : FileInterface ,ApplicationListener<ApplicationStartedEven
             }
         }
     }
+
 
 
     override fun save(data:ByteArray,path:String): Boolean {

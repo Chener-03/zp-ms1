@@ -7,7 +7,7 @@ interface FileInterface {
 
     companion object {
         fun get (type: FileStorageTypeEnum): FileInterface? {
-            return null;
+            return ApplicationContextHolder.getApplicationContext().getBean(type.clazzStr) as FileInterface?
         }
 
         fun get(type:String):FileInterface?{
