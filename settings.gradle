@@ -9,4 +9,5 @@ include 'sentinel-adapter'
 include 'data-sharing'
 include 'workflow'
 include 'storage-v2'
+include 'common-kt'
 
