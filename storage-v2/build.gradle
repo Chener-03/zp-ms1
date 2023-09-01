@@ -27,6 +27,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation project(':common')
+    implementation project(':common-kt')
     implementation project(':logger')
     implementation project(':sentinel-adapter')
 
@@ -61,13 +62,19 @@ dependencyManagement {
 }
 
 
-tasks.withType(KotlinCompile) {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += '-Xjsr305=strict'
         jvmTarget = '17'
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += "-parameters"
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }

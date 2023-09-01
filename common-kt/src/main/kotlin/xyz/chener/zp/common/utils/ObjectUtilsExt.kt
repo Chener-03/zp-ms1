@@ -1,43 +1,43 @@
 package xyz.chener.zp.common.utils
 
-import java.util.Objects
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.jvm.javaGetter
 
 
 open class ObjectUtilsKt : ObjectUtils() {
 
-    class TEST {
-        var aaa: String = ""
-    }
-
-
     companion object {
 
+        @JvmStatic
         fun <T> objectFieldsEqualsKt(o1: T, o2: T, vararg fields: KMutableProperty1<T, *>): Boolean {
             if (o1 == null || o2 == null) {
                 return o1 == o2
             }
-
-            if (!o1!!::class.equals(o2!!::class)) {
+            if (o1!!::class != o2!!::class) {
                 return false;
             }
-//o1!!::class.java.getMethod(fields[0]!!.javaGetter.name).invoke(o2)
-            println()
+
+            if (fields.isEmpty()) {
+                val filter = o1!!::class.members.stream().filter {
+                    it is KMutableProperty1<*, *>
+                }.toList()
+
+                filter.forEach{
+                    if (it.call(o1) != it.call(o2)){
+                        return@objectFieldsEqualsKt false
+                    }
+                }
+            }
+
+            fields.forEach {
+                val method = o1!!::class.java.getMethod(it.javaGetter?.name!!)
+                if (method.invoke(o1) != method.invoke(o2)){
+                    return@objectFieldsEqualsKt false
+                }
+            }
             return true
         }
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val test1 = TEST()
-            val test2 = TEST()
-            test1.aaa = "111"
-            test2.aaa = "222"
-            objectFieldsEqualsKt(test1, test2, TEST::aaa)
-
-        }
-
-
     }
-
 }
+
+
