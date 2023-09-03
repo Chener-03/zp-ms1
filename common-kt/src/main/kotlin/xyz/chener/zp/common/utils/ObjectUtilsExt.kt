@@ -1,5 +1,7 @@
 package xyz.chener.zp.common.utils
 
+
+
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.jvm.javaGetter
 
@@ -30,14 +32,16 @@ open class ObjectUtilsKt : ObjectUtils() {
             }
 
             fields.forEach {
-                val method = o1!!::class.java.getMethod(it.javaGetter?.name!!)
-                if (method.invoke(o1) != method.invoke(o2)){
+                if (it.call(o1) != it.call(o2)){
                     return@objectFieldsEqualsKt false
                 }
             }
             return true
         }
+
+
     }
 }
+
 
 

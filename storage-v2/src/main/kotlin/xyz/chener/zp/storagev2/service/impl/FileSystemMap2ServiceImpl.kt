@@ -50,11 +50,11 @@ open class FileSystemMap2ServiceImpl : ServiceImpl<FileSystemMap2Dao,   FileSyst
             it.storageType = uploadResult.storageType
             it.createTime = Date()
             it.resourceUuid = uploadResult.fileUID
-            val loginUserDetails = SecurityContextHolder.getContext().authentication.details as LoginUserDetails
-            it.uploadUserId = loginUserDetails.userId
+            val loginUserDetails = SecurityContextHolder.getContext().authentication?.details as? LoginUserDetails
+            it.uploadUserId = loginUserDetails?.userId
         }
 
-        val fm = this.lambdaQuery().eq(FileSystemMap2::fileName, fileSystemMap2.fileName)
+        val fm = this.ktQuery().eq(FileSystemMap2::fileName, fileSystemMap2.fileName)
             .eq(FileSystemMap2::uploadUserId, fileSystemMap2.uploadUserId).one()
         if (fm == null){
             this.save(fileSystemMap2)
@@ -63,7 +63,7 @@ open class FileSystemMap2ServiceImpl : ServiceImpl<FileSystemMap2Dao,   FileSyst
             this.updateById(fileSystemMap2)
         }
 
-        return UploadResult().also {
+        return uploadResult.also {
             it.success = true
         }
     }
@@ -71,16 +71,11 @@ open class FileSystemMap2ServiceImpl : ServiceImpl<FileSystemMap2Dao,   FileSyst
 
 
     override fun getFileUrl(uid: String): String? {
-        val sFunctionName = ObjectUtils.getSFunctionName(LoginUserDetails::getUserId)
-
-        val kMutableProperty1 = FileSystemMap2::resourceUuid
-
-
-        this.ktQuery().eq(FileSystemMap2::resourceUuid,"").one();
-
-        this.lambdaQuery().eq(FileSystemMap2::resourceUuid, uid).one()?.let {
-            val fileInterface = FileInterface.get(it.storageType!!)
-            return@getFileUrl fileInterface?.getUrl(uid)
+        this.ktQuery().eq(FileSystemMap2::resourceUuid, uid).one()?.let {
+            if (FileAuthEnum.contain(it.fileRwType?:0, FileAuthEnum.PUBLIC_READ)){
+                val fileInterface = FileInterface.get(it.storageType!!)
+                return@getFileUrl fileInterface?.getUrl(uid)
+            }
         }
         return null
     }

@@ -31,16 +31,6 @@ open class StorageV2Controller {
     @Autowired
     lateinit var fileSystemMap2Service: FileSystemMap2Service
 
-    @GetMapping("/test")
-    @WriteList
-    @EncryResult
-    fun test():FileSystemMap2{
-        val r = FileSystemMap2()
-        r.fileName = "test"
-        r.id = 123;
-        return r;
-    }
-
 
     @GetMapping("/getUploadUrl")
     fun getUploadUrl(@RequestParam("path") path:String,@RequestParam(value = "type", required = false)type:String?): UploadResult {
@@ -51,14 +41,6 @@ open class StorageV2Controller {
     fun confirmUpload(@ModelAttribute @Validated uploadResult: UploadResult): UploadResult {
         return fileSystemMap2Service.confirmUpload(uploadResult)
     }
-
-
-    @GetMapping("/getFileUrl")
-    fun getFileUrl(@RequestParam("uid") uid:String): String? {
-        return fileSystemMap2Service.getFileUrl(uid)
-    }
-
-
 
 }
 
@@ -72,13 +54,12 @@ open class StorageV2RedirectController {
 
     @GetMapping("/file")
     @WriteList
-    fun getFile(@RequestParam("uid") uid:String,response: HttpServletResponse) : jakarta.servlet.ServletResponse {
+    fun getFile(@RequestParam("uid") uid:String,response: HttpServletResponse) {
         val fileUrl = fileSystemMap2Service.getFileUrl(uid)
         if (StringUtils.hasText(fileUrl)){
             response.sendRedirect(fileUrl)
         }else{
-            response.sendError(404)
+            response.status = 404
         }
-        return response
     }
 }
