@@ -70,7 +70,9 @@ open class MINIOFile (val storageV2Config: xyz.chener.zp.storagev2.config.Storag
     override fun saveUrl(file: String): String? {
         AssertUrils.state(minioClient!=null,MinioClientNotStartError::class.java)
 
-        val url = GetPresignedObjectUrlArgs.builder().expiry(storageV2Config.uploadUrlExp,TimeUnit.SECONDS)
+        var url = GetPresignedObjectUrlArgs.builder().expiry(storageV2Config.uploadUrlExp,TimeUnit.SECONDS)
+            .bucket(minioConfig?.bucketName).`object`(file).method(Method.PUT).build()
+        url = GetPresignedObjectUrlArgs.builder().expiry(7,TimeUnit.DAYS)
             .bucket(minioConfig?.bucketName).`object`(file).method(Method.PUT).build()
         return minioClient?.getPresignedObjectUrl(url)
     }

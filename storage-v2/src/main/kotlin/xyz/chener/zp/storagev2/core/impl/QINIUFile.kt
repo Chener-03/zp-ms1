@@ -23,7 +23,7 @@ open class QINIUFile : FileInterface,CommandLineRunner {
     override fun run(vararg args: String?) {
         val a = ApplicationContextHolder.getApplicationContext()
             .getBean("xyz.chener.zp.storagev2.core.impl.MINIOFile") as MINIOFile
-        a.saveUrl("123")
+        val saveUrl = a.saveUrl("cnm.jpg")
         println()
     }
 
