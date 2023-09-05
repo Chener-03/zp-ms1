@@ -7,7 +7,7 @@ import xyz.chener.zp.storagev2.core.FileInterface
 
 
 @Service("xyz.chener.zp.storagev2.core.impl.QINIUFile")
-open class QINIUFile : FileInterface,CommandLineRunner {
+open class QINIUFile : FileInterface {
     override fun save(data: ByteArray, path: String): Boolean {
         TODO("Not yet implemented")
     }
@@ -18,13 +18,6 @@ open class QINIUFile : FileInterface,CommandLineRunner {
 
     override fun delete(file: String): Boolean {
         TODO("Not yet implemented")
-    }
-
-    override fun run(vararg args: String?) {
-        val a = ApplicationContextHolder.getApplicationContext()
-            .getBean("xyz.chener.zp.storagev2.core.impl.MINIOFile") as MINIOFile
-        val saveUrl = a.saveUrl("cnm.jpg")
-        println()
     }
 
     override fun saveUrl(file: String): String? {

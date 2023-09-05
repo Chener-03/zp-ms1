@@ -46,12 +46,16 @@ public class WsConnector {
 
 
     public String getIpBySession(Session session){
-        WsSession wsSession = (WsSession) session;
-        WsRemoteEndpointBasic remoteEndpointBasic = (WsRemoteEndpointBasic) getObjectField(wsSession, "remoteEndpointBasic",null);
-        WsRemoteEndpointImplServer base = (WsRemoteEndpointImplServer) getObjectField(remoteEndpointBasic, "base","org.apache.tomcat.websocket.WsRemoteEndpointBase");
-        Object socketChannelImpl = getObjectField(getObjectField(getObjectField(base, "socketWrapper", null), "socket", "org.apache.tomcat.util.net.SocketWrapperBase"), "sc", null);
-        InetSocketAddress address = (InetSocketAddress) getObjectField(socketChannelImpl, "remoteAddress", null);
-        return address.getAddress().getHostAddress();
+        try {
+            WsSession wsSession = (WsSession) session;
+            WsRemoteEndpointBasic remoteEndpointBasic = (WsRemoteEndpointBasic) getObjectField(wsSession, "remoteEndpointBasic",null);
+            WsRemoteEndpointImplServer base = (WsRemoteEndpointImplServer) getObjectField(remoteEndpointBasic, "base","org.apache.tomcat.websocket.WsRemoteEndpointBase");
+            Object socketChannelImpl = getObjectField(getObjectField(getObjectField(base, "socketWrapper", null), "socket", "org.apache.tomcat.util.net.SocketWrapperBase"), "sc", null);
+            InetSocketAddress address = (InetSocketAddress) getObjectField(socketChannelImpl, "remoteAddress", null);
+            return address.getAddress().getHostAddress();
+        }catch (Exception exception){
+            return null;
+        }
     }
     public Object getObjectField(Object obj,String fieldName,String className){
         try {
