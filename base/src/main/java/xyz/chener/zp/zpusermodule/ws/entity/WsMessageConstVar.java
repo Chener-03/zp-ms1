@@ -9,12 +9,18 @@ package xyz.chener.zp.zpusermodule.ws.entity;
 
 public class WsMessageConstVar {
 
+    // 未知
     public static final int UNKNOWN_CODE = 0;
+
+    // 心跳
     public static final int HEART_BEAT_CODE = 1;
+
+    // 推送消息通知
     public static final int MESSAGE_NOTIFY = 2;
 
 
 
+    // 二维码登录相关
     public static final int QRCODE_LOGIN_REQUEST = 3;
     public static final int QRCODE_LOGIN_RESPONSE = 4;
     public static final int QRCODE_LOGIN_FAIL = 5;
