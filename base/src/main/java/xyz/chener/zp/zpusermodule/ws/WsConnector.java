@@ -39,7 +39,7 @@ public class WsConnector {
         WsClient client = new WsClient();
         client.setSession(session);
         client.setSessionId(session.getId());
-        client.setSystem(LoginUserDetails.SystemEnum.WEB);
+//        client.setSystem(LoginUserDetails.SystemEnum.WEB);
         client.setIp(getIpBySession(session));
         WsCache.putUnAuthConnect(session.getId(),client);
     }

@@ -30,6 +30,7 @@ public class WsMessageProcesser {
             return;
         }
         message.setUsername(u.getUsername());
+        message.setObj(u);
     }
 
     public static void heartBeat(WsMessage message, Session session) {
@@ -44,8 +45,13 @@ public class WsMessageProcesser {
             log.error("心跳包异常，未找到连接信息");
             return;
         }
+        if (message.getObj() != null && message.getObj() instanceof LoginUserDetails lud){
+            unAuthConnect.setSystem(lud.getSystem());
+        }
         WsCache.putAuthConnect(session.getId(), unAuthConnect);
-        WsConnector.sendObject(message, session.getId());
+        WsConnector.sendObject(WsMessage.builder()
+                .code(message.getCode()).username(message.getUsername()).message("heart beat success").build()
+                , session.getId());
     }
 
     public static void qrCodeLogin(WsMessage message, Session session){

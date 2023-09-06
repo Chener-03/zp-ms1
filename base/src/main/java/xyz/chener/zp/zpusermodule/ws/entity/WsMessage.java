@@ -1,5 +1,7 @@
 package xyz.chener.zp.zpusermodule.ws.entity;
 
+import lombok.Builder;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,7 @@ import java.io.Serializable;
  * @Description: 页面消息传输实体类
  */
 
+@Builder
 public class WsMessage implements Serializable {
 
     public static final WsMessage EMPTY_MESSAGE = new WsMessage(WsMessageConstVar.UNKNOWN_CODE);
@@ -20,6 +23,14 @@ public class WsMessage implements Serializable {
         this.code = code;
     }
 
+    public WsMessage(Integer code, String jwt, String username, String message, Object obj) {
+        this.code = code;
+        this.jwt = jwt;
+        this.username = username;
+        this.message = message;
+        this.obj = obj;
+    }
+
     private Integer code;
 
     private String jwt;
@@ -27,6 +38,8 @@ public class WsMessage implements Serializable {
     private String username;
 
     private String message;
+
+    private Object obj;
 
     public String getMessage() {
         return message;
@@ -58,5 +71,13 @@ public class WsMessage implements Serializable {
 
     public void setCode(Integer code) {
         this.code = code;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public void setObj(Object obj) {
+        this.obj = obj;
     }
 }
