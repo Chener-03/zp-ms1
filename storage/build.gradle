@@ -41,8 +41,8 @@ dependencies {
 
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
 
-    implementation 'org.apache.skywalking:apm-toolkit-trace:8.16.0'
-    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.16.0'
+    implementation 'org.apache.skywalking:apm-toolkit-trace:9.0.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:9.0.0'
 }
 
 dependencyManagement {

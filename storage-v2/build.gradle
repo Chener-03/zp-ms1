@@ -45,8 +45,8 @@ dependencies {
         exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
     }
 
-    implementation 'org.apache.skywalking:apm-toolkit-trace:8.16.0'
-    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:8.16.0'
+    implementation 'org.apache.skywalking:apm-toolkit-trace:9.0.0'
+    implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:9.0.0'
 
     implementation 'com.qiniu:qiniu-java-sdk:7.14.0'
     implementation 'io.minio:minio:8.5.5'
