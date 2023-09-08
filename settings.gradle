@@ -1,6 +1,6 @@
 rootProject.name = 'zp-ms'
 include 'common'
-include 'user'
+include 'base'
 include 'storage'
 include 'gateway'
 include 'logger'
@@ -8,4 +8,7 @@ include 'system'
 include 'sentinel-adapter'
 include 'data-sharing'
 include 'workflow'
+include 'storage-v2'
+include 'common-kt'
+
 

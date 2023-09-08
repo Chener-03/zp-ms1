@@ -1,7 +1,7 @@
 package xyz.chener.zp.common.config.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -11,19 +11,24 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.chener.zp.common.config.CommonConfig;
 import xyz.chener.zp.common.config.writeList.WriteListRegister;
 import xyz.chener.zp.common.entity.CommonVar;
+import xyz.chener.zp.common.entity.LoginUserDetails;
+import xyz.chener.zp.common.utils.ObjectUtils;
 import xyz.chener.zp.common.utils.ThreadUtils;
 import xyz.chener.zp.common.utils.UriMatcherUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
+
+// OncePerRequestFilter 会导致spring的异步请求 第二次进入时无法授权 报401
 @Slf4j
-public class AuthFilter extends OncePerRequestFilter {
+public class AuthFilter implements Filter {
 
     private final CommonConfig commonConfig;
 
@@ -33,7 +38,7 @@ public class AuthFilter extends OncePerRequestFilter {
         this.commonConfig = commonConfig;
     }
 
-    @Override
+
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (writeListCheck(request)) {
             ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
@@ -52,14 +57,24 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         String userBase64 = request.getHeader(CommonVar.REQUEST_USER);
-        String user = new String(Base64.getDecoder().decode(userBase64), StandardCharsets.UTF_8);
+        String user = userBase64 == null ? null : new String(Base64.getDecoder().decode(userBase64), StandardCharsets.UTF_8);
+
+        AtomicReference<LoginUserDetails> loginUserDetails = new AtomicReference<>(null);
+        ThreadUtils.runIgnoreException(() -> {
+            String userObjectBase64 = request.getHeader(CommonVar.REQUEST_USER_OBJECT);
+            if (StringUtils.hasText(userObjectBase64))
+            {
+                loginUserDetails.set(new ObjectMapper().readValue(Base64.getDecoder().decode(userObjectBase64), LoginUserDetails.class));
+            }
+        });
 
         String auth = request.getHeader(CommonVar.REQUEST_USER_AUTH);
-        if (StringUtils.hasText(user) && StringUtils.hasText(auth))
+        if (StringUtils.hasText(user) && StringUtils.hasText(auth) && Objects.nonNull(loginUserDetails.get()) && ObjectUtils.nullSafeEquals(loginUserDetails.get().getUsername(),user))
         {
-            context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                    user, null,
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(auth)));
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null,
+                    AuthorityUtils.commaSeparatedStringToAuthorityList(auth));
+            usernamePasswordAuthenticationToken.setDetails(loginUserDetails.get());
+            context.setAuthentication(usernamePasswordAuthenticationToken);
             SecurityContextHolder.setContext(context);
             ThreadUtils.runIgnoreException(() -> filterChain.doFilter(request,response));
             return;
@@ -100,4 +115,8 @@ public class AuthFilter extends OncePerRequestFilter {
         return UriMatcherUtils.match(s,uri);
     }
 
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        doFilterInternal((HttpServletRequest) request,(HttpServletResponse) response,chain);
+    }
 }

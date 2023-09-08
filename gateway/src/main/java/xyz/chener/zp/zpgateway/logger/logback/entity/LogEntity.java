@@ -1,6 +1,8 @@
 package xyz.chener.zp.zpgateway.logger.logback.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -9,6 +11,10 @@ import java.util.Date;
  * @Date: 2023/03/16/11:07
  * @Email: chen@chener.xyz
  */
+
+
+
+
 public class LogEntity {
 
     /**
@@ -21,6 +27,13 @@ public class LogEntity {
      *         &quot;logger&quot;:&quot;%logger&quot;,
      *         &quot;message&quot;:&quot;%msg&quot;
      */
+
+    public LogEntity(){
+        this.uuid = java.util.UUID.randomUUID().toString();
+    }
+
+
+    private String uuid;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
     private Date time;
@@ -38,6 +51,15 @@ public class LogEntity {
     private String logger;
 
     private String message;
+
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public Date getTime() {
         return time;

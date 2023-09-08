@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import xyz.chener.zp.zpstoragecalculation.entity.dto.UserAllInfoDto;
 import xyz.chener.zp.zpstoragecalculation.service.impl.UserModuleServiceFallback;
 
-@FeignClient(name = "zp-user-module",fallback = UserModuleServiceFallback.class)
+@FeignClient(name = "zp-base-module",fallback = UserModuleServiceFallback.class)
 public interface UserModuleService {
 
     @RequestMapping("/api/web/getUserAllInfo")

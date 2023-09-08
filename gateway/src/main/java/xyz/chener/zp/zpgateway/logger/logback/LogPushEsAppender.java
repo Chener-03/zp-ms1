@@ -54,14 +54,14 @@ public class LogPushEsAppender extends ConsoleAppender<ILoggingEvent> {
     }
 
     private static void run(){
-        ArrayList<LogEntity> logEntities = new ArrayList<>(101);
+        ArrayList<LogEntity> logEntities = new ArrayList<>(1001);
         ObjectMapper om = new ObjectMapper();
         long lastTime = 0L;
         om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         while (!Thread.interrupted()){
             try {
-                if(logEntities.size() >= 100 || System.currentTimeMillis() - lastTime >= 60*1000) {
-                    if (logEntities.size()>0) {
+                if(logEntities.size() >= 1000 || System.currentTimeMillis() - lastTime >= 60*1000) {
+                    if (!logEntities.isEmpty()) {
                         loggerPush.add(logEntities, logEntities::clear);
                     }
                     lastTime = System.currentTimeMillis();

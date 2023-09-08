@@ -11,6 +11,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -36,7 +37,6 @@ import xyz.chener.zp.zpgateway.service.UserModuleService;
 import xyz.chener.zp.zpgateway.utils.HeaderUtils;
 import xyz.chener.zp.zpgateway.utils.UriMatcherUtils;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
@@ -108,32 +108,39 @@ public class SecurityRepository implements WebFilter {
 
             return Mono.fromFuture(CompletableFuture.supplyAsync(() -> userModuleService.getUserBaseInfoByName(userDetails.getUsername())))
                     .flatMap(userBaseInfo -> {
-                        if (userBaseInfo.getList().size() == 0)
+                        if (userBaseInfo.getList().isEmpty())
                             return getResponseMono(exchange,new UserNotFoundError());
                         UserBase userBase = userBaseInfo.getList().get(0);
                         try {
-                            AssertUrils.state(Objects.equals(userDetails.getDs(),userBase.getDs()), TokenOverdueException.class);
+                            AssertUrils.state(ObjectUtils.nullSafeEquals(userDetails.getDs(),userBase.getDs())
+                                    && ObjectUtils.nullSafeEquals(userDetails.getUserId(),userBase.getId()), TokenOverdueException.class);
                             if (checkUser(userBase)) {
                                 return Mono.fromFuture(CompletableFuture.supplyAsync(() -> userModuleService.getUserRoleById(userBase.getRoleId())))
                                         .flatMap(rolePageInfo -> {
-                                            if (rolePageInfo.getList().size() == 0)
+                                            if (rolePageInfo.getList().isEmpty())
                                                 return getResponseMono(exchange,new UserAuthNotFoundError());
                                             Role role = rolePageInfo.getList().get(0);
 
                                             List<String> roleAuthList = Arrays.stream(role.getPermissionEnNameList().split(",")).filter(s -> StringUtils.hasText(s) && s.startsWith(SecurityVar.ROLE_PREFIX)).toList();
+
+                                            String userDetailsBase64 = "";
                                             try {
-                                                String s = new ObjectMapper().writeValueAsString(userDetails);
-                                            } catch (Exception e) { }
+                                                String userDetailsJson = new ObjectMapper().writeValueAsString(userDetails);
+                                                userDetailsBase64 = Base64.getEncoder().encodeToString(userDetailsJson.getBytes(StandardCharsets.UTF_8));
+                                            } catch (Exception ignored) { }
+
+
                                             String base64Username = Base64.getEncoder().encodeToString(userBase.getUsername().getBytes(StandardCharsets.UTF_8));
 
                                             ServerWebExchange newExchange = HeaderUtils.addReactiveHeader(exchange
                                                     , CommonVar.REQUEST_USER, base64Username
-                                                    ,CommonVar.REQUEST_USER_AUTH, String.join(",",roleAuthList));
-                                            Context ctx = ReactiveSecurityContextHolder.withAuthentication(
-                                                    new UsernamePasswordAuthenticationToken(
-                                                            userBase.getUsername(), null,
-                                                            AuthorityUtils.commaSeparatedStringToAuthorityList(String.join(",",roleAuthList)))
-                                            );
+                                                    ,CommonVar.REQUEST_USER_AUTH, String.join(",",roleAuthList)
+                                                    ,CommonVar.REQUEST_USER_OBJECT, userDetailsBase64);
+
+                                            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userBase.getUsername(), null,
+                                                    AuthorityUtils.commaSeparatedStringToAuthorityList(String.join(",", roleAuthList)));
+                                            usernamePasswordAuthenticationToken.setDetails(userDetails);
+                                            Context ctx = ReactiveSecurityContextHolder.withAuthentication(usernamePasswordAuthenticationToken);
                                             return chain.filter(newExchange).contextWrite(ctx);
                                         });
                             }
@@ -172,7 +179,7 @@ public class SecurityRepository implements WebFilter {
             case LoginUserDetails.SystemEnum.WEB -> {
                 return urlPath.contains(CommonVar.WEB_URL_PREFIX);
             }
-            case LoginUserDetails.SystemEnum.MOBILE -> {
+            case LoginUserDetails.SystemEnum.CLIENT -> {
                 return urlPath.contains(CommonVar.CLIENT_URL_PREFIX);
             }
         }

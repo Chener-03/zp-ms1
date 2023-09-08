@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @Slf4j
 public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
@@ -46,8 +47,8 @@ public class UnifiedReturnHandle  implements HandlerMethodReturnValueHandler {
     public boolean supportsReturnType(MethodParameter returnType) {
         Annotation[] methodAnnotations = returnType.getMethodAnnotations();
         Annotation[] annotations = returnType.getDeclaringClass().getAnnotations();
-        return containAnn(methodAnnotations, UnifiedReturn.class.getName())
-                || containAnn(annotations, UnifiedReturn.class.getName());
+        return (containAnn(methodAnnotations, UnifiedReturn.class.getName())
+                || containAnn(annotations, UnifiedReturn.class.getName()));
     }
 
     private boolean containAnn(Annotation[] anns,String annName)

@@ -5,8 +5,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -28,9 +30,13 @@ public class UnifiedReturnConfig implements ApplicationListener<ApplicationStart
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         if (isInit.compareAndSet(false,true)) {
-            ArrayList<HandlerMethodReturnValueHandler> list = new ArrayList<>();
-            list.add(new UnifiedReturnHandle());
-            list.addAll(requestMappingHandlerAdapter.getReturnValueHandlers());
+            ArrayList<HandlerMethodReturnValueHandler> list = new ArrayList<>(Optional.ofNullable(requestMappingHandlerAdapter.getReturnValueHandlers()).orElse(new ArrayList<>()));
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getClass().equals(RequestResponseBodyMethodProcessor.class)){
+                    list.add(i,new UnifiedReturnHandle());
+                    break;
+                }
+            }
             requestMappingHandlerAdapter.setReturnValueHandlers(list);
         }
     }

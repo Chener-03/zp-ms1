@@ -8,6 +8,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
@@ -85,8 +86,11 @@ public class LoggerPush {
                         .build();
             }
 
-            ElasticsearchTransport transport = new RestClientTransport(
-                    restClient, new JacksonJsonpMapper());
+            ObjectMapper om = new ObjectMapper();
+            om.configure(com.fasterxml.jackson.core.JsonGenerator.Feature.IGNORE_UNKNOWN, true);
+            om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            JacksonJsonpMapper jacksonJsonpMapper = new JacksonJsonpMapper(om);
+            ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
             asyncClient = new ElasticsearchAsyncClient(transport);
             checkIndex();
             LogPushEsAppender.initQueue(this);
@@ -95,8 +99,9 @@ public class LoggerPush {
 
     private void checkIndex() {
         String indexPattnerName = loggerPush.getEsIndexName() + "-*";
+        String endpoint = "_index_template/" + loggerPush.getEsIndexName() + "-logs-template";
         try {
-            Request req = new Request("GET", "_index_template/zplogs-template");
+            Request req = new Request("GET", endpoint);
             restClient.performRequest(req);
         } catch (ResponseException responseException) {
             if (responseException.getResponse().getStatusLine().getStatusCode() == 404) {
@@ -106,7 +111,7 @@ public class LoggerPush {
                     ObjectMapper om = new ObjectMapper();
                     Map map = om.readValue(bios.toString(StandardCharsets.UTF_8), Map.class);
                     map.put("index_patterns", indexPattnerName);
-                    Request request = new Request("PUT","_index_template/zplogs-template" );
+                    Request request = new Request("PUT",endpoint);
                     request.setJsonEntity(om.writeValueAsString(map));
                     restClient.performRequest(request);
                 }catch (Exception exception){

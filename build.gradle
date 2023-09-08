@@ -11,7 +11,7 @@ allprojects{
 
 subprojects {
     ext {
-        set('springCloudVersion', "2022.0.3")
+        set('springCloudVersion', "2022.0.4")
     }
 }
 

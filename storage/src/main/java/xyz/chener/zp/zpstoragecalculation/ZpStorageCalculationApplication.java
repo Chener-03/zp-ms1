@@ -18,6 +18,7 @@ import java.util.UUID;
         @LoadBalancerClient(name = "zp-storagecalculation-module",configuration = LoadbalanceConfig.class)
 })
 @EnableTransactionManagement
+@Deprecated(since = "2023-08-29",forRemoval = true)
 public class ZpStorageCalculationApplication {
     public static void main(String[] args) {
         System.setProperty("csp.sentinel.log.output.type","console");
