@@ -4,15 +4,15 @@ RUN rm -f /etc/localtime \
 && ln -sv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 && echo "Asia/Shanghai" > /etc/timezone
 
-RUN mkdir -p /userapps
+RUN mkdir -p /apps
 
-COPY ./jarfile/*.jar /userapps
-COPY ./skywalking-agent/ /userapps/agent
+COPY ./jarfile/*.jar /apps
+COPY ./skywalking-agent/ /apps/agent
 
-WORKDIR /userapps
+WORKDIR /apps
 
 EXPOSE 6050
 
-
-ENTRYPOINT ["java","-javaagent:/userapps/agent/skywalking-agent.jar","--add-opens","java.base/java.lang.invoke=ALL-UNNAMED","--add-opens","java.base/sun.nio.ch=ALL-UNNAMED","-Dspring.cloud.nacos.discovery.ip=82.156.191.218","-jar","./user-1.0-SNAPSHOT.jar"]
+# base-1.0-SNAPSHOT
+ENTRYPOINT ["java","-javaagent:/apps/agent/skywalking-agent.jar","--add-opens","java.base/java.lang.invoke=ALL-UNNAMED","--add-opens","java.base/sun.nio.ch=ALL-UNNAMED","-Dspring.cloud.nacos.discovery.ip=82.156.191.218","-jar","./base-1.0-SNAPSHOT.jar"]
 

@@ -7,7 +7,8 @@ import org.apache.tomcat.websocket.WsRemoteEndpointBasic;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer;
 import org.springframework.stereotype.Component;
-import xyz.chener.zp.common.entity.LoginUserDetails;
+import org.springframework.util.StringUtils;
+import xyz.chener.zp.common.entity.CommonVar;
 import xyz.chener.zp.zpusermodule.ws.coded.WsDecoder;
 import xyz.chener.zp.zpusermodule.ws.coded.WsEncoder;
 import xyz.chener.zp.zpusermodule.ws.entity.WsClient;
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Email: chen@chener.xyz
  */
 
-@ServerEndpoint(value = "/ws/web/connect",decoders = WsDecoder.class,encoders = WsEncoder.class)
+@ServerEndpoint(value = "/ws/web/connect",decoders = WsDecoder.class,encoders = WsEncoder.class,configurator = WsConfig.WsConfigurator.class)
 @Component
 @Slf4j
 public class WsConnector {
@@ -39,13 +40,19 @@ public class WsConnector {
         WsClient client = new WsClient();
         client.setSession(session);
         client.setSessionId(session.getId());
-//        client.setSystem(LoginUserDetails.SystemEnum.WEB);
         client.setIp(getIpBySession(session));
         WsCache.putUnAuthConnect(session.getId(),client);
     }
 
-
-    public String getIpBySession(Session session){
+    private String getIpBySession(Session session){
+        Object ip = session.getUserProperties().get(CommonVar.IP_HEAD);
+        if (ip == null || !StringUtils.hasText(ip.toString())){
+            return getIpByReference(session);
+        }else {
+            return ip.toString();
+        }
+    }
+    private String getIpByReference(Session session){
         try {
             WsSession wsSession = (WsSession) session;
             WsRemoteEndpointBasic remoteEndpointBasic = (WsRemoteEndpointBasic) getObjectField(wsSession, "remoteEndpointBasic",null);
@@ -57,7 +64,7 @@ public class WsConnector {
             return null;
         }
     }
-    public Object getObjectField(Object obj,String fieldName,String className){
+    private Object getObjectField(Object obj,String fieldName,String className){
         try {
             Class clz;
             if (className!=null){

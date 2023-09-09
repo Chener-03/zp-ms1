@@ -20,13 +20,56 @@ public class IpUtils {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                     .getRequestAttributes()).getRequest();
-            String ip_HEAD = request.getHeader(CommonVar.IP_HEAD);
-            if (StringUtils.hasText(ip_HEAD)) return ip_HEAD;
-            String forwarded = request.getHeader("x-forwarded-for");
-            String ip = parseForwardedFor(forwarded);
-            return Objects.requireNonNullElseGet(ip, request::getRemoteAddr);
+            return getRealIp(request);
         }catch (Exception exception)
         {
+            return null;
+        }
+    }
+
+    public static String getRealIp(HttpServletRequest request){
+        try {
+            String ip = request.getHeader(CommonVar.IP_HEAD);
+
+            if (StringUtils.hasText(ip)) {
+                return parseForwardedFor(ip);
+            }
+
+            ip = request.getHeader("X-Forwarded-For");
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getHeader("Proxy-Client-IP");
+            }
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getHeader("WL-Proxy-Client-IP");
+            }
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getHeader("HTTP_CLIENT_IP");
+            }
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            }
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getHeader("X-Real-IP");
+            }
+
+            if (!StringUtils.hasText(ip) || "unknown".equalsIgnoreCase(ip))
+            {
+                ip = request.getRemoteAddr();
+            }
+
+            return Objects.requireNonNullElseGet(parseForwardedFor(ip), request::getRemoteAddr);
+
+        }catch (Exception err){
             return null;
         }
     }
@@ -34,9 +77,6 @@ public class IpUtils {
     private static String parseForwardedFor(String f)
     {
         if (!StringUtils.hasText(f)) return null;
-        int i = f.indexOf(",");
-        if (i < 0)
-            return f;
-        else return f.substring(0,i);
+        return f.split(",")[0];
     }
 }

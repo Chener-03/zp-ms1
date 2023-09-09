@@ -9,6 +9,7 @@ spring:
         group: zp
         server-addr: 101.42.12.133:8848
         namespace: 1379388b-aed1-4082-8ed2-54699a4cc9d4
+#        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
         username: nacos
         password: nacos123456
         file-extension: yml
@@ -17,6 +18,7 @@ spring:
         group: zp
         server-addr: 101.42.12.133:8848
         namespace: 1379388b-aed1-4082-8ed2-54699a4cc9d4
+#        namespace: 31566b11-faba-4430-ab6c-353aa99c9874
         username: nacos
         password: nacos123456
         ip: 127.0.0.1
@@ -40,7 +42,7 @@ spring:
       max-file-size: 1GB
       max-request-size: 1GB
 server:
-  port: 6101
+  port: 26308
   compression:
     enabled: true
 
