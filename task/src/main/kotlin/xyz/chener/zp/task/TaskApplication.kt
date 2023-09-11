@@ -10,10 +10,14 @@ import com.sun.jdi.event.MethodEntryEvent
 import com.sun.jdi.event.MethodExitEvent
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import java.io.File
+import xyz.chener.zp.task.core.op.Win32System
+import xyz.chener.zp.task.core.target.JarTaskExecute
+import xyz.chener.zp.task.core.target.JarTaskMBean
 import java.io.IOException
-import java.net.URLClassLoader
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
+import java.lang.management.ManagementFactory
+import javax.management.ObjectName
+import javax.management.remote.JMXConnectorFactory
+import javax.management.remote.JMXServiceURL
 
 
 @org.springframework.boot.autoconfigure.SpringBootApplication(exclude = [SentinelEndpointAutoConfiguration::class]
@@ -23,6 +27,7 @@ import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 open class TaskApplication {
 
     companion object {
+/*
         @JvmStatic
         fun main(args: Array<String>) {
             System.setProperty("csp.sentinel.log.output.type", "console")
@@ -81,6 +86,7 @@ open class TaskApplication {
             }
         }
 
+*/
 
         private fun waitForMethodEntryEvents(vm: VirtualMachine) {
             while (true) {
@@ -150,6 +156,29 @@ open class TaskApplication {
             return classes[0]
         }
 
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+
+
+
+
+            val hostname = "localhost"
+
+            val port = 12345
+            val jmxUrl = "service:jmx:rmi:///jndi/rmi://$hostname:$port/jmxrmi"
+
+            val serviceURL = JMXServiceURL(jmxUrl)
+            val connector = JMXConnectorFactory.connect(serviceURL)
+            val mbsc = connector.mBeanServerConnection
+
+            val name = ObjectName(JarTaskExecute.REG_PATH)
+
+            val invoke = mbsc.invoke(name, JarTaskMBean::toOutput.name, null, null)
+
+
+            connector.close()
+        }
 
     }
 

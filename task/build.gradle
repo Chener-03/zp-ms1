@@ -30,6 +30,7 @@ dependencies {
     implementation project(':common-kt')
     implementation project(':logger')
     implementation project(':sentinel-adapter')
+    implementation project(':task-depend')
 
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'

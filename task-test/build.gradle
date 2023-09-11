@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+
+
+dependencies {
+    implementation project(':task-depend')
+}
+
+test {
+    useJUnitPlatform()
+}
