@@ -28,7 +28,19 @@ class JarTaskMBeanImpl : JarTaskMBean {
         JarTaskExecute.errorOutput.setLength(0)
     }
 
-    override fun shundown() {
-        JarTaskExecute.shundownHook.forEach { it.run() }
+    override fun callShutDown() {
+        try {
+            JarTaskExecute.shundownHook.forEach { it.run() }
+        }catch (_:Throwable){}
+    }
+
+
+    override fun end() {
+        try {
+            JarTaskExecute.lock.lock()
+            JarTaskExecute.condition.signalAll()
+        }finally {
+            JarTaskExecute.lock.unlock()
+        }
     }
 }

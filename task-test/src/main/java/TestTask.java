@@ -3,11 +3,18 @@ import org.jetbrains.annotations.Nullable;
 import xyz.chener.zp.task.core.entity.TaskData;
 import xyz.chener.zp.task.core.target.JarTaskExecute;
 import xyz.chener.zp.task.core.target.TaskHandler;
+import xyz.chener.zp.task.core.target.TaskLogger;
+
+import java.lang.reflect.Method;
 
 public class TestTask implements TaskHandler {
 
     @Override
     public String handle(@NotNull TaskData param, long batch) {
+
+        TaskLogger.logError("123");
+        TaskLogger.logInfo("456");
+
         return null;
     }
 

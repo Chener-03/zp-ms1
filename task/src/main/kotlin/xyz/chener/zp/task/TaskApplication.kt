@@ -10,15 +10,21 @@ import com.sun.jdi.event.MethodEntryEvent
 import com.sun.jdi.event.MethodExitEvent
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import xyz.chener.zp.task.core.entity.TaskData
 import xyz.chener.zp.task.core.op.Win32System
 import xyz.chener.zp.task.core.target.JarTaskExecute
 import xyz.chener.zp.task.core.target.JarTaskMBean
 import java.io.IOException
 import java.lang.management.ManagementFactory
+import javax.management.JMX
+import javax.management.MBeanInfo
+import javax.management.MBeanParameterInfo
 import javax.management.ObjectName
 import javax.management.remote.JMXConnectorFactory
 import javax.management.remote.JMXServiceURL
-
+import kotlin.reflect.KClass
+import kotlin.reflect.full.functions
+import kotlin.reflect.javaType
 
 @org.springframework.boot.autoconfigure.SpringBootApplication(exclude = [SentinelEndpointAutoConfiguration::class]
     , excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
@@ -161,8 +167,6 @@ open class TaskApplication {
         fun main(args: Array<String>) {
 
 
-
-
             val hostname = "localhost"
 
             val port = 12345
@@ -174,10 +178,28 @@ open class TaskApplication {
 
             val name = ObjectName(JarTaskExecute.REG_PATH)
 
+            val funSignature = getFunSignature(JarTaskMBean::class, JarTaskMBean::handle.name)
+
+
             val invoke = mbsc.invoke(name, JarTaskMBean::toOutput.name, null, null)
 
 
+            val proxy = JMX.newMXBeanProxy(mbsc, name, JarTaskMBean::class.java)
+            proxy.handle(TaskData(),1)
+
+
             connector.close()
+        }
+
+
+        private fun getFunSignature(clazz:KClass<*>, funName:String) : Array<String> {
+            val kFunction = clazz.functions.find { it.name == funName } ?: return arrayOf()
+            return kFunction.parameters.filter {
+//                it.kind.name == "VALUE"
+                true
+            }.map {
+                it.type.toString()
+            }.toTypedArray()
         }
 
     }

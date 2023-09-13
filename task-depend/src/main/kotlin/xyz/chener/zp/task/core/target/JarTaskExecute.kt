@@ -1,22 +1,26 @@
 package xyz.chener.zp.task.core.target
 
 import xyz.chener.zp.task.core.error.TaskHandlerNotNull
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.lang.management.ManagementFactory
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
 import javax.management.ObjectName
 
+
 object JarTaskExecute{
 
     const val REG_PATH = "xyz.chener.zp.task.core.target:type=JarTaskMBean";
 
-    private var lock:ReentrantLock = ReentrantLock()
+    internal var lock:ReentrantLock = ReentrantLock()
 
-    private var condition : Condition = lock.newCondition()
+    internal var condition : Condition = lock.newCondition()
 
     private var taskHandler:TaskHandler? = null
 
     internal var output:StringBuffer = StringBuffer()
+
     internal var errorOutput:StringBuffer = StringBuffer()
 
     internal var shundownHook:List<Runnable> = ArrayList()
@@ -63,7 +67,6 @@ object JarTaskExecute{
             override fun println(x: String?) {
                 output.append(x).append("\n")
             }
-
             override fun print(x: String?) {
                 output.append(x).append("\n")
             }

@@ -17,6 +17,8 @@ interface JarTaskMBean {
 
     fun clearOut()
 
-    fun shundown()
+    fun callShutDown()
+
+    fun end()
 
 }
