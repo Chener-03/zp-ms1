@@ -9,7 +9,7 @@ interface SystemOperate {
 
     fun processExist(pid:Long):Boolean
 
-    fun startProcess(cmd:String):Long
+    fun startProcess(cmd:String,envPath:String):Long
 
     companion object{
         fun getSystemOperate():SystemOperate{

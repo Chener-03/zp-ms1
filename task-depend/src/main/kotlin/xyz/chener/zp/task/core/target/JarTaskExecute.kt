@@ -3,15 +3,21 @@ package xyz.chener.zp.task.core.target
 import xyz.chener.zp.task.core.error.TaskHandlerNotNull
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.lang.Exception
 import java.lang.management.ManagementFactory
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
+import javax.management.MBeanServer
+import javax.management.MBeanServerConnection
 import javax.management.ObjectName
+import kotlin.system.exitProcess
 
 
 object JarTaskExecute{
 
     const val REG_PATH = "xyz.chener.zp.task.core.target:type=JarTaskMBean";
+
+    const val WAIT_CONNECT_TIMEOUT = 1000 * 60 * 5L
 
     internal var lock:ReentrantLock = ReentrantLock()
 
@@ -25,10 +31,39 @@ object JarTaskExecute{
 
     internal var shundownHook:List<Runnable> = ArrayList()
 
+
+
     init {
         redirectSystemOut()
         prepareMBean()
+        timeOutKill()
     }
+
+    private fun timeOutKill(){
+        Thread {
+            try {
+                while (true){
+                    Thread.sleep(WAIT_CONNECT_TIMEOUT)
+                    if (getMxbeanConnectCount() == 0){
+                        println("超时未连接，自动退出")
+                        exitProcess(0)
+                    }
+                }
+            }catch (_:Throwable){}
+        }.let {
+            it.isDaemon = true
+            it.start()
+        }
+    }
+
+    private fun getMxbeanConnectCount() : Int {
+        try {
+            val serverConnection = ManagementFactory.getPlatformMBeanServer() as MBeanServerConnection
+            return serverConnection.mBeanCount
+        }catch (ignored:Exception){}
+        return 0
+    }
+
 
     fun getHandler():TaskHandler{
         if (taskHandler == null){

@@ -33,7 +33,7 @@ spring:
       enabled: false
   config:
     import:
-      - optional:nacos:zp-mysql-config.yml?group=zp
+#      - optional:nacos:zp-mysql-config.yml?group=zp
       - optional:nacos:zp-config?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
@@ -41,9 +41,18 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://bj-cynosdbmysql-grp-a7tnayym.sql.tencentcdb.com:21449/zptaskdev?characterEncoding=utf8&useSSL=false&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
+    username: admin01
+    password: CZPczp666...
+    hikari:
+      max-lifetime: 60000
+      maximum-pool-size: 5
+
 server:
   port: 26312
   compression:
     enabled: true
-
-

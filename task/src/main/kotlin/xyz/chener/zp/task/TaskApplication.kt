@@ -8,23 +8,26 @@ import com.sun.jdi.connect.IllegalConnectorArgumentsException
 import com.sun.jdi.event.ExceptionEvent
 import com.sun.jdi.event.MethodEntryEvent
 import com.sun.jdi.event.MethodExitEvent
+import org.apache.shardingsphere.elasticjob.api.JobConfiguration
+import org.apache.shardingsphere.elasticjob.api.ShardingContext
+import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
+import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobConfigurationAPI
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.JobConfigurationAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
+import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import xyz.chener.zp.task.core.entity.TaskData
-import xyz.chener.zp.task.core.op.Win32System
-import xyz.chener.zp.task.core.target.JarTaskExecute
-import xyz.chener.zp.task.core.target.JarTaskMBean
 import java.io.IOException
-import java.lang.management.ManagementFactory
-import javax.management.JMX
-import javax.management.MBeanInfo
-import javax.management.MBeanParameterInfo
-import javax.management.ObjectName
-import javax.management.remote.JMXConnectorFactory
-import javax.management.remote.JMXServiceURL
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
-import kotlin.reflect.javaType
+
 
 @org.springframework.boot.autoconfigure.SpringBootApplication(exclude = [SentinelEndpointAutoConfiguration::class]
     , excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
@@ -165,8 +168,19 @@ open class TaskApplication {
 
         @JvmStatic
         fun main(args: Array<String>) {
+            org.springframework.boot.runApplication<TaskApplication>(*args)
+
+//            ProcessBuilder().redirect
 
 
+
+
+
+//            ScheduleJobBootstrap(registryCenter,job,jobConfiguration).schedule()
+
+
+
+/*
             val hostname = "localhost"
 
             val port = 12345
@@ -188,15 +202,14 @@ open class TaskApplication {
             proxy.handle(TaskData(),1)
 
 
-            connector.close()
+            connector.close()*/
         }
 
 
         private fun getFunSignature(clazz:KClass<*>, funName:String) : Array<String> {
             val kFunction = clazz.functions.find { it.name == funName } ?: return arrayOf()
             return kFunction.parameters.filter {
-//                it.kind.name == "VALUE"
-                true
+                it.kind.name == "VALUE"
             }.map {
                 it.type.toString()
             }.toTypedArray()

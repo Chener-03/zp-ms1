@@ -34,7 +34,7 @@ class Win32System : SystemOperate {
         return false
     }
 
-    override fun startProcess(cmd: String): Long {
-        TODO("Not yet implemented")
+    override fun startProcess(cmd: String, envPath: String): Long {
+        return 0L
     }
 }
