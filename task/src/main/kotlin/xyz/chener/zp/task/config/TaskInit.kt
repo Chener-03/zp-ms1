@@ -36,6 +36,7 @@ class TaskInit : CommandLineRunner {
 
         var job = object: SimpleJob {
             override fun execute(shardingContext: ShardingContext?) {
+
                 println("132:" + shardingContext?.shardingItem)
             }
         }
@@ -46,6 +47,7 @@ class TaskInit : CommandLineRunner {
             .newBuilder("test12", 3)
             .cron("0/5 * * * * ?")
             .jobParameter("123")
+            .shardingItemParameters("0=A,1=B,2=C")
             .addExtraConfigurations(TracingConfiguration("RDB",dataSource))
             .overwrite(true)
             .build()
