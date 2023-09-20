@@ -168,6 +168,11 @@ open class TaskApplication {
 
         @JvmStatic
         fun main(args: Array<String>) {
+            Thread.ofVirtual().start(){
+                val t = Thread.currentThread()
+                println(1)
+            }
+
             org.springframework.boot.runApplication<TaskApplication>(*args)
 
 //            ProcessBuilder().redirect
