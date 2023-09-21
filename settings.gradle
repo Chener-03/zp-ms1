@@ -13,4 +13,5 @@ include 'common-kt'
 include 'task'
 include 'task-depend'
 include 'task-test'
+include 'test'
 

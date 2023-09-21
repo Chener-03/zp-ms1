@@ -8,7 +8,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
 }
 
-java{
+java {
     sourceCompatibility = '17'
 }
 
@@ -27,9 +27,10 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation project(':common')
-    implementation project(':common-kt')
-    implementation project(':logger')
-    implementation project(':sentinel-adapter')
+//    implementation project(':common-kt')
+//    implementation project(':logger')
+//    implementation project(':sentinel-adapter')
+    implementation project(':task-depend')
 
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -48,8 +49,41 @@ dependencies {
     implementation 'org.apache.skywalking:apm-toolkit-trace:9.0.0'
     implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:9.0.0'
 
-    implementation 'com.qiniu:qiniu-java-sdk:7.14.0'
-    implementation 'io.minio:minio:8.5.5'
+
+//    implementation 'org.quartz-scheduler:quartz:2.5.0-rc1'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-core:3.0.3'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-http-executor:3.0.3'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-lifecycle:3.0.3'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-api:3.0.3'
+//
+//    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-spring-boot-starter:3.0.3'
+
+
+
+
+
+
+
+    implementation 'com.github.jsqlparser:jsqlparser:4.6'
+
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
+    implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
+
+    implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
+
+    implementation 'org.apache.skywalking:apm-toolkit-trace:9.0.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.2'
+    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.7'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 }
 
