@@ -23,9 +23,11 @@ import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import xyz.chener.zp.common.utils.Md5Utiles
+import xyz.chener.zp.task.config.TaskConfiguration
 import java.io.IOException
 import java.util.*
 import kotlin.reflect.KClass
@@ -36,6 +38,7 @@ import kotlin.reflect.full.functions
     , excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
 @EnableFeignClients
 @EnableTransactionManagement
+@EnableConfigurationProperties(TaskConfiguration::class)
 open class TaskApplication {
 
     companion object {

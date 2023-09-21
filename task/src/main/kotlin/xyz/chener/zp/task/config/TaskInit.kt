@@ -20,6 +20,7 @@ import org.apache.zookeeper.data.Id
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
+import xyz.chener.zp.task.core.ZookeeperProxy
 import javax.sql.DataSource
 
 
@@ -30,30 +31,18 @@ class TaskInit : CommandLineRunner {
     lateinit var dataSource: DataSource
 
 
+    @Autowired
+    lateinit var zooKeeper: ZookeeperProxy
+
     override fun run(vararg args: String?) {
 
-        val connectString = "127.0.0.1:2181"
 
-        val zooKeeper = ZooKeeper(connectString, 5000) { event ->
-            println("Received event: $event")
-        }
 
-        val acls = ArrayList<ACL>()
-        val id = Id("digest", "zkadmin:Abcd1234")
-
-        acls.add(ACL(ZooDefs.Perms.ALL, id))
-
-        while (zooKeeper.state != ZooKeeper.States.CONNECTED) {
-            Thread.sleep(100)
-        }
-
-        println("  session ID: " + zooKeeper.sessionId)
-
-    zooKeeper.addWatch("/",object:Watcher{
-        override fun process(event: WatchedEvent?) {
-            println(event)
-        }
-    },AddWatchMode.PERSISTENT_RECURSIVE)
+        zooKeeper.addWatch("/",object:Watcher{
+            override fun process(event: WatchedEvent?) {
+                println(event)
+            }
+        },AddWatchMode.PERSISTENT_RECURSIVE)
 
 
 
