@@ -28,9 +28,9 @@ spring:
           enabled: true
         response:
           enabled:  true
+      okhttp:
+        enabled: true
 
-    sentinel:
-      enabled: false
 
   config:
     import:

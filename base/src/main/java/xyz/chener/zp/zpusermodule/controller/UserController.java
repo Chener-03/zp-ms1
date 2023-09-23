@@ -1,7 +1,6 @@
 package xyz.chener.zp.zpusermodule.controller;
 
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
-import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreakerStrategy;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.PostConstruct;
@@ -40,6 +39,7 @@ import xyz.chener.zp.common.utils.MapBuilder;
 import xyz.chener.zp.common.utils.RequestUtils;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.CircuitBreakRuleManager;
 import xyz.chener.zp.sentinelAdapter.circuitbreak.annotation.CircuitBreakResource;
+import xyz.chener.zp.sentinelAdapter.currentlimit.annotation.LimitResource;
 import xyz.chener.zp.zpusermodule.config.oplog.OpRecordMybatisWrapper;
 import xyz.chener.zp.zpusermodule.config.oplog.entity.OpEnum;
 import xyz.chener.zp.zpusermodule.entity.*;
@@ -334,6 +334,15 @@ public class UserController {
                     .add("token",e.getToken()).build());
         });
         return res;
+    }
+
+
+
+    @GetMapping("/uuuutest")
+    @WriteList
+    @LimitResource("def")
+    public String uuuutest(){
+        return Thread.currentThread().getName();
     }
 
 }

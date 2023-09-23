@@ -29,8 +29,9 @@ spring:
           enabled: true
         response:
             enabled:  true
-    sentinel:
-      enabled: false
+      okhttp:
+        enabled: true
+
   config:
     import:
       - optional:nacos:zp-mysql-config.yml?group=zp

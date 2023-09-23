@@ -5,7 +5,7 @@ plugins {
 }
 
 java{
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -32,9 +32,9 @@ dependencies {
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
     implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
 
-    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
-        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
-    }
+//    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
+//        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
+//    }
 /*    implementation 'com.alibaba.csp:sentinel-datasource-nacos'
     implementation 'com.alibaba.csp:sentinel-datasource-extension'*/
 
@@ -44,7 +44,7 @@ dependencies {
 
     implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
+    implementation 'io.github.openfeign:feign-okhttp:12.5'
 }
 
 dependencyManagement {

@@ -1,6 +1,5 @@
 package xyz.chener.zp.system;
 
-import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -12,8 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Email: chen@chener.xyz
  */
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class
-        , SentinelEndpointAutoConfiguration.class},
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},
         excludeName = {"org.redisson.spring.starter.RedissonAutoConfiguration"}
 )
 @EnableFeignClients

@@ -17,8 +17,7 @@ import xyz.chener.zp.workflow.utils.Json;
  */
 
 
-@SpringBootApplication(exclude = SentinelEndpointAutoConfiguration.class
-,excludeName = {"org.redisson.spring.starter.RedissonAutoConfiguration"})
+@SpringBootApplication(excludeName = {"org.redisson.spring.starter.RedissonAutoConfiguration"})
 @EnableFeignClients
 @EnableDiscoveryClient
 @EnableTransactionManagement

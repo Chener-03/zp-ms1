@@ -1,49 +1,21 @@
 package xyz.chener.zp.task
 
-import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.jdi.*
-import com.sun.jdi.connect.AttachingConnector
-import com.sun.jdi.connect.Connector
-import com.sun.jdi.connect.IllegalConnectorArgumentsException
-import com.sun.jdi.event.ExceptionEvent
-import com.sun.jdi.event.MethodEntryEvent
-import com.sun.jdi.event.MethodExitEvent
-import org.apache.shardingsphere.elasticjob.api.JobConfiguration
-import org.apache.shardingsphere.elasticjob.api.ShardingContext
-import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
-import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobConfigurationAPI
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.JobConfigurationAPIImpl
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
-import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration
-import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
-import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
-import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import xyz.chener.zp.common.utils.Md5Utiles
 import xyz.chener.zp.task.config.TaskConfiguration
-import java.io.IOException
-import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 
 
-@org.springframework.boot.autoconfigure.SpringBootApplication(exclude = [SentinelEndpointAutoConfiguration::class]
-    , excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
+@org.springframework.boot.autoconfigure.SpringBootApplication(excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(TaskConfiguration::class)
 open class TaskApplication {
 
     companion object {
-
-
 
         @JvmStatic
         fun main(args: Array<String>) {

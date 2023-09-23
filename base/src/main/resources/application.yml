@@ -28,9 +28,9 @@ spring:
           enabled: true
         response:
           enabled:  true
+      okhttp:
+        enabled: true
 
-    sentinel:
-      enabled: false
 
   config:
     import:
@@ -40,7 +40,6 @@ spring:
       - optional:nacos:zp-config?group=zp
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
-
 
 
 

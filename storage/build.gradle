@@ -5,7 +5,7 @@ plugins {
 }
 
 java{
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -34,9 +34,9 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.2'
     implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.7'
 
-    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
-        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
-    }
+//    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
+//        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
+//    }
 
 
     implementation 'com.github.oshi:oshi-core:6.4.3'

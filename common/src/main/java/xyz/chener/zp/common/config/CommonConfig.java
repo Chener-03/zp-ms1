@@ -26,6 +26,9 @@ public class CommonConfig {
     private final LoggerPush loggerPush = new LoggerPush();
     private final MybatisCache mybatisCache = new MybatisCache();
 
+    private Boolean enableServletVitureThread = true;
+
+
     public MybatisCache getMybatisCache() {
         return mybatisCache;
     }
@@ -43,6 +46,13 @@ public class CommonConfig {
     }
 
 
+    public Boolean getEnableServletVitureThread() {
+        return enableServletVitureThread;
+    }
+
+    public void setEnableServletVitureThread(Boolean enableServletVitureThread) {
+        this.enableServletVitureThread = enableServletVitureThread;
+    }
 
     public static class Jwt{
         private String salt = "qwer";

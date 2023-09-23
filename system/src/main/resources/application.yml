@@ -29,8 +29,10 @@ spring:
           enabled: true
         response:
           enabled:  true
-    sentinel:
-      enabled: false
+      okhttp:
+        enabled: true
+
+
   config:
     import:
       - optional:nacos:zp-config?group=zp

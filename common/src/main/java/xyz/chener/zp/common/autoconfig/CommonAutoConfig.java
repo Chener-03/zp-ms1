@@ -22,6 +22,7 @@ import xyz.chener.zp.common.config.security.AuthFilter;
 import xyz.chener.zp.common.config.security.EntryPointProcess;
 import xyz.chener.zp.common.config.unifiedReturn.UnifiedErrorReturn;
 import xyz.chener.zp.common.config.unifiedReturn.UnifiedReturnConfig;
+import xyz.chener.zp.common.config.vitureThread.ServletVitureThreadPoolAutoConfiguration;
 import xyz.chener.zp.common.config.writeList.WriteListRegister;
 import xyz.chener.zp.common.utils.Jwt;
 import xyz.chener.zp.common.utils.NacosUtils;
@@ -41,7 +42,8 @@ import xyz.chener.zp.common.utils.NacosUtils;
         , HttpRequestInterfaceInject.class
         , NacosMetadataRegister.class
         , RequestUrlBeanDefinitionIterator.class
-        , HttpClientConfig.class})
+        , HttpClientConfig.class
+        , ServletVitureThreadPoolAutoConfiguration.class})
 public class CommonAutoConfig {
 
     private final CommonConfig commonConfig;
