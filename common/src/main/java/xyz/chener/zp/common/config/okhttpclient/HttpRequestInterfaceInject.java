@@ -49,7 +49,7 @@ public class HttpRequestInterfaceInject implements BeanDefinitionRegistryPostPro
                     MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(e);
                     HttpExchange ann = Class.forName(metadataReader.getClassMetadata().getClassName()).getAnnotation(HttpExchange.class);
                     return Objects.nonNull(ann);
-                } catch (IOException | ClassNotFoundException ignored) {}
+                } catch (Throwable ignored) {}
                 return false;
             }).map(e -> {
                 try {

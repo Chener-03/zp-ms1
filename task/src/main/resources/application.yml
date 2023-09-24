@@ -56,11 +56,16 @@ spring:
       maximum-pool-size: 5
 
 server:
-  port: 26312
+  port: 26313
   compression:
     enabled: true
+
+
 zp:
   task:
     zk:
-      address: "127.0.0.1:2181"
-
+      address: "101.42.12.133:2181"
+      digestACL: "zkadmin:Abcd1234"
+    task-cfg:
+      address: "101.42.12.133:2181"
+      digestACL: "zkadmin:Abcd1234"

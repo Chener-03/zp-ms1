@@ -7,23 +7,29 @@ import com.alibaba.nacos.api.naming.NamingFactory
 import org.apache.zookeeper.ZooKeeper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn
 import xyz.chener.zp.common.entity.WriteList
 import xyz.chener.zp.common.utils.NacosUtils
+import xyz.chener.zp.task.entity.ZooInstance
+import xyz.chener.zp.task.service.InstanceService
 
 
 @RestController
 @RequestMapping("/api/web/task")
 @UnifiedReturn
 @Validated
-class TaskListController {
+open class TaskListController {
 
 
     @Autowired
     lateinit var nacosUtils: NacosUtils
+
+    @Autowired
+    lateinit var instanceService: InstanceService
 
     @RequestMapping("/test")
     @WriteList
@@ -35,5 +41,12 @@ class TaskListController {
 
         return "1"
     }
+
+    @GetMapping("/getOnlineInstance")
+    @WriteList
+    open fun getOnlineInstance():List<ZooInstance>{
+        return instanceService.getOnlineInstance()
+    }
+
 
 }

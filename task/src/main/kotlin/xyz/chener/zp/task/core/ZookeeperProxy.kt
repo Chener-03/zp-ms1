@@ -24,12 +24,18 @@ open class ZookeeperProxy : ZooKeeper,DisposableBean  {
     @Throws(IOException::class)
      constructor(connectString: String?,sessionTimeout: Int,watcher: Watcher?,taskConfiguration : TaskConfiguration):super(connectString, sessionTimeout, watcher){
         this.taskConfiguration = taskConfiguration
+        taskConfiguration.zk.digestACL?.let {
+            this.addAuthInfo("digest", it.toByteArray())
+        }
         checkRootDirExist()
     }
 
     @Throws(IOException::class)
     constructor(connectString: String?,sessionTimeout: Int,watcher: Watcher?,conf : ZKClientConfig?,taskConfiguration : TaskConfiguration):super(connectString, sessionTimeout, watcher,conf){
         this.taskConfiguration = taskConfiguration
+        taskConfiguration.zk.digestACL?.let {
+            this.addAuthInfo("digest", it.toByteArray())
+        }
         checkRootDirExist()
     }
 
@@ -46,11 +52,7 @@ open class ZookeeperProxy : ZooKeeper,DisposableBean  {
     }
 
     open fun getAcl() : List<ACL> {
-        return taskConfiguration.zk.digestACL?.let {
-            return@let it.stream().map { it1 ->
-                ACL(ZooDefs.Perms.ALL, Id("digest", it1))
-            }.toList()
-        } ?:ZooDefs.Ids.OPEN_ACL_UNSAFE
+        return ZooDefs.Ids.OPEN_ACL_UNSAFE
     }
 
 

@@ -1,3 +1,5 @@
 package xyz.chener.zp.task.entity
 
-open class ZooInstance(val address:String,val createTime : Long,val processCore:Int,val memory:Long)
+open class ZooInstance(var ip:String,var address:String, var createTime : Long, var processCore:Int, var memory:Long, var appProcessUid:String?,var jobInstanceId:String?){
+    constructor() : this("","", 0, 0, 0, null,null)
+}

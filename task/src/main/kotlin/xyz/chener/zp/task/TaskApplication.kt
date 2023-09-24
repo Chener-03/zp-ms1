@@ -1,10 +1,12 @@
 package xyz.chener.zp.task
 
 
+import org.apache.shardingsphere.elasticjob.infra.listener.ElasticJobListener
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import xyz.chener.zp.task.config.TaskConfiguration
+import java.util.ServiceLoader
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 
@@ -19,27 +21,33 @@ open class TaskApplication {
 
         @JvmStatic
         fun main(args: Array<String>) {
-/*
+            val load = ServiceLoader.load(ElasticJobListener::class.java)
 
-            val requestStr = """
-{
-    "startTime": "2023-09-20 00:00:00",
-    "endTime": "2023-09-20 20:00:00",
-    "contractList": [
-        "JNCYHT-LRF-0920001"
-    ],
-    "size": 10,
-    "page": 1
-}
-            """.trimIndent()
-            val map: MutableMap<String, Any> = TreeMap()
-            map["Kcwl-OpenApi-AppSecret"] = "sdfdsfsdfdsf435436546575b6776878"
-            map.putAll(ObjectMapper().readValue(requestStr, TreeMap::class.java) as Map<out String, Any>)
+            load.stream().forEach{
+                println(it)
+            }
 
-            val sign: String = Md5Utiles.getStrMd5(ObjectMapper().writeValueAsString(map))
-            println(System.currentTimeMillis())
-            println(sign)
-*/
+            /*
+
+                        val requestStr = """
+            {
+                "startTime": "2023-09-20 00:00:00",
+                "endTime": "2023-09-20 20:00:00",
+                "contractList": [
+                    "JNCYHT-LRF-0920001"
+                ],
+                "size": 10,
+                "page": 1
+            }
+                        """.trimIndent()
+                        val map: MutableMap<String, Any> = TreeMap()
+                        map["Kcwl-OpenApi-AppSecret"] = "sdfdsfsdfdsf435436546575b6776878"
+                        map.putAll(ObjectMapper().readValue(requestStr, TreeMap::class.java) as Map<out String, Any>)
+
+                        val sign: String = Md5Utiles.getStrMd5(ObjectMapper().writeValueAsString(map))
+                        println(System.currentTimeMillis())
+                        println(sign)
+            */
             org.springframework.boot.runApplication<TaskApplication>(*args)
 
 

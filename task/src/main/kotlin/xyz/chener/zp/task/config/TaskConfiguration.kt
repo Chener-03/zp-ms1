@@ -15,12 +15,15 @@ open class TaskConfiguration {
 }
 
 open class TaskCfg {
-    var ip:String?=null
+    var address:String?="127.0.0.1:2181"
+    var vitureDir:String? = "zp-elastic-job-dev"
+    var registIp:String? = null
+    var digestACL: String? = null
 }
 
 open class ZK {
     var address: String? = null
     var vitureDir: String = "/zp-task-dev"
-    var digestACL: List<String>? = null
+    var digestACL: String? = null
     var connectTimeOut: Int = 5000
 }
