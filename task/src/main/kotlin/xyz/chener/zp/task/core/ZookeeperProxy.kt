@@ -42,7 +42,7 @@ open class ZookeeperProxy @Throws(IOException::class) constructor(
     }
 
     private fun register(){
-        zooKeeperInstance.create()
+//        zooKeeperInstance.create()
     }
 
 

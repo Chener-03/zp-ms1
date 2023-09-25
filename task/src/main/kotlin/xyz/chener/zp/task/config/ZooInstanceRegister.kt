@@ -1,12 +1,14 @@
 package xyz.chener.zp.task.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import okhttp3.internal.notify
 import org.apache.shardingsphere.elasticjob.infra.env.IpUtils
 import org.apache.shardingsphere.elasticjob.infra.handler.sharding.JobInstance
 import org.apache.zookeeper.CreateMode
 import org.apache.zookeeper.WatchedEvent
 import org.apache.zookeeper.Watcher
 import org.apache.zookeeper.Watcher.Event
+import org.apache.zookeeper.data.Stat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -44,8 +46,8 @@ class ZooInstanceRegister {
                                 null,
                                 "Zookeeper Refresh"
                             ))
-                        ApplicationContextHolder.getApplicationContext().getBean(ZookeeperProxy::class.java)
-                        ApplicationContextHolder.getApplicationContext().getBean(ZooInstance::class.java)
+                        ApplicationContextHolder.getApplicationContext().getBean(ZookeeperProxy::class.java).getRootDir()
+                        ApplicationContextHolder.getApplicationContext().getBean(ZooInstance::class.java).ip
                     }
                 }
             }, taskConfiguration)
@@ -75,8 +77,11 @@ class ZooInstanceRegister {
                 System.getProperty(InfoRegistration.APP_UID),
                 JobInstance().jobInstanceId
             )
-            val path = zk.create("${zk.getRootDir()}/${zooInstance.address}", ObjectMapper().writeValueAsBytes(zooInstance), zk.getAcl(), CreateMode.EPHEMERAL)
-            log.info("注册实例:{}",path)
+            val exists:Stat? = zk.exists("${zk.getRootDir()}/${zooInstance.address}", false)
+            if (exists == null){
+                val path = zk.create("${zk.getRootDir()}/${zooInstance.address}", ObjectMapper().writeValueAsBytes(zooInstance), zk.getAcl(), CreateMode.EPHEMERAL)
+                log.info("注册实例:{}",path)
+            }
             return zooInstance
         }catch (e:Exception) {
             log.error("注册实例失败", e)
