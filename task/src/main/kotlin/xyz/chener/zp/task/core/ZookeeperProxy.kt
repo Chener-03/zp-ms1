@@ -15,28 +15,34 @@ import org.springframework.beans.factory.DisposableBean
 import xyz.chener.zp.task.config.TaskConfiguration
 import java.io.IOException
 
-open class ZookeeperProxy : ZooKeeper,DisposableBean  {
+open class ZookeeperProxy @Throws(IOException::class) constructor(
+    private val connectString: String?,
+    private val sessionTimeout: Int,
+    private val watcher: Watcher?,
+    private var taskConfiguration: TaskConfiguration
+) : ZooKeeper(connectString, sessionTimeout, watcher),DisposableBean  {
 
     private val log : Logger = LoggerFactory.getLogger(ZookeeperProxy::class.java)
 
-    private var taskConfiguration : TaskConfiguration
+    private lateinit var zooKeeperInstance:ZooKeeper
 
-    @Throws(IOException::class)
-     constructor(connectString: String?,sessionTimeout: Int,watcher: Watcher?,taskConfiguration : TaskConfiguration):super(connectString, sessionTimeout, watcher){
-        this.taskConfiguration = taskConfiguration
+    init {
         taskConfiguration.zk.digestACL?.let {
             this.addAuthInfo("digest", it.toByteArray())
         }
         checkRootDirExist()
     }
 
-    @Throws(IOException::class)
-    constructor(connectString: String?,sessionTimeout: Int,watcher: Watcher?,conf : ZKClientConfig?,taskConfiguration : TaskConfiguration):super(connectString, sessionTimeout, watcher,conf){
-        this.taskConfiguration = taskConfiguration
-        taskConfiguration.zk.digestACL?.let {
-            this.addAuthInfo("digest", it.toByteArray())
+
+    private fun init(){
+        zooKeeperInstance = ZooKeeper(connectString, sessionTimeout) {
+
         }
-        checkRootDirExist()
+
+    }
+
+    private fun register(){
+        zooKeeperInstance.create()
     }
 
 
