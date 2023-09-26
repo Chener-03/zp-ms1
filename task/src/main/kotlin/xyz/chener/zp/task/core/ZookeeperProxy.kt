@@ -15,7 +15,9 @@ import org.springframework.beans.factory.DisposableBean
 import xyz.chener.zp.task.config.TaskConfiguration
 import java.io.IOException
 
-open class ZookeeperProxy @Throws(IOException::class) constructor(
+open class ZookeeperProxy
+@Throws(IOException::class)
+constructor(
     private val connectString: String?,
     private val sessionTimeout: Int,
     private val watcher: Watcher?,
@@ -24,7 +26,6 @@ open class ZookeeperProxy @Throws(IOException::class) constructor(
 
     private val log : Logger = LoggerFactory.getLogger(ZookeeperProxy::class.java)
 
-    private lateinit var zooKeeperInstance:ZooKeeper
 
     init {
         taskConfiguration.zk.digestACL?.let {
@@ -32,19 +33,6 @@ open class ZookeeperProxy @Throws(IOException::class) constructor(
         }
         checkRootDirExist()
     }
-
-
-    private fun init(){
-        zooKeeperInstance = ZooKeeper(connectString, sessionTimeout) {
-
-        }
-
-    }
-
-    private fun register(){
-//        zooKeeperInstance.create()
-    }
-
 
     open fun getRootDir():String{
         return this.taskConfiguration.zk.vitureDir

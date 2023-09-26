@@ -64,8 +64,8 @@ server:
 zp:
   task:
     zk:
-      address: "101.42.12.133:2181"
-      digestACL: "zkadmin:Abcd1234"
+      address: "127.0.0.1:2181"
+#      digestACL: "zkadmin:Abcd1234"
     task-cfg:
-      address: "101.42.12.133:2181"
-      digestACL: "zkadmin:Abcd1234"
+      address: "127.0.0.1:2181"
+#      digestACL: "zkadmin:Abcd1234"

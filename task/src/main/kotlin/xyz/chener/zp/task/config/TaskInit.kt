@@ -2,29 +2,22 @@ package xyz.chener.zp.task.config
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration
 import org.apache.shardingsphere.elasticjob.api.ShardingContext
-import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler
-import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandlerPropertiesValidator
-import org.apache.shardingsphere.elasticjob.infra.pojo.JobConfigurationPOJO
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.JobConfigurationAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ServerStatisticsAPIImpl
-import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
-import org.apache.zookeeper.AddWatchMode
-import org.apache.zookeeper.WatchedEvent
-import org.apache.zookeeper.Watcher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
-import org.springframework.boot.autoconfigure.quartz.JobStoreType
 import org.springframework.stereotype.Component
+import xyz.chener.zp.task.core.SimpleJobHandleProxy
 import xyz.chener.zp.task.core.ZookeeperProxy
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
-import xyz.chener.zp.task.core.listener.LoggerAppendListener
+import xyz.chener.zp.task.core.listener.TaskExecContextListener
 import xyz.chener.zp.task.service.TaskInfoService
+import java.lang.reflect.Proxy
 import javax.sql.DataSource
 
 
@@ -56,8 +49,8 @@ class TaskInit : CommandLineRunner {
             .description("测试任务")
             .overwrite(true)
             .disabled(true)
-            .jobErrorHandlerType("LOG")
-            .jobListenerTypes(LoggerAppendListener::class.java.name)
+            .jobErrorHandlerType("THROW")
+            .jobListenerTypes(TaskExecContextListener::class.java.name)
             .build()
 
 /*        ScheduleJobBootstrap(
@@ -66,6 +59,13 @@ class TaskInit : CommandLineRunner {
             ).schedule()*/
 
         val job = TestSimpleJob()
+
+        val j = Proxy.newProxyInstance(
+            this.javaClass.classLoader,
+            arrayOf(SimpleJob::class.java),
+            SimpleJobHandleProxy(job)
+        ) as SimpleJob
+        j.execute(ShardingContext("","",1 ,"",1,""))
         ScheduleJobBootstrap(zookeeperRegistryCenter, job, jobConfiguration).schedule()
 
 
