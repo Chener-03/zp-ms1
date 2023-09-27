@@ -55,7 +55,7 @@ class ZooInstanceRegister {
         try {
             val zk = ZookeeperProxy(taskConfiguration.zk.address, taskConfiguration.zk.connectTimeOut, object : Watcher {
                 override fun process(event: WatchedEvent?) {
-                    if (event?.state == Event.KeeperState.Disconnected) {
+                    if (event?.state == Event.KeeperState.Disconnected || event?.state == Event.KeeperState.Expired) {
                         ApplicationContextHolder.getApplicationContext().publishEvent(
                             RefreshEvent(
                                 this,

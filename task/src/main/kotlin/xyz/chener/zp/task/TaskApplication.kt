@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 
 
-@org.springframework.boot.autoconfigure.SpringBootApplication(excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
+@org.springframework.boot.autoconfigure.SpringBootApplication//(excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(TaskConfiguration::class)

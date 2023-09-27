@@ -51,6 +51,8 @@ dependencies {
 
     implementation 'io.github.openfeign:feign-okhttp:12.5'
 
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
+
 
 //    implementation 'org.quartz-scheduler:quartz:2.5.0-rc1'
     implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-core:3.0.3'

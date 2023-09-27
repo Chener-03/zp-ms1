@@ -12,6 +12,8 @@ open class TaskInfo : Model<TaskInfo?>() {
 
     var taskName: String? = null
 
+    var jobName: String? = null
+
     var orgId: Long? = null
 
     var createUserId: Long? = null

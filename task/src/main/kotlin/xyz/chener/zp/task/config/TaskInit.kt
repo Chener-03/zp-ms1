@@ -9,6 +9,7 @@ import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.S
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
@@ -36,37 +37,39 @@ class TaskInit : CommandLineRunner {
     @Autowired
     lateinit var zookeeperRegistryCenter: ZookeeperRegistryCenter
 
+    @Autowired
+    lateinit var redissonClient: RedissonClient
+
     override fun run(vararg args: String?) {
 
 
 
         val jobConfiguration = JobConfiguration
-            .newBuilder("test12", 3)
+            .newBuilder("test12", 2)
             .cron("0/10 * * * * ?")
             .jobParameter("123")
-            .shardingItemParameters("0=A,1=B,2=C")
+//            .shardingItemParameters("0=A")
             .addExtraConfigurations(TracingConfiguration("RDB",dataSource))
             .description("测试任务")
             .overwrite(true)
             .disabled(true)
-            .jobErrorHandlerType("THROW")
+            .misfire(true)
+            .jobErrorHandlerType("IGNORE")
             .jobListenerTypes(TaskExecContextListener::class.java.name)
             .build()
 
-/*        ScheduleJobBootstrap(
-            zookeeperRegistryCenter, "HTTP",
-            jobConfiguration
-            ).schedule()*/
+        val currentTaskUid = xyz.chener.zp.task.core.TaskUtils.getCurrentTaskUid(jobConfiguration.jobName)
+
+        /*        ScheduleJobBootstrap(
+                    zookeeperRegistryCenter, "HTTP",
+                    jobConfiguration
+                    ).schedule()*/
 
         val job = TestSimpleJob()
 
-        val j = Proxy.newProxyInstance(
-            this.javaClass.classLoader,
-            arrayOf(SimpleJob::class.java),
-            SimpleJobHandleProxy(job)
-        ) as SimpleJob
-        j.execute(ShardingContext("","",1 ,"",1,""))
-        ScheduleJobBootstrap(zookeeperRegistryCenter, job, jobConfiguration).schedule()
+
+
+        ScheduleJobBootstrap(zookeeperRegistryCenter,job, jobConfiguration).schedule()
 
 
 
