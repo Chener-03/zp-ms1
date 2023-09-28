@@ -6,6 +6,7 @@ import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobB
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ServerStatisticsAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
@@ -13,6 +14,7 @@ import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
+import xyz.chener.zp.common.entity.PublicEnum
 import xyz.chener.zp.task.core.SimpleJobHandleProxy
 import xyz.chener.zp.task.core.ZookeeperProxy
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
@@ -53,7 +55,7 @@ class TaskInit : CommandLineRunner {
             .description("测试任务")
             .overwrite(true)
             .disabled(true)
-            .misfire(true)
+            .misfire(false)
             .jobErrorHandlerType("IGNORE")
             .jobListenerTypes(TaskExecContextListener::class.java.name)
             .build()
@@ -89,8 +91,9 @@ class TaskInit : CommandLineRunner {
         val serversTotalCount = ServerStatisticsAPIImpl(zookeeperRegistryCenter).serversTotalCount
         val allServersBriefInfo = ServerStatisticsAPIImpl(zookeeperRegistryCenter).allServersBriefInfo
 
+        val jobBriefInfo = JobStatisticsAPIImpl(zookeeperRegistryCenter).getJobBriefInfo(jobConfiguration.jobName)
 
-
+//        val shardingInfo = ShardingStatisticsAPIImpl(zookeeperRegistryCenter).getShardingInfo(jobConfiguration.jobName)
 
 
         println()

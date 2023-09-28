@@ -3,6 +3,7 @@ package xyz.chener.zp.task.entity
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.extension.activerecord.Model
+import jakarta.validation.constraints.NotEmpty
 
 
 open class TaskInfo : Model<TaskInfo?>() {
@@ -12,6 +13,7 @@ open class TaskInfo : Model<TaskInfo?>() {
 
     var taskName: String? = null
 
+    @NotEmpty(message = "任务名称不能为空")
     var jobName: String? = null
 
     var orgId: Long? = null
@@ -23,6 +25,8 @@ open class TaskInfo : Model<TaskInfo?>() {
 
     //执行器
     var taskHandle: String? = null
+
+    var load_task:Int? = null
 
     //是否启用
     var enable: Int? = null

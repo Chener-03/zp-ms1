@@ -6,6 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
 import xyz.chener.zp.task.entity.TaskShardingExecLog
+import xyz.chener.zp.task.entity.ZooInstance
 import xyz.chener.zp.task.entity.enums.TaskState
 import xyz.chener.zp.task.service.TaskShardingExecLogService
 import java.util.*
@@ -15,6 +16,10 @@ abstract class SimpleJobHandleProxy : SimpleJob {
     private val log : Logger = LoggerFactory.getLogger(SimpleJobHandleProxy::class.java)
 
     private var threadLogger:InheritableThreadLocal<TaskLogger> = InheritableThreadLocal()
+
+
+    @Volatile
+    private var zooInstance:ZooInstance? = null
 
     fun getLogger():TaskLogger?{
         return threadLogger.get()
@@ -48,11 +53,15 @@ abstract class SimpleJobHandleProxy : SimpleJob {
     private fun recordTaskStart(taskuid:String,shardingContext: ShardingContext?):Boolean{
         return try {
             val taskShardingExecLogService = ApplicationContextHolder.getApplicationContext().getBean(TaskShardingExecLogService::class.java)
+            if (zooInstance == null){
+                zooInstance = ApplicationContextHolder.getApplicationContext().getBean(ZooInstance::class.java)
+            }
             TaskShardingExecLog().run {
                 this.startTime = Date()
                 this.taskUid = taskuid
                 this.state= TaskState.RUNNING.int
                 this.shardingItem = shardingContext?.shardingItem?:0
+                this.execServerAddress = zooInstance?.address
                 taskShardingExecLogService.save(this)
             }
             true
@@ -74,7 +83,7 @@ abstract class SimpleJobHandleProxy : SimpleJob {
                 this.logs = threadLogger.get()?.getLogs()
                 taskShardingExecLogService.updateById(this)
             }
-        }catch (e:Exception) {
+        } catch (e:Exception) {
             log.error("记录分片任务结束日志失败: {}  {},{},{}",e.message,shardingContext?.jobName,shardingContext?.taskId,shardingContext?.shardingItem)
         }
     }

@@ -57,7 +57,7 @@ spring:
       maximum-pool-size: 5
 
 server:
-  port: 26313
+  port: 26314
   compression:
     enabled: true
 
@@ -69,4 +69,5 @@ zp:
 #      digestACL: "zkadmin:Abcd1234"
     task-cfg:
       address: "127.0.0.1:2181"
+      registIp: "10.18.5.26"
 #      digestACL: "zkadmin:Abcd1234"

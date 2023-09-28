@@ -4,6 +4,9 @@ import com.alibaba.cloud.nacos.NacosDiscoveryProperties
 import com.alibaba.cloud.nacos.NacosServiceManager
 import com.alibaba.cloud.nacos.endpoint.NacosDiscoveryEndpoint
 import com.alibaba.nacos.api.naming.NamingFactory
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.zookeeper.ZooKeeper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.annotation.Validated
@@ -26,6 +29,9 @@ open class TaskListController {
 
 
     @Autowired
+    private lateinit var zookeeperRegistryCenter: ZookeeperRegistryCenter
+
+    @Autowired
     lateinit var nacosUtils: NacosUtils
 
     @Autowired
@@ -33,14 +39,20 @@ open class TaskListController {
 
     @RequestMapping("/test")
     @WriteList
-    fun test():String{
-        val nsm = ApplicationContextHolder.getApplicationContext().getBean(NacosServiceManager::class.java)
-        val allInstances = nacosUtils.manager.namingService.getAllInstances("zp-task-module", "zp")
-        val b = ApplicationContextHolder.getApplicationContext().getBean(NacosDiscoveryProperties::class.java)
-
-
-        return "1"
+    fun test():Any{
+        val shardingInfo = ShardingStatisticsAPIImpl(zookeeperRegistryCenter).getShardingInfo("test12")
+        JobOperateAPIImpl(zookeeperRegistryCenter).shutdown("test12",null)
+        return shardingInfo
     }
+
+    @RequestMapping("/test1")
+    @WriteList
+    fun test1():Any{
+        val shardingInfo = ShardingStatisticsAPIImpl(zookeeperRegistryCenter).getShardingInfo("test12")
+        JobOperateAPIImpl(zookeeperRegistryCenter).enable("test12",null)
+        return shardingInfo
+    }
+
 
     @GetMapping("/getOnlineInstance")
     @WriteList

@@ -15,6 +15,8 @@ open class TaskShardingExecLog : Model<TaskShardingExecLog?>() {
 
     var shardingItem: Int? = null
 
+    var execServerAddress:String? = null
+
     var logs: String? = null
 
     //1进行中  2完成  3抛异常

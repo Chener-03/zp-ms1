@@ -20,7 +20,7 @@ class TestSimpleJob : SimpleJobHandleProxy() {
             throw RuntimeException("测试异常")
         }
         getLogger()?.info("任务${shardingContext?.shardingItem}开始 hhh")
-        Thread.sleep(1000*2)
+        Thread.sleep(1000*5)
         println("任务${shardingContext?.shardingItem}结束 "+Thread.currentThread().name)
     }
 }

@@ -10,8 +10,10 @@ import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
 import xyz.chener.zp.task.config.TaskConfiguration
 import xyz.chener.zp.task.core.ZookeeperProxy
 import xyz.chener.zp.task.entity.TaskLog
+import xyz.chener.zp.task.entity.TaskShardingExecLog
 import xyz.chener.zp.task.entity.enums.TaskState
 import xyz.chener.zp.task.service.TaskLogService
+import xyz.chener.zp.task.service.TaskShardingExecLogService
 import xyz.chener.zp.task.service.impl.TaskLogServiceImpl
 import java.util.*
 import kotlin.reflect.KMutableProperty1
@@ -58,7 +60,19 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
         val tasklog:TaskLog? = taskLogService.ktQuery().eq(TaskLog::taskUid, currentTaskUid)
             .eq(TaskLog::jobName, shardingContexts?.jobName).one()
         tasklog?.let {
-            it.state = TaskState.FINISH.int
+            val tses = ApplicationContextHolder.getApplicationContext().getBean(TaskShardingExecLogService::class.java)
+            val execList = tses.ktQuery().eq(TaskShardingExecLog::taskUid, tasklog.taskUid)
+                .select(TaskShardingExecLog::id, TaskShardingExecLog::state)
+                .list()
+
+            execList.forEach { ec->
+                if (ec.state == TaskState.RUNNING.int) {
+                    tses.ktUpdate().set(TaskShardingExecLog::state, TaskState.CRASH.int)
+                        .eq(TaskShardingExecLog::id, ec.id).update()
+                }
+            }
+
+            it.state = if (execList.map { it1->it1.state }.contains(TaskState.EXCEPTION.int))  TaskState.EXCEPTION.int else TaskState.FINISH.int
             it.endTime = Date()
             taskLogService.updateById(it)
         }

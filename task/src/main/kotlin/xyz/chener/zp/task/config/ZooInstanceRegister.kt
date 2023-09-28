@@ -35,6 +35,10 @@ class ZooInstanceRegister {
 
     @Bean
     fun zooInstance(taskConfiguration: TaskConfiguration): ZooInstance {
+        taskConfiguration.taskCfg.registIp?.let{
+            System.setProperty("elasticjob.preferred.network.ip",it)
+        }
+
         val ipaddr = "${IpUtils.getIp()}:$port"
         return ZooInstance(
             IpUtils.getIp(),
