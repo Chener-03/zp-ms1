@@ -2,6 +2,7 @@ package xyz.chener.zp.common.utils;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import xyz.chener.zp.common.entity.LoginUserDetails;
 import xyz.chener.zp.common.entity.SecurityVar;
 
 import java.util.Collection;
@@ -25,6 +26,15 @@ public class SecurityUtils {
             }
         }
         return false;
+    }
+
+
+    public static LoginUserDetails currentUser(){
+        try {
+            return (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getDetails();
+        }catch (Exception e){
+            return null;
+        }
     }
 
 }

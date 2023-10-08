@@ -15,12 +15,24 @@ import java.lang.RuntimeException
 class TestSimpleJob : SimpleJobHandleProxy() {
 
     override fun executeJob(shardingContext: ShardingContext?) {
+//        this.execute(shardingContext)
         println("任务${shardingContext?.shardingItem}开始 "+Thread.currentThread().name + "     ${TaskUtils.getCurrentTaskUid(shardingContext?.jobName)}")
         if (shardingContext?.shardingItem == 1){
-            throw RuntimeException("测试异常")
+//            throw RuntimeException("测试异常")
+
+            Thread.sleep(1000*1)
+        }else{
+            for (i in 1..5){
+                if (shouldEnd()) {
+                    break
+                }
+                Thread.sleep(1000*1)
+                println("任务${shardingContext?.shardingItem}---${i}执行中")
+                getLogger()?.info("任务${shardingContext?.shardingItem}---${i}执行中")
+            }
         }
         getLogger()?.info("任务${shardingContext?.shardingItem}开始 hhh")
-        Thread.sleep(1000*5)
+
         println("任务${shardingContext?.shardingItem}结束 "+Thread.currentThread().name)
     }
 }

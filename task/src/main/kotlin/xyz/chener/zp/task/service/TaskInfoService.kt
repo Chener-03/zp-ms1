@@ -4,4 +4,4 @@ import com.baomidou.mybatisplus.extension.service.IService
 import xyz.chener.zp.task.entity.TaskInfo
 
 
-interface TaskInfoService : IService<TaskInfo?>
+interface TaskInfoService : IService<TaskInfo>

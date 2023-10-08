@@ -70,8 +70,13 @@ class TaskInit : CommandLineRunner {
         val job = TestSimpleJob()
 
 
+        val jb = ScheduleJobBootstrap(zookeeperRegistryCenter, job, jobConfiguration)
+        jb.schedule()
 
-        ScheduleJobBootstrap(zookeeperRegistryCenter,job, jobConfiguration).schedule()
+        /*Thread.ofVirtual().start{
+            Thread.sleep(10 * 1000)
+            jb.shutdown()
+        }*/
 
 
 

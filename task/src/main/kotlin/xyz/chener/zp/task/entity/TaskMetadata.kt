@@ -16,7 +16,6 @@ open class TaskMetadata {
 
     var timeZone:String = "Asia/Shanghai"
 
-    var record : Boolean = false
 
     var description: String? = null
 

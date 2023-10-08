@@ -7,8 +7,14 @@ import org.apache.zookeeper.data.Stat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
+import xyz.chener.zp.common.utils.chain.AbstractChainExecute
+import xyz.chener.zp.common.utils.chain.ChainStarter
 import xyz.chener.zp.task.config.TaskConfiguration
 import xyz.chener.zp.task.core.ZookeeperProxy
+import xyz.chener.zp.task.core.notify.EmailNotify
+import xyz.chener.zp.task.core.notify.MessageNotify
+import xyz.chener.zp.task.core.notify.NotifyHeader
+import xyz.chener.zp.task.core.notify.NotifyParam
 import xyz.chener.zp.task.entity.TaskLog
 import xyz.chener.zp.task.entity.TaskShardingExecLog
 import xyz.chener.zp.task.entity.enums.TaskState
@@ -44,6 +50,8 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             this.state = TaskState.RUNNING.int
         }
         taskLogService.save(taskLog)
+
+        ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { NotifyParam(true,false, it) })
     }
 
 
@@ -56,6 +64,7 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             return
         }
 
+        // 更新任务状态
         val taskLogService = ApplicationContextHolder.getApplicationContext().getBean(TaskLogService::class.java)
         val tasklog:TaskLog? = taskLogService.ktQuery().eq(TaskLog::taskUid, currentTaskUid)
             .eq(TaskLog::jobName, shardingContexts?.jobName).one()
@@ -75,9 +84,20 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             it.state = if (execList.map { it1->it1.state }.contains(TaskState.EXCEPTION.int))  TaskState.EXCEPTION.int else TaskState.FINISH.int
             it.endTime = Date()
             taskLogService.updateById(it)
+
+            ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { it2 ->
+                NotifyParam(false,it.state == 3, it2)
+            })
         }
     }
 
+
+    private fun getNotifyAllProcessor():List<AbstractChainExecute> {
+        val n1 = ApplicationContextHolder.getApplicationContext().getBean(NotifyHeader::class.java)
+        val n2 = ApplicationContextHolder.getApplicationContext().getBean(EmailNotify::class.java)
+        val n3 = ApplicationContextHolder.getApplicationContext().getBean(MessageNotify::class.java)
+        return listOf(n1,n2,n3)
+    }
 
     private fun registerTaskUidToZk(uuid:String,jobName:String?){
         val zk = ApplicationContextHolder.getApplicationContext().getBean(ZookeeperProxy::class.java)
@@ -98,11 +118,5 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             zk.setData("${cfg.taskCfg.vitureDir}/${jobName}/${CTX_PATH}",null, -1)
         }
     }
-
-
-
-
-
-
 
 }

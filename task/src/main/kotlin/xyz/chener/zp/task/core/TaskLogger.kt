@@ -18,16 +18,16 @@ open class TaskLogger(private var taskUid: String,private var shardingItem: Int)
     private val redissonClient: RedissonClient = ApplicationContextHolder.getApplicationContext().getBean(RedissonClient::class.java)
 
     fun info(fmt:String?,vararg args:Any?){
-        log("INFO",fmt,args)
+        log("INFO",fmt,*args)
     }
 
     fun error(fmt:String?,vararg args:Any?){
-        log("ERROR",fmt,args)
+        log("ERROR",fmt,*args)
     }
 
 
     private fun log(level:String , fmt:String?,vararg args:Any?){
-        val str = "[${simpleDateFormat.format(Date())}] [$level]" + String.format(fmt?:"",args) + "\n"
+        val str = "[${simpleDateFormat.format(Date())}] [$level]" + String.format(fmt?:"",*args) + "\n"
         logs.append(str)
         synchronousRedisLog(str)
     }

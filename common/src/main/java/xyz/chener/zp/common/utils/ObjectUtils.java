@@ -248,4 +248,13 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
     }
 
 
+    public static <T> T newInstance(String classFullName){
+        try {
+            return (T) newInstance(Class.forName(classFullName));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
 }

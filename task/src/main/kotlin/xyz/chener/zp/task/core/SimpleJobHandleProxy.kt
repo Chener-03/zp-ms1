@@ -2,9 +2,12 @@ package xyz.chener.zp.task.core
 
 import org.apache.shardingsphere.elasticjob.api.ShardingContext
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
+import org.apache.zookeeper.data.Stat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
+import xyz.chener.zp.task.config.ElasticJobConfiguration
+import xyz.chener.zp.task.config.TaskConfiguration
 import xyz.chener.zp.task.entity.TaskShardingExecLog
 import xyz.chener.zp.task.entity.ZooInstance
 import xyz.chener.zp.task.entity.enums.TaskState
@@ -17,6 +20,8 @@ abstract class SimpleJobHandleProxy : SimpleJob {
 
     private var threadLogger:InheritableThreadLocal<TaskLogger> = InheritableThreadLocal()
 
+    private var threadShardingContext:InheritableThreadLocal<ShardingContext?> = InheritableThreadLocal()
+
 
     @Volatile
     private var zooInstance:ZooInstance? = null
@@ -25,9 +30,33 @@ abstract class SimpleJobHandleProxy : SimpleJob {
         return threadLogger.get()
     }
 
+    fun shouldEnd():Boolean{
+        return try {
+            val shardingContext = threadShardingContext.get()
+            val zk = ApplicationContextHolder.getApplicationContext().getBean(ZookeeperProxy::class.java)
+            val tc = ApplicationContextHolder.getApplicationContext().getBean(TaskConfiguration::class.java)
+            val stat : Stat? = zk.exists(
+                "${tc.taskCfg.vitureDir}/${shardingContext?.jobName}/instances/${getZooInstance().jobInstanceId}",
+                false
+            )
+            if (stat == null) {
+                getLogger()?.info("[外部终止信号]任务实例已被移除，任务分片执行终止: {%s},{%s}, item:{%s}",shardingContext?.jobName,shardingContext?.taskId,shardingContext?.shardingItem)
+                true
+            }else{
+                return false
+            }
+        }catch (e:Exception) {
+            return true
+        }
+    }
 
 
     final override fun execute(shardingContext: ShardingContext?) {
+        if (checkSelfCall()){
+            log.error("检测到任务自调用: {},{}, item:{}",shardingContext?.jobName,shardingContext?.taskId,shardingContext?.shardingItem)
+            return
+        }
+
         val taskuid = TaskUtils.getCurrentTaskUid(shardingContext?.jobName)
         if (taskuid.isNullOrEmpty()){
             log.error("执行任务分片失败，找不到任务上下文: {},{}, item:{}",shardingContext?.jobName,shardingContext?.taskId,shardingContext?.shardingItem)
@@ -35,6 +64,7 @@ abstract class SimpleJobHandleProxy : SimpleJob {
         }
 
         threadLogger.set(TaskLogger(taskuid,shardingContext?.shardingItem?:0))
+        threadShardingContext.set(shardingContext)
 
         if (!recordTaskStart(taskuid,shardingContext)){
             return
@@ -48,20 +78,19 @@ abstract class SimpleJobHandleProxy : SimpleJob {
         }
 
         threadLogger.get()?.clearRedisLog()
+        threadLogger.remove()
+        threadShardingContext.remove()
     }
 
     private fun recordTaskStart(taskuid:String,shardingContext: ShardingContext?):Boolean{
         return try {
             val taskShardingExecLogService = ApplicationContextHolder.getApplicationContext().getBean(TaskShardingExecLogService::class.java)
-            if (zooInstance == null){
-                zooInstance = ApplicationContextHolder.getApplicationContext().getBean(ZooInstance::class.java)
-            }
             TaskShardingExecLog().run {
                 this.startTime = Date()
                 this.taskUid = taskuid
                 this.state= TaskState.RUNNING.int
                 this.shardingItem = shardingContext?.shardingItem?:0
-                this.execServerAddress = zooInstance?.address
+                this.execServerAddress = getZooInstance().address
                 taskShardingExecLogService.save(this)
             }
             true
@@ -88,6 +117,26 @@ abstract class SimpleJobHandleProxy : SimpleJob {
         }
     }
 
+
+    private fun checkSelfCall():Boolean {
+        var count = 0
+        Thread.currentThread().stackTrace.forEachIndexed { index, stackTraceElement ->
+            if (stackTraceElement.className == SimpleJobHandleProxy::class.java.name && stackTraceElement.methodName == SimpleJobHandleProxy::execute.name){
+                count ++
+            }
+            if (index > 20)
+                return@forEachIndexed
+        }
+        return count > 1
+    }
+
+
     abstract fun executeJob(shardingContext: ShardingContext?)
 
+    private fun getZooInstance():ZooInstance{
+        if (zooInstance == null){
+            zooInstance = ApplicationContextHolder.getApplicationContext().getBean(ZooInstance::class.java)
+        }
+        return zooInstance!!
+    }
 }

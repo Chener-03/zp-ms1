@@ -1,11 +1,15 @@
 package xyz.chener.zp.task
 
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.shardingsphere.elasticjob.infra.listener.ElasticJobListener
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import xyz.chener.zp.task.config.TaskConfiguration
+import xyz.chener.zp.task.entity.NOTIFY_TIME
+import xyz.chener.zp.task.entity.NOTIFY_TYPE
+import xyz.chener.zp.task.entity.TaskMetadata
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
@@ -21,11 +25,6 @@ open class TaskApplication {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            val load = ServiceLoader.load(ElasticJobListener::class.java)
-
-            load.stream().forEach{
-                println(it)
-            }
 
             /*
 
@@ -48,6 +47,17 @@ open class TaskApplication {
                         println(System.currentTimeMillis())
                         println(sign)
             */
+
+
+            val tm = TaskMetadata()
+            tm.jobShardingCount = 2
+            tm.cron = "0/10 * * * * ?"
+            tm.taskNotify.notifyTime = NOTIFY_TIME.EXCEPTION + (NOTIFY_TIME.START + NOTIFY_TIME.END)
+            tm.taskNotify.notifyTypes = NOTIFY_TYPE.ZNX + NOTIFY_TYPE.EMAIL
+            tm.taskNotify.emails = listOf("541308303@qq.com")
+
+            val writeValueAsString = ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(tm)
+
             org.springframework.boot.runApplication<TaskApplication>(*args)
 
 

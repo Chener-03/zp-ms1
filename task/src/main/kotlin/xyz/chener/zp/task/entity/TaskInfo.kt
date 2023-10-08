@@ -21,7 +21,7 @@ open class TaskInfo : Model<TaskInfo?>() {
     var createUserId: Long? = null
 
     //任务类型 handle dataflow  jar http等 或者其它..
-    var taskType: String? = null
+    var taskType: Int? = null
 
     //执行器
     var taskHandle: String? = null
