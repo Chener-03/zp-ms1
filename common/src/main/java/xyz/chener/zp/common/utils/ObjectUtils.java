@@ -2,6 +2,8 @@ package xyz.chener.zp.common.utils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import org.springframework.util.NumberUtils;
+import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.entity.SFunction;
 
 import java.io.ByteArrayOutputStream;
@@ -13,8 +15,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @Author: chenzp
@@ -255,6 +257,141 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
             return null;
         }
     }
+
+
+
+
+    public static class Getter {
+
+        /**
+         * 从字符串中获取数组下标
+         * @param key
+         * @return
+         */
+        private static List<String> parenthesisDifferentiation(String key){
+            AtomicReference<String> refKey = new AtomicReference<>(key);
+            List<String> list = new ArrayList<>();
+            while (true){
+                Long s = getFirstArrayIndexNum(refKey);
+                if (s == null) break;
+                list.add(String.format("[%s]",s.toString()));
+            }
+            return list;
+        }
+
+        /**
+         * 从字符串中获取第一个数组下标
+         * @param _outKey
+         * @return
+         */
+        private static Long getFirstArrayIndexNum(AtomicReference<String> _outKey){
+            int index = 0;
+            int left = _outKey.get().indexOf("[", index);
+            if (left == -1)
+                return null;
+
+            index = left;
+            int right =  _outKey.get().indexOf("]", index);
+            if (right == -1)
+                return null;
+
+            String substring = _outKey.get().substring(index + 1, right);
+            if (substring.isEmpty())
+                throw new RuntimeException("数组下标必须为整数");
+
+            try {
+                _outKey.set(_outKey.get().substring(right + 1));
+                return NumberUtils.parseNumber(substring, Long.class);
+            }catch (Exception e) {
+                throw new RuntimeException("数组下标必须为整数");
+            }
+        }
+
+
+        /**
+         * 从对象中获取多级key
+         * @param object
+         * @param key
+         * @return
+         */
+        public static Object getObjectWithMultistageKey(Object object,String key){
+            try {
+                if (key.contains(".") || (key.contains("[") && key.contains("]"))){
+                    String[] split = key.split("\\.");
+
+                    if (!Arrays.stream(split).allMatch(StringUtils::hasText)){
+                        throw new RuntimeException("分隔符中存在连续的 '.' 请检查是否合法");
+                    }
+
+                    List<String> keyList = Arrays.asList(split);
+                    ArrayList<String> newKeyList = new ArrayList<>();
+                    keyList.forEach(ek->{
+                        if (ek.contains("[")){
+                            int left = ek.indexOf("[");
+                            String leftPrefix = ek.substring(0, left);
+                            if (StringUtils.hasText(leftPrefix)){
+                                newKeyList.add(leftPrefix);
+                            }
+                            newKeyList.addAll(parenthesisDifferentiation(ek));
+                        }else {
+                            newKeyList.add(ek);
+                        }
+                    });
+
+                    for (String s : newKeyList) {
+                        object = getObjectWithKey(object,s);
+                        if (object == null){
+                            return null;
+                        }
+                    }
+                    return object;
+                }
+                return getObjectWithKey(object,key);
+            }catch (Exception e) {
+                throw new RuntimeException("Key不合法: '" + key + "'      " + e.getMessage());
+            }
+        }
+
+
+        /**
+         * 从对象中获取key
+         * @param object
+         * @param key
+         * @return
+         */
+        public static Object getObjectWithKey(Object object,String key){
+            if (object == null)
+                return null;
+
+            if (key.contains("[")){
+                if (object instanceof List){
+                    long index = Long.parseLong(key.substring(key.indexOf("[") + 1, key.indexOf("]")));
+                    try {
+                        return ((List<?>) object).get((int) index);
+                    }catch (Exception e) {
+                        return null;
+                    }
+                }
+            }
+
+            if (object instanceof Map map){
+                return map.get(key);
+            }
+
+            try {
+                Field field = object.getClass().getDeclaredField(key);
+                boolean access = field.canAccess(object);
+                field.setAccessible(true);
+                Object o = field.get(object);
+                field.setAccessible(access);
+                return o;
+            } catch (Exception ignored) { }
+
+            return null;
+        }
+    }
+
+
 
 
 }

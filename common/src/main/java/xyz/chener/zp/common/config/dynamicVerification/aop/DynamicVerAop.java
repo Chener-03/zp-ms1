@@ -121,7 +121,8 @@ public class DynamicVerAop {
                 log.warn("The target field of dynamic validation is of map type, but the verified field is not marked");
             }else {
                 for (String key : metadata.dsObjectFieldNames) {
-                    Object o = getObjectWithMultistageKey(obj, key);
+
+                    Object o = ObjectUtils.Getter.getObjectWithMultistageKey(obj, key);
                     if (ObjectUtils.isBasicType(o))
                     {
                         resList.add(processBaseType(o));
@@ -134,7 +135,7 @@ public class DynamicVerAop {
             ArrayList<String> objTypeString = new ArrayList<>();
             if (metadata.dsObjectFieldNames.length > 0){
                 for (String key : metadata.dsObjectFieldNames) {
-                    Object o = getObjectWithMultistageKey(obj, key);
+                    Object o = ObjectUtils.Getter.getObjectWithMultistageKey(obj, key);
                     if (ObjectUtils.isBasicType(o))
                     {
                         objTypeString.add(processBaseType(o));
@@ -164,7 +165,7 @@ public class DynamicVerAop {
                         });
             }
 
-            if (objTypeString.size()>0){
+            if (!objTypeString.isEmpty()){
                 resList.addAll(objTypeString);
             }else {
                 log.warn("The target field of dynamic validation is of object type, but the verified field is not marked or the entity class is not annotated @DsEntityField");
@@ -183,6 +184,16 @@ public class DynamicVerAop {
         return o;
     }
 
+
+    /**
+     *  从对象中获取 by 多级key
+     *  准备弃用
+     *  请使用 {@link ObjectUtils.Getter#getObjectWithMultistageKey(Object, String)}
+     * @param map
+     * @param key
+     * @return
+     */
+    @Deprecated(since = "2023.10.13" ,forRemoval = true)
     private Object getObjectWithMultistageKey(Object map,String key){
         if (key.contains(".")){
             String[] split = key.split("\\.");
@@ -195,6 +206,16 @@ public class DynamicVerAop {
         return getObjectWithKey(map,key);
     }
 
+
+    /**
+     *  从对象中获取 by key
+     *  准备弃用
+     *  请使用 {@link ObjectUtils.Getter#getObjectWithKey(Object, String)}
+     * @param map
+     * @param key
+     * @return
+     */
+    @Deprecated(since = "2023.10.13" ,forRemoval = true)
     private Object getObjectWithKey(Object map,String key){
         if (map == null) return null;
         if (map instanceof Map){
