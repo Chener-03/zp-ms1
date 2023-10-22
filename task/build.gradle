@@ -42,9 +42,6 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.2'
     implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.7'
 
-//    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
-//        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
-//    }
 
     implementation 'org.apache.skywalking:apm-toolkit-trace:9.0.0'
     implementation 'org.apache.skywalking:apm-toolkit-logback-1.x:9.0.0'
@@ -54,14 +51,13 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
 
 
-//    implementation 'org.quartz-scheduler:quartz:2.5.0-rc1'
     implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-core:3.0.3'
     implementation 'org.apache.shardingsphere.elasticjob:elasticjob-http-executor:3.0.3'
     implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-lifecycle:3.0.3'
     implementation 'org.apache.shardingsphere.elasticjob:elasticjob-api:3.0.3'
-//
-//    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-spring-boot-starter:3.0.3'
 
+
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 

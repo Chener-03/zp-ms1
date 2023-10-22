@@ -2,10 +2,12 @@ package xyz.chener.zp.common.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,7 +36,7 @@ public class AuthFilter implements Filter {
 
     public static final String MICROSERVICE_CALL = "MICROSERVICE_CALL";
 
-    public AuthFilter(@Qualifier("commonConfig") CommonConfig commonConfig) {
+    public AuthFilter(CommonConfig commonConfig) {
         this.commonConfig = commonConfig;
     }
 

@@ -18,7 +18,7 @@ open class NotifyHeader : AbstractChainExecute(){
 
     override fun handle(param: Any?): Any? {
         if (param is NotifyParam){
-            return try {
+            try {
                 taskInfoService.ktQuery().eq(TaskInfo::jobName,param.jobName).one()?.let {
 
                     val taskMetadata = ObjectMapper().readValue(it.metadata, TaskMetadata::class.java)

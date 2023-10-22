@@ -1,16 +1,23 @@
 package xyz.chener.zp.task.core.listener
 
+import com.rabbitmq.client.Channel
 import org.apache.shardingsphere.elasticjob.infra.listener.ShardingContexts
 import org.apache.shardingsphere.elasticjob.lite.api.listener.AbstractDistributeOnceElasticJobListener
 import org.apache.zookeeper.CreateMode
 import org.apache.zookeeper.data.Stat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.amqp.rabbit.connection.ChannelListener
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
+import xyz.chener.zp.common.utils.Json
 import xyz.chener.zp.common.utils.chain.AbstractChainExecute
 import xyz.chener.zp.common.utils.chain.ChainStarter
 import xyz.chener.zp.task.config.TaskConfiguration
 import xyz.chener.zp.task.core.ZookeeperProxy
+import xyz.chener.zp.task.core.mq.MqConfig
+import xyz.chener.zp.task.core.mq.MqConfig.Companion.DEFAULT_TOPIC_EXCHANGE
 import xyz.chener.zp.task.core.notify.EmailNotify
 import xyz.chener.zp.task.core.notify.MessageNotify
 import xyz.chener.zp.task.core.notify.NotifyHeader
@@ -88,6 +95,10 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { it2 ->
                 NotifyParam(false,it.state == 3, it2)
             })
+
+
+            val rabbitTemplate  =ApplicationContextHolder.getApplicationContext().getBean(RabbitTemplate::class.java)
+            rabbitTemplate.convertAndSend(DEFAULT_TOPIC_EXCHANGE,MqConfig.TASK_END_KEY,Json.json(it))
         }
     }
 

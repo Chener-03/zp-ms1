@@ -48,16 +48,6 @@ open class TaskApplication {
                         println(sign)
             */
 
-
-            val tm = TaskMetadata()
-            tm.jobShardingCount = 2
-            tm.cron = "0/10 * * * * ?"
-            tm.taskNotify.notifyTime = NOTIFY_TIME.EXCEPTION + (NOTIFY_TIME.START + NOTIFY_TIME.END)
-            tm.taskNotify.notifyTypes = NOTIFY_TYPE.ZNX + NOTIFY_TYPE.EMAIL
-            tm.taskNotify.emails = listOf("541308303@qq.com")
-
-            val writeValueAsString = ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(tm)
-
             org.springframework.boot.runApplication<TaskApplication>(*args)
 
 

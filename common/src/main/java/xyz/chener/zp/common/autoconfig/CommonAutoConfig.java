@@ -65,10 +65,6 @@ public class CommonAutoConfig {
         return new Jwt(commonConfig);
     }
 
-    @Bean
-    public AuthFilter authFilter() {
-        return new AuthFilter(commonConfig);
-    }
 
     @Bean
     public AccessDeniedProcess accessDeniedProcess() {

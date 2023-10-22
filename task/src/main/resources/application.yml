@@ -41,6 +41,7 @@ spring:
       - optional:nacos:zp-actuator-config.yml?group=zp
       - optional:nacos:zp-mvc-normal?group=zp
       - optional:nacos:zp-redis-config.yml?group=zp
+      - optional:nacos:zp-rabbit-config?group=zp
   servlet:
     multipart:
       max-file-size: 1GB
@@ -56,10 +57,13 @@ spring:
       max-lifetime: 60000
       maximum-pool-size: 5
 
+
 server:
   port: 26314
   compression:
     enabled: true
+
+
 
 
 zp:

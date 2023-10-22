@@ -341,8 +341,8 @@ public class UserController {
     @GetMapping("/uuuutest")
     @WriteList
     @LimitResource("def")
-    public String uuuutest(){
-        return Thread.currentThread().getName();
+    public String uuuutest(HttpServletRequest request){
+        return Thread.currentThread().getName() + request.getRequestURI();
     }
 
 }

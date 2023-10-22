@@ -35,16 +35,13 @@ name={"org.springframework.boot.actuate.autoconfigure.security.servlet.Managemen
 public class SecurityConfig {
 
 
-    private final AuthFilter authFilter  ;
     private final CommonConfig commonConfig;
     private final AccessDeniedProcess accessDeniedProcess;
     private final EntryPointProcess entryPointProcess;
 
-    public SecurityConfig(AuthFilter authFilter
-            , CommonConfig commonConfig
+    public SecurityConfig(CommonConfig commonConfig
             , AccessDeniedProcess accessDeniedProcess
             , EntryPointProcess entryPointProcess) {
-        this.authFilter = authFilter;
         this.commonConfig = commonConfig;
         this.accessDeniedProcess = accessDeniedProcess;
         this.entryPointProcess = entryPointProcess;
@@ -74,7 +71,7 @@ public class SecurityConfig {
                 .sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(cfg -> cfg.requestMatchers(writeList).permitAll().anyRequest().authenticated())
                 .exceptionHandling(cfg -> cfg.authenticationEntryPoint(entryPointProcess)
-                        .accessDeniedHandler(accessDeniedProcess)).addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                        .accessDeniedHandler(accessDeniedProcess)).addFilterBefore(new AuthFilter(commonConfig), UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
