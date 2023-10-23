@@ -24,6 +24,8 @@ open class TaskShardingExecLog : Model<TaskShardingExecLog?>() {
     var errMessage: String? = null
     var startTime: Date? = null
     var endTime: Date? = null
+
+    var resultString: String? = null
 }
 
 

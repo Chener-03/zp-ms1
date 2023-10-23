@@ -6,11 +6,12 @@ import org.apache.shardingsphere.elasticjob.infra.listener.ElasticJobListener
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import xyz.chener.zp.common.utils.Md5Utiles
 import xyz.chener.zp.task.config.TaskConfiguration
 import xyz.chener.zp.task.entity.NOTIFY_TIME
 import xyz.chener.zp.task.entity.NOTIFY_TYPE
 import xyz.chener.zp.task.entity.TaskMetadata
-import java.util.ServiceLoader
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 
@@ -26,27 +27,22 @@ open class TaskApplication {
         @JvmStatic
         fun main(args: Array<String>) {
 
-            /*
+
 
                         val requestStr = """
-            {
-                "startTime": "2023-09-20 00:00:00",
-                "endTime": "2023-09-20 20:00:00",
-                "contractList": [
-                    "JNCYHT-LRF-0920001"
-                ],
-                "size": 10,
-                "page": 1
-            }
+                            {
+                                "startTime": "2023-09-12 10:00:00",
+                                "endTime": "2023-09-12 11:00:00"
+                            }
                         """.trimIndent()
                         val map: MutableMap<String, Any> = TreeMap()
-                        map["Kcwl-OpenApi-AppSecret"] = "sdfdsfsdfdsf435436546575b6776878"
+                        map["Kcwl-OpenApi-AppSecret"] = "misydj7fd27b04649892df521079s5g58"
                         map.putAll(ObjectMapper().readValue(requestStr, TreeMap::class.java) as Map<out String, Any>)
 
                         val sign: String = Md5Utiles.getStrMd5(ObjectMapper().writeValueAsString(map))
                         println(System.currentTimeMillis())
                         println(sign)
-            */
+
 
             org.springframework.boot.runApplication<TaskApplication>(*args)
 

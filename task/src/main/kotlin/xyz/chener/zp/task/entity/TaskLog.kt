@@ -26,5 +26,7 @@ open class TaskLog : Model<TaskLog?>() {
 
     //对应elasticjob日志表的taskid
     var taskId: String? = null
+
+    var resultString: String? = null
 }
 

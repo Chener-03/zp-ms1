@@ -5,6 +5,7 @@ allprojects{
 
     repositories {
         maven { name "Alibaba" ; url "https://maven.aliyun.com/repository/public" }
+        maven { name "sonatype" ; url "https://oss.sonatype.org/content/repositories/" }
         mavenCentral()
     }
 }

@@ -1,8 +1,11 @@
 package xyz.chener.zp.task.entity
 
 import com.baomidou.mybatisplus.annotation.IdType
+import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableId
+import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.extension.activerecord.Model
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler
 import jakarta.validation.constraints.NotEmpty
 
 
@@ -26,13 +29,15 @@ open class TaskInfo : Model<TaskInfo?>() {
     //执行器
     var taskHandle: String? = null
 
-    var load_task:Int? = null
+    var load_task: Int? = null
 
     //是否启用
     var enable: Int? = null
 
-    //触发类型  cron   手动  其它任务调用
-    var tiggerType: String? = null
+    //触发类型  cron   手动  其它任务调用 json
+    @TableField(typeHandler = JacksonTypeHandler::class)
+    var tiggerType: TiggerType? = null
+
 
     //元数据JSON  存储任务数据 如cron 参数等
     var metadata: String? = null

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.connection.ChannelListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
+import org.springframework.util.StreamUtils
+import org.springframework.util.StringUtils
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
 import xyz.chener.zp.common.utils.Json
 import xyz.chener.zp.common.utils.chain.AbstractChainExecute
@@ -88,15 +90,25 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
                 }
             }
 
+            //结果处理
+            var resultStr: String? = null
+            execList.forEach {ec->
+                if (StringUtils.hasText(ec.resultString)) {
+                    resultStr += ec.resultString
+                }
+            }
+            it.resultString = resultStr
+
             it.state = if (execList.map { it1->it1.state }.contains(TaskState.EXCEPTION.int))  TaskState.EXCEPTION.int else TaskState.FINISH.int
             it.endTime = Date()
             taskLogService.updateById(it)
 
+            // 任务状态通知
             ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { it2 ->
                 NotifyParam(false,it.state == 3, it2)
             })
 
-
+            // 执行依赖通知
             val rabbitTemplate  =ApplicationContextHolder.getApplicationContext().getBean(RabbitTemplate::class.java)
             rabbitTemplate.convertAndSend(DEFAULT_TOPIC_EXCHANGE,MqConfig.TASK_END_KEY,Json.json(it))
         }
