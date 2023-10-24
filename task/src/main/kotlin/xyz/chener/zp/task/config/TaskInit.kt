@@ -44,6 +44,9 @@ class TaskInit : CommandLineRunner {
 
     override fun run(vararg args: String?) {
 
+        if (1 == 1)
+            return
+
 
 
         val jobConfiguration = JobConfiguration

@@ -4,6 +4,9 @@ import com.alibaba.cloud.nacos.NacosDiscoveryProperties
 import com.alibaba.cloud.nacos.NacosServiceManager
 import com.alibaba.cloud.nacos.endpoint.NacosDiscoveryEndpoint
 import com.alibaba.nacos.api.naming.NamingFactory
+import com.github.pagehelper.Page
+import com.github.pagehelper.PageHelper
+import com.github.pagehelper.PageInfo
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
@@ -15,17 +18,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder
 import xyz.chener.zp.common.config.unifiedReturn.annotation.UnifiedReturn
 import xyz.chener.zp.common.entity.WriteList
+import xyz.chener.zp.common.entity.vo.PageParams
 import xyz.chener.zp.common.utils.NacosUtils
 import xyz.chener.zp.common.utils.SecurityUtils
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
 import xyz.chener.zp.task.core.listener.TaskExecContextListener
+import xyz.chener.zp.task.entity.TaskInfo
 import xyz.chener.zp.task.entity.ZooInstance
 import xyz.chener.zp.task.service.InstanceService
+import xyz.chener.zp.task.service.TaskInfoService
 import javax.sql.DataSource
 
 
@@ -44,6 +51,9 @@ open class TaskListController {
 
     @Autowired
     lateinit var instanceService: InstanceService
+
+    @Autowired
+    lateinit var taskInfoService: TaskInfoService
 
     @RequestMapping("/test")
     @WriteList
@@ -78,6 +88,12 @@ open class TaskListController {
     @WriteList
     open fun getOnlineInstance():List<ZooInstance>{
         return instanceService.getOnlineInstance()
+    }
+
+
+    @GetMapping("/getTaskLists")
+    open fun getTaskLists(@ModelAttribute taskInfo: TaskInfo,@ModelAttribute pageParams: PageParams):PageInfo<TaskInfo> {
+        taskInfoService.getTaskLists(taskInfo,pageParams,SecurityContextHolder.getContext().authentication.name)
     }
 
 

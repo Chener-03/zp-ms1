@@ -3,6 +3,7 @@ package xyz.chener.zp.task.service.impl
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.esotericsoftware.kryo.util.ObjectMap
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.pagehelper.PageInfo
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
@@ -10,6 +11,7 @@ import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cglib.core.ReflectUtils
 import org.springframework.stereotype.Service
+import xyz.chener.zp.common.entity.vo.PageParams
 import xyz.chener.zp.common.utils.AssertUrils
 import xyz.chener.zp.common.utils.ObjectUtils
 import xyz.chener.zp.task.core.SimpleJobHandleProxy
@@ -76,5 +78,8 @@ open class TaskInfoServiceImpl : ServiceImpl<TaskInfoDao, TaskInfo>(), TaskInfoS
     }
 
 
+    override fun getTaskLists(taskInfo: TaskInfo, pageParams: PageParams,username:String): PageInfo<TaskInfo> {
+
+    }
 }
 
