@@ -30,6 +30,7 @@ import xyz.chener.zp.common.utils.SecurityUtils
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
 import xyz.chener.zp.task.core.listener.TaskExecContextListener
 import xyz.chener.zp.task.entity.TaskInfo
+import xyz.chener.zp.task.entity.TaskInfoVo
 import xyz.chener.zp.task.entity.ZooInstance
 import xyz.chener.zp.task.service.InstanceService
 import xyz.chener.zp.task.service.TaskInfoService
@@ -92,8 +93,8 @@ open class TaskListController {
 
 
     @GetMapping("/getTaskLists")
-    open fun getTaskLists(@ModelAttribute taskInfo: TaskInfo,@ModelAttribute pageParams: PageParams):PageInfo<TaskInfo> {
-        taskInfoService.getTaskLists(taskInfo,pageParams,SecurityContextHolder.getContext().authentication.name)
+    open fun getTaskLists(@ModelAttribute taskInfo: TaskInfoVo, @ModelAttribute pageParams: PageParams):PageInfo<TaskInfoVo> {
+        return taskInfoService.getTaskLists(taskInfo,pageParams,SecurityContextHolder.getContext().authentication.name)
     }
 
 

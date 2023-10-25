@@ -5,8 +5,9 @@ import com.github.pagehelper.PageInfo
 import org.springframework.web.bind.annotation.ModelAttribute
 import xyz.chener.zp.common.entity.vo.PageParams
 import xyz.chener.zp.task.entity.TaskInfo
+import xyz.chener.zp.task.entity.TaskInfoVo
 
 
 interface TaskInfoService : IService<TaskInfo> {
-    fun getTaskLists(taskInfo: TaskInfo, pageParams: PageParams,username:String): PageInfo<TaskInfo>
+    fun getTaskLists(taskInfo: TaskInfoVo, pageParams: PageParams, username:String): PageInfo<TaskInfoVo>
 }

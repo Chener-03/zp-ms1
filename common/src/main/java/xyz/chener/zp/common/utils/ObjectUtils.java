@@ -1,15 +1,12 @@
 package xyz.chener.zp.common.utils;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.common.entity.SFunction;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -106,22 +103,52 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
      * @param source
      * @param target
      */
-    public static void copyFields(Object source, Object target)
+    public static void copyFields(Object source, Object target,Class targetListClass)
     {
+        if (source == null || target == null) return;
+        if (source instanceof List list && target instanceof List list2 ) {
+            if (targetListClass != null){
+                list2.clear();
+                list.forEach(e -> {
+                    try {
+                        Object o = newInstance(targetListClass);
+                        copyObjFields(e, o);
+                        list2.add(o);
+                    } catch (Exception ignored) { }
+                });
+            }
+            return;
+        }
+        copyObjFields(source,target);
+    }
+
+    public static void copyFields(Object source, Object target){
+        copyFields(source,target,null);
+    }
+
+
+    /**
+     * 拷贝单个对象
+     * @param source
+     * @param target
+     */
+    public static void copyObjFields(Object source, Object target){
         if(source == null || target == null) return;
-        Class<?> clz2 = target.getClass();
-        Arrays.stream(source.getClass().getDeclaredFields()).forEach(e->{
-            try {
-                Field f = clz2.getDeclaredField(e.getName());
-                boolean targetAccess = f.canAccess(target);
-                boolean sourceAccess = e.canAccess(source);
-                f.setAccessible(true);
-                e.setAccessible(true);
-                f.set(target,e.get(source));
-                f.setAccessible(targetAccess);
-                e.setAccessible(sourceAccess);
-            }catch (Exception exception){}
-        });
+
+        if (source instanceof Map map || target instanceof Map map2){
+            copyMapFields(source,target);
+            return;
+        }
+        try {
+            BeanUtils.copyProperties(source,target);
+        }catch (Exception ignored){}
+    }
+
+    private static void copyMapFields(Object source,Object target){
+        if(source == null || target == null) return;
+        if(source instanceof Map map && target instanceof Map map2){
+            map2.putAll(map);
+        }
     }
 
 

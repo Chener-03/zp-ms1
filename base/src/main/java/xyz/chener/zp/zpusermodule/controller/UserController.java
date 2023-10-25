@@ -312,6 +312,18 @@ public class UserController {
     }
 
 
+    @PostMapping("/getUserBaseInfoByUserIds")
+    @PreAuthorize("hasAnyRole('microservice_call')")
+    public List<UserBase> getUserBaseInfoByUserIds(@RequestBody List<Long> userIds){
+        return userBaseService.lambdaQuery().in(UserBase::getId,userIds).list();
+    }
+
+
+
+
+    // ----------------------------------------------
+    // ------------------ TEST ----------------------
+
     @GetMapping("/getWsOnlineUsersForMsTest")
     @WriteList
     @Deprecated

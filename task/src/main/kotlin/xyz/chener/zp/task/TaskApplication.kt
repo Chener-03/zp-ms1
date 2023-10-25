@@ -2,24 +2,30 @@ package xyz.chener.zp.task
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.shardingsphere.elasticjob.infra.listener.ElasticJobListener
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfiguration
 import xyz.chener.zp.common.utils.Md5Utiles
 import xyz.chener.zp.task.config.TaskConfiguration
-import xyz.chener.zp.task.entity.NOTIFY_TIME
-import xyz.chener.zp.task.entity.NOTIFY_TYPE
-import xyz.chener.zp.task.entity.TaskMetadata
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 
 
-@org.springframework.boot.autoconfigure.SpringBootApplication//(excludeName = ["org.redisson.spring.starter.RedissonAutoConfiguration"])
+@org.springframework.boot.autoconfigure.SpringBootApplication
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(TaskConfiguration::class)
+@LoadBalancerClients(
+    LoadBalancerClient(
+        name = "zp-base-module",
+        configuration = [NormalLoadBalanceAutoConfiguration::class]
+    )
+)
 open class TaskApplication {
 
     companion object {
@@ -44,8 +50,7 @@ open class TaskApplication {
                         println(sign)
 
 
-            org.springframework.boot.runApplication<TaskApplication>(*args)
-
+            SpringApplication.run(TaskApplication::class.java, *args)
 
 //            ProcessBuilder().redirect
 

@@ -1,6 +1,5 @@
 package xyz.chener.zp.zpstoragecalculation;
 
-import com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +11,7 @@ import xyz.chener.zp.zpstoragecalculation.config.feign.loadbalance.LoadbalanceCo
 
 import java.util.UUID;
 
-@SpringBootApplication(exclude = {SentinelEndpointAutoConfiguration.class})
+@SpringBootApplication
 @EnableFeignClients
 @LoadBalancerClients({
         @LoadBalancerClient(name = "zp-storagecalculation-module",configuration = LoadbalanceConfig.class)

@@ -43,3 +43,10 @@ open class TaskInfo : Model<TaskInfo?>() {
     var metadata: String? = null
 
 }
+
+
+open class TaskInfoVo : TaskInfo(){
+    var orgName: String? = null
+
+    var createUserName: String? = null
+}
