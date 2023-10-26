@@ -2,7 +2,7 @@ package xyz.chener.zp.task.entity
 
 open class TiggerType {
 
-    var tiggerTypeEnum:TiggerTypeEnum = TiggerTypeEnum.NONE
+    var tiggerTypeEnum:Int = TiggerTypeEnum.NONE.ordinal
 
     var taskEndDepId:Long? = null
 

@@ -19,6 +19,8 @@ import xyz.chener.zp.task.core.SimpleJobHandleProxy
 import xyz.chener.zp.task.core.ZookeeperProxy
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
 import xyz.chener.zp.task.core.listener.TaskExecContextListener
+import xyz.chener.zp.task.entity.TiggerType
+import xyz.chener.zp.task.entity.TiggerTypeEnum
 import xyz.chener.zp.task.service.TaskInfoService
 import java.lang.reflect.Proxy
 import javax.sql.DataSource
@@ -43,6 +45,8 @@ class TaskInit : CommandLineRunner {
     lateinit var redissonClient: RedissonClient
 
     override fun run(vararg args: String?) {
+
+
 
         if (1 == 1)
             return

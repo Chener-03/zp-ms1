@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import xyz.chener.zp.common.utils.chain.AbstractChainExecute
 import xyz.chener.zp.task.entity.NOTIFY_TIME
 import xyz.chener.zp.task.entity.TaskInfo
+import xyz.chener.zp.task.entity.TaskLog
 import xyz.chener.zp.task.entity.TaskMetadata
 import xyz.chener.zp.task.service.TaskInfoService
 
@@ -21,18 +22,18 @@ open class NotifyHeader : AbstractChainExecute(){
             try {
                 taskInfoService.ktQuery().eq(TaskInfo::jobName,param.jobName).one()?.let {
 
-                    val taskMetadata = ObjectMapper().readValue(it.metadata, TaskMetadata::class.java)
+                    val taskMetadata = it.metadata!!
                     val nt = taskMetadata.taskNotify.notifyTime
                     if (param.isStart && NOTIFY_TIME.contains(NOTIFY_TIME.START.int,nt)){
-                        return taskMetadata.taskNotify
+                        return NotifyMetaData(param,param.taskLog,it,true)
                     }
 
                     if (param.isException && NOTIFY_TIME.contains(NOTIFY_TIME.EXCEPTION.int,nt)){
-                        return taskMetadata.taskNotify
+                        return NotifyMetaData(param,param.taskLog,it,false)
                     }
 
                     if (!param.isStart && NOTIFY_TIME.contains(NOTIFY_TIME.END.int,nt)){
-                        return taskMetadata.taskNotify
+                        return NotifyMetaData(param,param.taskLog,it,false)
                     }
                 }
                 return null
@@ -45,4 +46,19 @@ open class NotifyHeader : AbstractChainExecute(){
 }
 
 
-data class NotifyParam(val isStart:Boolean,val isException:Boolean ,val jobName:String)
+data class NotifyParam(val isStart:Boolean,val isException:Boolean ,val jobName:String,val taskLog: TaskLog)
+
+open class NotifyMetaData {
+    var notifyParam:NotifyParam
+    var taskLog:TaskLog
+    var taskInfo:TaskInfo
+    var start:Boolean
+
+    constructor(notifyParam: NotifyParam, taskLog: TaskLog, taskInfo: TaskInfo,start:Boolean) {
+        this.notifyParam = notifyParam
+        this.taskLog = taskLog
+        this.taskInfo = taskInfo
+        this.start = start
+    }
+}
+

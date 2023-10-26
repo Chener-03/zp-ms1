@@ -51,7 +51,7 @@ open class TaskInfoServiceImpl : ServiceImpl<TaskInfoDao, TaskInfo>(), TaskInfoS
     @Throws(RuntimeException::class)
     open fun getJobConfiguration(taskInfo: TaskInfo) : JobConfiguration {
         try {
-            val taskMetadata = ObjectMapper().readValue(taskInfo.metadata, TaskMetadata::class.java)
+            val taskMetadata = taskInfo.metadata!!
             val builder = JobConfiguration.newBuilder(taskInfo.jobName, taskMetadata.jobShardingCount)
             builder.cron(taskMetadata.cron)
             builder.jobParameter(taskMetadata.jobParam)

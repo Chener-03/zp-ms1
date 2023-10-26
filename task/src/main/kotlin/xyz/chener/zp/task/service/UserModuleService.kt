@@ -23,7 +23,7 @@ interface UserModuleService {
     @RequestMapping(value = ["/api/web/getUserOrgsByUsername"], method = [RequestMethod.GET])
     fun getUserOrgs(@RequestParam(value = "username") username: String?): List<OrgBase?>?
 
-    @RequestMapping(value = ["/api/web/getUserBaseInfoByUserIds"])
+    @RequestMapping(value = ["/api/web/getUserBaseInfoByUserIds"], method = [RequestMethod.POST])
     fun getUserBaseInfoByUserIds(@RequestBody userIds: List<Long?>?): List<UserBase>
 
 }

@@ -60,7 +60,12 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
         }
         taskLogService.save(taskLog)
 
-        ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { NotifyParam(true,false, it) })
+        Thread.ofVirtual().start {
+            ChainStarter.start(getNotifyAllProcessor()
+                , shardingContexts?.jobName?.let {
+                    NotifyParam(true,false, it,taskLog)
+                })
+        }
     }
 
 
@@ -104,9 +109,11 @@ class TaskExecContextListener : AbstractDistributeOnceElasticJobListener(0,0) {
             taskLogService.updateById(it)
 
             // 任务状态通知
-            ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { it2 ->
-                NotifyParam(false,it.state == 3, it2)
-            })
+            Thread.ofVirtual().start {
+                ChainStarter.start(getNotifyAllProcessor(), shardingContexts?.jobName?.let { it2 ->
+                    NotifyParam(false,it.state == 3, it2,it)
+                })
+            }
 
             // 执行依赖通知
             val rabbitTemplate  =ApplicationContextHolder.getApplicationContext().getBean(RabbitTemplate::class.java)

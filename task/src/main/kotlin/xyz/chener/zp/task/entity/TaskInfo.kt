@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.activerecord.Model
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler
 import jakarta.validation.constraints.NotEmpty
 
-
+@TableName(autoResultMap = true)
 open class TaskInfo : Model<TaskInfo?>() {
 
     @TableId(type = IdType.ASSIGN_ID)
@@ -29,7 +29,7 @@ open class TaskInfo : Model<TaskInfo?>() {
     //执行器
     var taskHandle: String? = null
 
-    var load_task: Int? = null
+    var loadTask: Int? = null
 
     //是否启用
     var enable: Int? = null
@@ -40,7 +40,8 @@ open class TaskInfo : Model<TaskInfo?>() {
 
 
     //元数据JSON  存储任务数据 如cron 参数等
-    var metadata: String? = null
+    @TableField(typeHandler = JacksonTypeHandler::class)
+    var metadata: TaskMetadata? = null
 
 }
 
