@@ -103,7 +103,6 @@ open class TaskListController {
     @PostMapping("/saveTaskInfo")
     open fun saveTaskInfo(@RequestBody taskInfo:TaskInfoVo):Boolean {
 
-
         return true
     }
 

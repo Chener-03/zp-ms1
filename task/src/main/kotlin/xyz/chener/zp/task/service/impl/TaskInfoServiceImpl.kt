@@ -8,18 +8,22 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cglib.core.ReflectUtils
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.util.CollectionUtils
 import org.springframework.util.StringUtils
 import xyz.chener.zp.common.entity.vo.PageParams
 import xyz.chener.zp.common.utils.AssertUrils
 import xyz.chener.zp.common.utils.ObjectUtils
+import xyz.chener.zp.common.utils.SecurityUtils
 import xyz.chener.zp.task.core.SimpleJobHandleProxy
 import xyz.chener.zp.task.core.listener.TaskExecContextListener
 import xyz.chener.zp.task.dao.TaskInfoDao
@@ -28,6 +32,7 @@ import xyz.chener.zp.task.entity.TaskInfoVo
 import xyz.chener.zp.task.entity.TaskMetadata
 import xyz.chener.zp.task.entity.enums.TaskType
 import xyz.chener.zp.task.error.LoadTaskError
+import xyz.chener.zp.task.error.NoAuthModifyTaskError
 import xyz.chener.zp.task.error.TaskNotFoundError
 import xyz.chener.zp.task.error.UserNoOrgErrpr
 import xyz.chener.zp.task.service.TaskInfoService
@@ -116,13 +121,38 @@ open class TaskInfoServiceImpl : ServiceImpl<TaskInfoDao, TaskInfo>(), TaskInfoS
         }.distinct().toList()
         val infoByUserIds = userModuleService.getUserBaseInfoByUserIds(userIds)
 
+        val shardingStatisticsAPIImpl = ShardingStatisticsAPIImpl(zookeeperRegistryCenter)
+        val jobStatisticsAPI = JobStatisticsAPIImpl(zookeeperRegistryCenter)
+
         res.forEach {
             it.orgName = userOrgs?.stream()?.filter { org -> org?.id == it.orgId }?.findFirst()?.orElse(null)?.orgChName
             it.createUserName = infoByUserIds.stream().filter { user -> user?.id == it.createUserId }?.findFirst()?.orElse(null)?.username
+
+            jobStatisticsAPI.runCatching { this.getJobBriefInfo(it.jobName) }.onSuccess { jobInfo ->
+                it.status = jobInfo?.status?.ordinal
+                shardingStatisticsAPIImpl.runCatching { this.getShardingInfo(it.jobName) }.onSuccess {sis ->
+                    it.nodes.addAll(sis)
+                }
+            }
         }
 
         return PageInfo(res)
     }
 
+
+    override fun saveTaskInfo(taskInfo: TaskInfoVo): Boolean {
+        return if (taskInfo.id == null){
+            SecurityUtils.currentUser()?.let {
+                taskInfo.createUserId = it.userId
+            }
+            taskInfo.orgId = userModuleService.getUserOrgs(SecurityContextHolder.getContext().authentication.name)?.stream()?.findFirst()?.orElse(null)?.id
+            save(taskInfo)
+        }else {
+            SecurityUtils.currentUser()?.let {
+                AssertUrils.state(ObjectUtils.nullSafeEquals(it.userId,taskInfo.createUserId), NoAuthModifyTaskError::class.java)
+            }
+            updateById(taskInfo)
+        }
+    }
 }
 

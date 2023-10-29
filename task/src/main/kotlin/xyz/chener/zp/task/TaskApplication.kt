@@ -1,6 +1,8 @@
 package xyz.chener.zp.task
 
 
+import com.alibaba.nacos.api.NacosFactory
+import com.alibaba.nacos.api.naming.pojo.Instance
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -12,20 +14,18 @@ import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfig
 import xyz.chener.zp.common.utils.Md5Utiles
 import xyz.chener.zp.task.config.TaskConfiguration
 import java.util.*
-import kotlin.reflect.KClass
-import kotlin.reflect.full.functions
 
 
 @org.springframework.boot.autoconfigure.SpringBootApplication
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(TaskConfiguration::class)
-@LoadBalancerClients(
+/*@LoadBalancerClients(
     LoadBalancerClient(
         name = "zp-base-module",
         configuration = [NormalLoadBalanceAutoConfiguration::class]
     )
-)
+)*/
 open class TaskApplication {
 
     companion object {
@@ -33,9 +33,29 @@ open class TaskApplication {
         @JvmStatic
         fun main(args: Array<String>) {
 
+            val properties = Properties()
+            properties["serverAddr"] = "101.42.12.133:8848"
+            properties["namespace"] = "1379388b-aed1-4082-8ed2-54699a4cc9d4"
+            properties["group"] = "zp"
+            properties["username"] = "nacos"
+            properties["password"] = "nacos123456"
 
 
-                        val requestStr = """
+//            val namingService = NacosFactory.createNamingService(properties)
+
+//            namingService.registerInstance("fuck","zp", Instance().also {
+//                it.ip = "1.1.1.2"
+//                it.clusterName = "fuckname"
+//                it.port = 1299
+//                it.metadata["label"] = "test"
+//            })
+
+//            val allInstances = namingService.getAllInstances("zp-base-module","zp")
+//            namingService.selectOneHealthyInstance()
+
+//            Thread.sleep(10000010);
+
+            val requestStr = """
                             {
                                 "startTime": "2023-09-12 10:00:00",
                                 "endTime": "2023-09-12 11:00:00"
@@ -80,16 +100,6 @@ open class TaskApplication {
 
 
             connector.close()*/
-        }
-
-
-        private fun getFunSignature(clazz:KClass<*>, funName:String) : Array<String> {
-            val kFunction = clazz.functions.find { it.name == funName } ?: return arrayOf()
-            return kFunction.parameters.filter {
-                it.kind.name == "VALUE"
-            }.map {
-                it.type.toString()
-            }.toTypedArray()
         }
 
     }

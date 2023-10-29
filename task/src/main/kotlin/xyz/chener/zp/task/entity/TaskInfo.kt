@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.extension.activerecord.Model
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler
 import jakarta.validation.constraints.NotEmpty
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.domain.ShardingInfo
 
 @TableName(autoResultMap = true)
 open class TaskInfo : Model<TaskInfo?>() {
@@ -50,4 +51,9 @@ open class TaskInfoVo : TaskInfo(){
     var orgName: String? = null
 
     var createUserName: String? = null
+
+    var status: Int? = null
+
+    var nodes: MutableList<ShardingInfo> = ArrayList()
+
 }

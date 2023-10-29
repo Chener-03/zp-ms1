@@ -4,7 +4,9 @@ package xyz.chener.zp.task.core.mq
 import org.springframework.amqp.core.*
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
-import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -18,8 +20,16 @@ open class MqConfig {
         const val DEFAULT_TOPIC_EXCHANGE = "amq.topic"
     }
 
-    @Bean
-    fun simpleRabbitListenerContainerFactory(connectionFactory: ConnectionFactory?): SimpleRabbitListenerContainerFactory {
+
+    @Bean(name = ["rabbitListenerContainerFactory"])
+    @ConditionalOnMissingBean(name = ["rabbitListenerContainerFactory"])
+    @ConditionalOnProperty(
+        prefix = "spring.rabbitmq.listener",
+        name = ["type"],
+        havingValue = "simple",
+        matchIfMissing = true
+    )
+    fun rabbitListenerContainerFactory(connectionFactory: ConnectionFactory?): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL)

@@ -11,6 +11,7 @@ import xyz.chener.zp.common.config.auth2fa.Auth2FaRegister;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
+import xyz.chener.zp.common.config.loadbalance.TagLoadBalancerClientConfiguration;
 import xyz.chener.zp.common.config.nacosMetadataReg.NacosMetadataRegister;
 import xyz.chener.zp.common.config.okhttpclient.HttpClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpRequestInterfaceInject;
@@ -43,7 +44,8 @@ import xyz.chener.zp.common.utils.NacosUtils;
         , NacosMetadataRegister.class
         , RequestUrlBeanDefinitionIterator.class
         , HttpClientConfig.class
-        , ServletVitureThreadPoolAutoConfiguration.class})
+        , ServletVitureThreadPoolAutoConfiguration.class
+        , TagLoadBalancerClientConfiguration.class})
 public class CommonAutoConfig {
 
     private final CommonConfig commonConfig;

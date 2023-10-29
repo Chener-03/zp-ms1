@@ -47,18 +47,18 @@ class TaskInit : CommandLineRunner {
     override fun run(vararg args: String?) {
 
 
-
-        if (1 == 1)
-            return
+//
+//        if (1 == 1)
+//            return
 
 
 
         val jobConfiguration = JobConfiguration
-            .newBuilder("test12", 2)
+            .newBuilder("test12", 1)
             .cron("0/10 * * * * ?")
             .jobParameter("123")
 //            .shardingItemParameters("0=A")
-            .addExtraConfigurations(TracingConfiguration("RDB",dataSource))
+//            .addExtraConfigurations(TracingConfiguration("RDB",dataSource))
             .description("测试任务")
             .overwrite(true)
             .disabled(true)
@@ -103,7 +103,21 @@ class TaskInit : CommandLineRunner {
         val serversTotalCount = ServerStatisticsAPIImpl(zookeeperRegistryCenter).serversTotalCount
         val allServersBriefInfo = ServerStatisticsAPIImpl(zookeeperRegistryCenter).allServersBriefInfo
 
-        val jobBriefInfo = JobStatisticsAPIImpl(zookeeperRegistryCenter).getJobBriefInfo(jobConfiguration.jobName)
+
+//        JobOperateAPIImpl(zookeeperRegistryCenter).shutdown(jobConfiguration.jobName,null)
+
+        Thread.ofVirtual().start {
+            while (true){
+                Thread.sleep(1000)
+                try {
+                    val jobBriefInfo = ShardingStatisticsAPIImpl(zookeeperRegistryCenter).getShardingInfo(jobConfiguration.jobName)
+                    jobBriefInfo.forEach{
+                        println("${it.instanceId}  ${it.item}   ${it.serverIp}   ${it.status.name}")
+                    }
+                }catch (_:Exception){
+                }
+            }
+        }
 
 //        val shardingInfo = ShardingStatisticsAPIImpl(zookeeperRegistryCenter).getShardingInfo(jobConfiguration.jobName)
 

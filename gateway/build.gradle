@@ -29,12 +29,6 @@ dependencies {
 
     implementation 'com.auth0:java-jwt:4.0.0'
 
-
-//    implementation ('com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'){
-//        exclude group: 'com.alibaba.csp', module: 'sentinel-transport-simple-http'
-//    }
-/*    implementation 'com.alibaba.csp:sentinel-datasource-nacos'
-    implementation 'com.alibaba.csp:sentinel-datasource-extension'*/
     implementation 'com.alibaba.cloud:spring-cloud-alibaba-sentinel-gateway'
 
 

@@ -51,10 +51,12 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
 
 
-    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-core:3.0.3'
-    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-http-executor:3.0.3'
-    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-lifecycle:3.0.3'
-    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-api:3.0.3'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-core:3.0.4'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-http-executor:3.0.4'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-lite-lifecycle:3.0.4'
+    implementation 'org.apache.shardingsphere.elasticjob:elasticjob-api:3.0.4'
+    implementation 'org.yaml:snakeyaml:2.2'
+
 
 
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
