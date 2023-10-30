@@ -87,7 +87,7 @@ class TaskInit : CommandLineRunner {
 
 
 
-        JobOperateAPIImpl(zookeeperRegistryCenter).enable(jobConfiguration.jobName,null)
+//        JobOperateAPIImpl(zookeeperRegistryCenter).enable(jobConfiguration.jobName,null)
 
 
 /*

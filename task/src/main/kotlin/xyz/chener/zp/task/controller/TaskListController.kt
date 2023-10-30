@@ -95,8 +95,10 @@ open class TaskListController {
 
 
     @GetMapping("/getTaskLists")
+    @WriteList
     open fun getTaskLists(@ModelAttribute taskInfo: TaskInfoVo, @ModelAttribute pageParams: PageParams):PageInfo<TaskInfoVo> {
-        return taskInfoService.getTaskLists(taskInfo,pageParams,SecurityContextHolder.getContext().authentication.name)
+        return taskInfoService.getTaskLists(taskInfo,pageParams,"lubw")
+//        return taskInfoService.getTaskLists(taskInfo,pageParams,SecurityContextHolder.getContext().authentication.name)
     }
 
 
