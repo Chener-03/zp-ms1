@@ -1,28 +1,23 @@
 package xyz.chener.zp.task.config
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration
-import org.apache.shardingsphere.elasticjob.api.ShardingContext
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.JobStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ServerStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.statistics.ShardingStatisticsAPIImpl
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter
-import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob
-import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration
 import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import xyz.chener.zp.common.entity.PublicEnum
-import xyz.chener.zp.task.core.SimpleJobHandleProxy
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.Validator
 import xyz.chener.zp.task.core.ZookeeperProxy
 import xyz.chener.zp.task.core.jobs.TestSimpleJob
 import xyz.chener.zp.task.core.listener.TaskExecContextListener
-import xyz.chener.zp.task.entity.TiggerType
-import xyz.chener.zp.task.entity.TiggerTypeEnum
+import xyz.chener.zp.task.entity.TaskInfo
 import xyz.chener.zp.task.service.TaskInfoService
-import java.lang.reflect.Proxy
 import javax.sql.DataSource
 
 
@@ -44,7 +39,16 @@ class TaskInit : CommandLineRunner {
     @Autowired
     lateinit var redissonClient: RedissonClient
 
+
+    @Autowired
+    @Lazy
+    private val validator: Validator? = null
+
     override fun run(vararg args: String?) {
+        val t = TaskInfo()
+
+        var bindingResult =   BeanPropertyBindingResult(t,TaskInfo::class.java.name);
+        validator?.validate(t, bindingResult);
 
 
 //

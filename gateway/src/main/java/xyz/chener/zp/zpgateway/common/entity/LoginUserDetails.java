@@ -2,9 +2,6 @@ package xyz.chener.zp.zpgateway.common.entity;
 
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @Author: chenzp
  * @Date: 2023/01/11/13:47

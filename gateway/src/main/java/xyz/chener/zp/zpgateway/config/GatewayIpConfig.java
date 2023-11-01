@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -36,6 +37,9 @@ public class GatewayIpConfig {
     public GatewayIpConfig(@Qualifier("gatewayCostomProperties") GatewayCostomProperties gatewayCostomProperties) {
         this.gatewayCostomProperties = gatewayCostomProperties;
     }
+
+    @Autowired
+    LoadBalancerClientFactory loadBalancerClientFactory;
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE-100)

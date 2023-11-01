@@ -1,8 +1,6 @@
 package xyz.chener.zp.zpgateway.logger.logback.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Data;
 
 import java.util.Date;
 

@@ -12,6 +12,5 @@ public class ZpGatewayApplication {
     public static void main(String[] args) {
         System.setProperty("csp.sentinel.log.output.type","console");
         SpringApplication.run(ZpGatewayApplication.class, args);
-
     }
 }

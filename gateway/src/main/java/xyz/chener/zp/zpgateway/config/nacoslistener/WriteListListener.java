@@ -1,36 +1,14 @@
 package xyz.chener.zp.zpgateway.config.nacoslistener;
 
-import com.alibaba.nacos.api.NacosFactory;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.listener.Event;
-import com.alibaba.nacos.api.naming.listener.EventListener;
-import com.alibaba.nacos.api.naming.listener.NamingEvent;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.cloud.endpoint.event.RefreshEvent;
-import org.springframework.cloud.endpoint.event.RefreshEventListener;
-import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteDefinition;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component

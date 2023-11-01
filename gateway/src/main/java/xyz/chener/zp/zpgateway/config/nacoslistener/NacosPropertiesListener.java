@@ -20,7 +20,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -19,7 +19,6 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import xyz.chener.zp.zpgateway.logger.logback.LogPushEsAppender;
