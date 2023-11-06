@@ -13,14 +13,14 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfiguration;
+import xyz.chener.zp.common.config.feign.loadbalance.GenericLoadBalanceConfiguration;
 
 @SpringBootApplication
 @EnableFeignClients
 @EnableDiscoveryClient
 @EnableTransactionManagement
 @LoadBalancerClients({
-        @LoadBalancerClient(name = "zp-base-module",configuration = NormalLoadBalanceAutoConfiguration.class)
+        @LoadBalancerClient(name = "zp-base-module",configuration = GenericLoadBalanceConfiguration.class)
 })
 @Configuration
 public class BaseApplication {

@@ -4,13 +4,16 @@ package xyz.chener.zp.task
 import com.alibaba.nacos.api.NacosFactory
 import com.alibaba.nacos.api.naming.pojo.Instance
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.ObjectProvider
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import xyz.chener.zp.common.config.feign.loadbalance.NormalLoadBalanceAutoConfiguration
+import xyz.chener.zp.common.config.feign.loadbalance.GenericLoadBalanceConfiguration
 import xyz.chener.zp.common.utils.Md5Utiles
 import xyz.chener.zp.task.config.TaskConfiguration
 import java.net.URLDecoder
@@ -25,13 +28,14 @@ import java.util.*
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableConfigurationProperties(TaskConfiguration::class)
-/*@LoadBalancerClients(
+@LoadBalancerClients(
     LoadBalancerClient(
         name = "zp-base-module",
-        configuration = [NormalLoadBalanceAutoConfiguration::class]
+        configuration = [GenericLoadBalanceConfiguration::class]
     )
-)*/
+)
 open class TaskApplication {
+
 
     companion object {
 

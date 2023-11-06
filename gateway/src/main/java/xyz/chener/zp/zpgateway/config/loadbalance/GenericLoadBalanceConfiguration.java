@@ -1,8 +1,7 @@
-package xyz.chener.zp.common.config.feign.loadbalance;
+package xyz.chener.zp.zpgateway.config.loadbalance;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.loadbalancer.core.ReactorLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
@@ -10,16 +9,15 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
-import java.util.List;
 
-public class NormalLoadBalanceAutoConfiguration {
 
+public class GenericLoadBalanceConfiguration {
 
     @Bean
     public ReactorLoadBalancer<ServiceInstance> reactorServiceInstanceLoadBalancer(Environment environment,
                                                                                    LoadBalancerClientFactory loadBalancerClientFactory) {
         String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-        return new NormalLoadBalance(
+        return new LoadBalanceDispatch(
                 loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
     }
 }

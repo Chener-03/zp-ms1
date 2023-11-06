@@ -33,6 +33,7 @@ spring:
       enabled: false
 
 
+
   config:
     import:
       - optional:nacos:zp-gateway-config.yml?group=zp
@@ -59,3 +60,4 @@ zp:
         data-id: gateway-sentinel-degrade.json
         data-type: json
         rule-type: degrade
+

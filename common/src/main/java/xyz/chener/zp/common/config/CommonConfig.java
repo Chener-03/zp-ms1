@@ -28,6 +28,15 @@ public class CommonConfig {
 
     private Boolean enableServletVitureThread = true;
 
+    private String instanceTag = null;
+
+    public String getInstanceTag() {
+        return instanceTag;
+    }
+
+    public void setInstanceTag(String instanceTag) {
+        this.instanceTag = instanceTag;
+    }
 
     public MybatisCache getMybatisCache() {
         return mybatisCache;

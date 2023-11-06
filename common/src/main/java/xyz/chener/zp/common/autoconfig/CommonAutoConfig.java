@@ -10,6 +10,7 @@ import xyz.chener.zp.common.config.antiShaking.aop.AntiShakingAop;
 import xyz.chener.zp.common.config.ctx.ApplicationContextHolder;
 import xyz.chener.zp.common.config.dynamicVerification.aop.DynamicVerAop;
 import xyz.chener.zp.common.config.feign.FeignClientConfig;
+import xyz.chener.zp.common.config.grayscalePublishing.GrayscalePublishTagRegister;
 import xyz.chener.zp.common.config.nacosMetadataReg.NacosMetadataRegister;
 import xyz.chener.zp.common.config.okhttpclient.HttpClientConfig;
 import xyz.chener.zp.common.config.okhttpclient.HttpRequestInterfaceInject;
@@ -39,6 +40,7 @@ import xyz.chener.zp.common.utils.NacosUtils;
         , HttpRequestInterfaceInject.class
         , NacosMetadataRegister.class
         , RequestUrlBeanDefinitionIterator.class
+        , GrayscalePublishTagRegister.class
         , HttpClientConfig.class
         , ServletVitureThreadPoolAutoConfiguration.class })
 public class CommonAutoConfig {

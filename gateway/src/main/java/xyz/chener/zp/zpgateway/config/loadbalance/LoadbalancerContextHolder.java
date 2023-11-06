@@ -2,7 +2,7 @@ package xyz.chener.zp.zpgateway.config.loadbalance;
 
 
 public class LoadbalancerContextHolder {
-    private static final ThreadLocal<ServerInstance> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<ServerInstance> threadLocal = new InheritableThreadLocal<>();
 
     public static ServerInstance setNextInstance(ServerInstance instance)
     {

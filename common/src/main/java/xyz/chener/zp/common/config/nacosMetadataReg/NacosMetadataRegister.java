@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import xyz.chener.zp.common.config.auth2fa.Auth2FaRegister;
+import xyz.chener.zp.common.config.grayscalePublishing.GrayscalePublishTagRegister;
 import xyz.chener.zp.common.config.writeList.WriteListRegister;
 
 import java.util.*;
@@ -17,9 +18,10 @@ public class NacosMetadataRegister {
 
     public static final List<MetatadaRegInterface> metatadaRegInterfaceList = new ArrayList<>();
 
-    public NacosMetadataRegister(){
+    public NacosMetadataRegister(GrayscalePublishTagRegister grayscalePublishTagRegister) {
         metatadaRegInterfaceList.add(WriteListRegister.getInstance());
         metatadaRegInterfaceList.add(Auth2FaRegister.getInstance());
+        metatadaRegInterfaceList.add(grayscalePublishTagRegister);
     }
 
     @Bean(name = "xyz.chener.zp.common.config.nacosMetadataReg.NacosMetadataRegister.nacosWatch")
